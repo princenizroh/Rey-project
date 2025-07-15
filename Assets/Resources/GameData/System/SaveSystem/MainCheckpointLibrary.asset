@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49dc6fb6ef599034488926bf9b56ada5, type: 3}
+  m_Name: MainCheckpointLibrary
+  m_EditorClassIdentifier: 
+  id: 
+  allCheckpoints:
+  - {fileID: 11400000, guid: 9946c6e78cfb7684e8363ab40d941084, type: 2}
+  - {fileID: 11400000, guid: 7554509441a635f4588900e36f8f412a, type: 2}
+  - {fileID: 11400000, guid: edeb83287180681409ad8a9b218286cf, type: 2}
+  - {fileID: 11400000, guid: cb6e5fdb59535f643ae66aa4c86a480d, type: 2}
+  - {fileID: 11400000, guid: 78c55b18a2b4e7d4c92ae3e1d6509b7e, type: 2}
+  - {fileID: 11400000, guid: 26b246bde874779419e7f3f266393bb4, type: 2}
+  - {fileID: 11400000, guid: 703bab07ee828044595dc41be0f0145f, type: 2}
+  - {fileID: 11400000, guid: 800a3d850f271d748adcbdfea59e5554, type: 2}
+  defaultStartingCheckpoint: {fileID: 11400000, guid: 9946c6e78cfb7684e8363ab40d941084, type: 2}
+  libraryName: Main Checkpoint Library
+  description: Collection of all checkpoints in the game

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60c3ecd41d4056f40aec6abd56fa98c8, type: 3}
+  m_Name: SS_Area-3
+  m_EditorClassIdentifier: 
+  id: 
+  checkpointName: SS Area-3
+  description: 
+  spawnPosition: {x: 227.67001, y: 1.23, z: 30.739998}
+  spawnRotation: {x: -0, y: 0, z: 0}
+  sceneName: Level-1
+  saveAudioData: {fileID: 0}
+  areaName: Lobi
+  lastSavePlayTime: 181.74402
+  lastSaveDateTime: 2025-07-14 16:30:09

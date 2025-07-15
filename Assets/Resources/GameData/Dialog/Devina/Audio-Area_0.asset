@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d4f200e077cbbb4286ff78870a34d60, type: 3}
+  m_Name: Audio-Area_0
+  m_EditorClassIdentifier: 
+  id: audio-area_0
+  dialogLines:
+  - id: 0
+    speakerName: Devina
+    text: Rara... kamu merepotkanku, cuma buat nyariin kamu
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 1
+    speakerName: Devina
+    text: Rara, kamu di mana sih...
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 2
+    speakerName: Devina
+    text: Ihh, bau banget sampahnya. Mau muntah rasanya
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 3
+    speakerName: Devina
+    text: Doc Hudson?? Itu anda??
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 4
+    speakerName: Devina
+    text: Oh... sepertinya di sana jalan keluarnya
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 5
+    speakerName: Devina
+    text: Di mana jalan keluarnya ya...
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 6
+    speakerName: Devina
+    text: Tempat ini... seram sekali. Bulu kudukku merinding...
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 7
+    speakerName: Devina
+    text: Rara...? Kamu di sini?
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 8
+    speakerName: Devina
+    text: Kenapa hawanya dingin banget... ini nggak enak...
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 9
+    speakerName: Devina
+    text: Astaga... suara apa itu? Jangan-jangan Rara?
+    voiceClip: {fileID: 0}
+    duration: 3
+  - id: 10
+    speakerName: Devina
+    text: Tenang, Devina. Nggak boleh panik... fokus cari dia.
+    voiceClip: {fileID: 0}
+    duration: 3
+  oneTimePlay: 1
