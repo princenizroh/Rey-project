@@ -792,4 +792,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dce90e8573e8b14d88dd9e271631aac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcDialogNene: {fileID: 3981284733392907837, guid: 031ab429f1959bc4dbf38df63bb1d977, type: 3}
