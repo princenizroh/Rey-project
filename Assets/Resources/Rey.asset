@@ -1,0 +1,723 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
+  m_Name: Rey
+  m_EditorClassIdentifier: 
+  coreBlock:
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Dunia yang gelap aku selalu merasakan kehangatan"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Aku selalu mendengar suara detak jantung yang selalu menenangkanku"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Suara asing dari seseorang yang tidak aku kenal..."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Dan itu adalah ibuku"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Suara Ibuku teredam, seperti musik dari kejauhan"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Aku mengambang, tubuhku ringan, dan semua kebutuhanku"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Sampai suatu ketika duniaku yang nyaman mulai mendorongku"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Rasa ini yang tidak aku kenal"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Dingin.. Sakit.. Terang.. Sesak.."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "[Sound: Oek oek oek]"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Lihat kepalanya sudah muncul"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Selamat ya bu anaknya perempuan"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Sayang kamu berhasil"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Aku mau mati rasanya"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Ibu nanti pola makannya diperhatikan ya"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Usahakan makan makanan bergizi dan minum air putih yang banyak"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Ini penting untuk membantu produksi ASI Ibu"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Nanti akan ada pendarahan nifas, seperti haid tapi lebih banyak di awal"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Area jalan lahir mungkin akan terasa nyeri atau tidak nyaman"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Jaga area tersebut tetap bersih dan kering"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Ketika bayi sedang tidur, segeralah Ibu tidur istirahat yang cukup adalah obat terbaik untuk pemulihan Ibu"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Baik bidan"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Suara ini.."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Rasa ini begitu hangat"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "[Keadaan: Sang anak membuka matanya. Keadaan dari gelap menjadi terang]"
+      choices:
+      - playerChoice: "Membuka mata"
+        npcResponse: "continue"
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Lihat dia membuka matanya"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Ihh... lucu sekali"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Iya ya dia mulai membuka matanya"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Halo nak ini ayah"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Dan ini ibumu"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah.. Ibu.."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Lapar.."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "[Keadaan: Sang anak merasa lapar]"
+      choices:
+      - playerChoice: "Mengeluarkan suara \"Neh\" yang menandakan lapar"
+        npcResponse: "choice_a_hunger"
+      - playerChoice: "Menangis keras"
+        npcResponse: "choice_b_hunger"
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Dia mengeluarkan suara, apa yang dia butuhkan"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Itu tandanya dia butuh ASI"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Tanda seperti itu menandakan dia sedang lapar"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Sayang, beri dia ASI"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Iya sayang"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Kenapa anak ini menangis? Berisik sekali..."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Kalau anaknya menangis terus itu tandanya dia butuh sesuatu ibu"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Karena bayinya baru lahir sepertinya anaknya sedang lapar"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Ibu bisa beri ASI untuk kebutuhan bayinya"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Iya deh daripada berisik terus"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Tuh sayang bayinya berhenti menangis"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: iya sudah berenti, kupikir akan mendengar bayi ini menangis setiap hari"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Kamu akan mendengar bayi ini menangis setiap hari jika kamu tidak menenangkannya"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Aku sungguh tidak kuat"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Bagaimana dengan makanannya"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Cukup ASI saja sayang"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Untuk makanannya bisa dari ASI atau susu formula"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Susu formula?"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Iya bu, di hari-hari pertama ini perut bayi masih sangat kecil, sekecil kelereng"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Jadi, kolostrum atau ASI pertama yang kental dan kekuningan yang keluar sedikit itu sudah sangat cukup dan penuh dengan antibodi"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Untuk susu formula ada tahap tahapannya ibu"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Pertama, sebelum membuat susu tangan harus dicuci bersih. Semua peralatan, dari botol sampai dotnya, harus disterilkan."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Kedua, takarannya harus sempurna. Harus mengikuti petunjuk yang di kaleng. Jangan dikurangi atau dilebihkan, karena bisa membenai ginjal bayi yang masih mungil"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Ketiga, air dan suhunya harus hangat. Jangan pakai air panas mendidih, karena bisa merusak vitamin di dalam susu"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Keempat, cara memberikannya. Saat menyusu, dekap si kecil dengan posisi kepala sedikit lebih tinggi. Miringkan botolnya agar dot terisi penuh susu, bukan udara, untuk mengurangi risiko kembung"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Kelima, kenali tanda kenyang dan selalu sendawakan. Kalau bayi sudah berhenti menghisap atau mendoro dot, artinya dia sudah cukup."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Setelah itu, wajib disendawakan agar udara yang tertelan bisa keluar"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Susui bayi sesering yang dia mau, tidak perlu dijadwal"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Tandanya lapar itu kalau dia mulai gelisah. Jangan tunggu sampai dia menangis kencang, karena itu tanda lapar yang sudah terlambat"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Dan juga bayi baru lahir akan sering buang air kecil dan besar. Ini tandanya dia cukup minum. Rajin-rajin dicek dan diganti ya, Bu, supaya kulitnya tidak iritasi."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Lalu, untuk beberapa hari ke depan perasaan ibu mungkin akan campur aduk. Kadang sangat bahagia, kadang bisa tiba-tiba sedih."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Ini wajar, namanya baby blues karena perubahan hormon. Jangan dipendam sendiri, ceritakan pada suami"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Bidan: Nanti jika butuh bantuan, jangan ragu hubungi saya atau segera ke fasilitas kesehatan ya ibu"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Baik bidan"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Sayang, kira kira namanya mau dipanggil siapa"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Ayah sudah menyimpan nama untuk anak kita"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Apa itu sayang"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Namanya Gabungan dari nama kita berdua."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Rey Isayat Putri"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Kenapa begitu?"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Nama Rey, Ayah ambil dari namamu Linda Rey Putri sebagai pengigat abadi dari ibu hebat yang telah berjuang melahirkannya. Seperti dalam bahasa spanyol Rey adalah ratu. Nantinya akan menjadi anak yang hebat dalam menjadi pemimpin dan cerdas dalam segala situasi yang ada"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Isayat dari nama ayah, Adam Gryat Isayat. Sebagai tanda bahwa dia adalah penerus keluarga kita"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ayah: Dan Putri adalah doanya, semoga dia tumbuh menjadi putri yang menbanggakan kita semua."
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "Ibu: Hmm.. aku suka dengan nama itu"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: "[Keadaan: Sang anak menutup mata yang mana layar menjadi gelap dan day 1 selesai]"
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}

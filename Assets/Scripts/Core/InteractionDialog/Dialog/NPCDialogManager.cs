@@ -1,14 +1,15 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Timeline;
 using UnityEngine.UI;
 
 public class NPCDialogManager : MonoBehaviour
 {
     public DialogMasterManager dialogSequence;
     public GameObject dialogBar;
-    public TMP_Text npcName;
+    // public TMP_Text npcName;
     public TMP_Text dialogText;
-    public Image npcImage;
+    // public Image npcImage;
 
     public int currentDialogIndex = 0;
 
@@ -57,27 +58,49 @@ public class NPCDialogManager : MonoBehaviour
 
         DialogBlock block = dialogSequence.dialogBlocks[currentDialogIndex];
 
-        npcName.text = block.npcName;
-        AnimateDialogText(block.npcDialog); // <-- Animate the dialog text
-        npcImage.sprite = block.npcImage;
-
-        if (block.choices != null && block.choices.Length > 0)
+        if (block.dialogType == DialogBlock.DialogType.ThreeD)
         {
-            var dialogController = FindObjectOfType<DialogController>();
-            if (dialogController != null)
-                dialogController.summonQuestionBar();
+            Debug.Log("Showing 3D dialog for: ");
 
-            var playerAnswerManager = FindObjectOfType<PlayerAnswerManager>();
-            if (playerAnswerManager != null)
-                playerAnswerManager.ShowChoices(block.choices, OnPlayerChoseResponse);
+            var tmp_textmesh_3d = FindObjectOfType<TMP_Text>();
+            if (tmp_textmesh_3d == null)
+            {
+                Debug.LogError("TMP_Text component not found in the scene!");
+                return;
+            }
+            
+            tmp_textmesh_3d.text = block.npcDialog;
+            AnimateDialogText(block.npcDialog);
+            tmp_textmesh_3d.gameObject.SetActive(true);
+
+
         }
-        else
+        else if (block.dialogType == DialogBlock.DialogType.TwoD)
         {
-            var playerAnswerManager = FindObjectOfType<PlayerAnswerManager>();
-            if (playerAnswerManager != null)
-                playerAnswerManager.HideChoices();
+
+            // npcName.text = block.npcName;
+            AnimateDialogText(block.npcDialog); // <-- Animate the dialog text
+            // npcImage.sprite = block.npcImage;
+
+            if (block.choices != null && block.choices.Length > 0)
+            {
+                var dialogController = FindObjectOfType<DialogController>();
+                if (dialogController != null)
+                    dialogController.summonQuestionBar();
+
+                var playerAnswerManager = FindObjectOfType<PlayerAnswerManager>();
+                if (playerAnswerManager != null)
+                    playerAnswerManager.ShowChoices(block.choices, OnPlayerChoseResponse);
+            }
+            else
+            {
+                var playerAnswerManager = FindObjectOfType<PlayerAnswerManager>();
+                if (playerAnswerManager != null)
+                    playerAnswerManager.HideChoices();
+            }
         }
-    }
+            
+        }
 
     [System.Obsolete]
     public void ContinueDialog()
@@ -133,6 +156,9 @@ public class NPCDialogManager : MonoBehaviour
         string displayText = fullText;
         const string prefix = "mapname:";
         const string exitgameprefix = "exitgame:true";
+        const string timelineprefix = "timeline:";
+        const string chargemeterprefix = "charge:";
+
         if (fullText.StartsWith(prefix))
         {
             int spaceIndex = fullText.IndexOf(' ');
@@ -140,10 +166,23 @@ public class NPCDialogManager : MonoBehaviour
             {
                 displayText = fullText.Substring(spaceIndex + 1);
             }
-        } else if (fullText.StartsWith(exitgameprefix))
+        }
+        else if (fullText.StartsWith(exitgameprefix))
         {
             displayText = "Exiting game...";
             Application.Quit();
+        }
+        else if (fullText.StartsWith(timelineprefix))
+        {
+            // Handle timeline logic here
+            // Example: You might want to trigger a timeline event or notify another component
+            Debug.Log("Timeline event triggered: " + fullText);
+        }
+        else if (fullText.StartsWith(chargemeterprefix))
+        {
+            // Handle charge meter logic here
+            // For example, you might want to update a UI element or trigger an event
+            displayText = "Charge meter updated.";
         }
 
         dialogText.text = "";

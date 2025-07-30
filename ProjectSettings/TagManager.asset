@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - activeConstructable
   - Light
+  - QuestionBar
+  - NPC
   layers:
   - Default
   - TransparentFX
