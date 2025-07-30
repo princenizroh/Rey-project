@@ -19,8 +19,8 @@ TagManager:
   - Environment
   - GroundCheck
   - Enemy
-  - 
-  - 
+  - PostProcessing
+  - Volumetric
   - 
   - 
   - 
