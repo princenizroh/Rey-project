@@ -91,9 +91,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogSequence: {fileID: 0}
   dialogBar: {fileID: 3981284733392907837}
-  npcName: {fileID: 0}
   dialogText: {fileID: 1138495789599517058}
-  npcImage: {fileID: 0}
   currentDialogIndex: 0
 --- !u!1 &7923851400080781126
 GameObject:
@@ -129,7 +127,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 262.16, y: -61.349182}
+  m_AnchoredPosition: {x: 262.16, y: -61.34912}
   m_SizeDelta: {x: 1556.629, y: 223.4396}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &410158645405111090

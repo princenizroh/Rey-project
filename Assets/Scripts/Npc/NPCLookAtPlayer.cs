@@ -8,6 +8,7 @@ public class NPCLookAtPlayer : MonoBehaviour
 
     // Dialogue system
     private NPCDialogManagerMaster dialogManager;
+    private CoreGameManager coreGameManager;
 
     [System.Obsolete]
     void Start()
@@ -23,6 +24,12 @@ public class NPCLookAtPlayer : MonoBehaviour
         if (dialogManager == null)
         {
             Debug.LogError("NPCDialogManagerMaster not found in the scene.");
+        }
+
+        coreGameManager = FindObjectOfType<CoreGameManager>();
+        if (coreGameManager == null)
+        {
+            Debug.LogError("CoreGameManager not found in the scene.");
         }
 
     }
@@ -71,7 +78,7 @@ public class NPCLookAtPlayer : MonoBehaviour
     {
         if (playerDetected && Input.GetKeyDown(KeyCode.E))
         {
-            dialogManager.InitiateStartDialog("Rey/Linda/LindaTesting");
+            coreGameManager.StartCoreGame("Rey");
         }
     }
 
