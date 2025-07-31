@@ -33,6 +33,9 @@ public class CoreGameManager : MonoBehaviour
     private bool isShowingResponse = false;
     private bool isPlayingCutscene = false;
     private bool isTextAnimating = false;
+
+    private System.Action currentCompletionCallback;
+    public bool IsSequenceRunning { get; private set; }
     
     // Events
     public Action onCoreGameFinished;
@@ -104,7 +107,7 @@ public class CoreGameManager : MonoBehaviour
     /// </summary>
     /// <param name="resourcePath">Path to the CoreGame ScriptableObject in Resources folder (e.g., "resource/rey")</param>
     [Obsolete]
-    public void StartCoreGame(string resourcePath)
+    public void StartCoreGame(string resourcePath, System.Action onComplete = null)
     {
         // Load the CoreGame ScriptableObject from Resources
         CoreGame loadedCoreGame = Resources.Load<CoreGame>(resourcePath);
@@ -112,18 +115,22 @@ public class CoreGameManager : MonoBehaviour
         if (loadedCoreGame == null)
         {
             Debug.LogError($"CoreGame file not found at path: {resourcePath}");
+            onComplete?.Invoke();
             return;
         }
         
         if (loadedCoreGame.coreBlock == null || loadedCoreGame.coreBlock.Length == 0)
         {
             Debug.LogError($"CoreGame at path '{resourcePath}' has no blocks!");
+            onComplete?.Invoke();
             return;
         }
         
         // Set the loaded data as current
         coreGameData = loadedCoreGame;
         currentBlockIndex = 0;
+        currentCompletionCallback = onComplete;
+        IsSequenceRunning = true;
         
         Debug.Log($"Starting CoreGame sequence from: {resourcePath}");
         ProcessCurrentBlock();
@@ -1087,6 +1094,9 @@ public class CoreGameManager : MonoBehaviour
         ClearAll3DDialogs(); // Clear any remaining 3D dialogs
         DestroyDialogInstances();
         onCoreGameFinished?.Invoke();
+        IsSequenceRunning = false;
+        currentCompletionCallback?.Invoke();
+        currentCompletionCallback = null; 
     }
     
     #endregion
