@@ -2,13 +2,15 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
-using DS;
 
 public class NarratorDay1 : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI narratorText;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private CoreGameManager coregame;
+
+    [System.Obsolete]
     public IEnumerator Narrate()
     {
         // Set the background image for Day 1 black
@@ -26,14 +28,15 @@ public class NarratorDay1 : MonoBehaviour
     {
     }
 
+    [System.Obsolete]
     private IEnumerator PlayNightSequence()
     {
         CloseEyes();
         yield return new WaitForSeconds(1f);
         narratorText.text = "Day 1 (Kelahiran)";
-        yield return new WaitForSeconds(2f); 
-        narratorText.text = "Dunia yang gelap ini.. aku selalu merasakan kehangatan";
-        yield return new WaitForSeconds(3f);
+        Debug.Log("Narrator: Day 1 (Kelahiran)");
+        coregame.StartCoreGame("GameData/Dialog/Rey/Dialog1");
+        Debug.Log("CoreGameManager: StartCoreGame with Dialog1");
         narratorText.gameObject.SetActive(false);
     }
 
