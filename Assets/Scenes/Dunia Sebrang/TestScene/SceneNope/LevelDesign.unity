@@ -45085,11 +45085,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77e48b161294d844d94ff4fb9a327f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogText: {fileID: 2047317704}
-  dialogUI: {fileID: 1590352599}
-  dialogUIActive: 0
-  audioSource: {fileID: 324703819}
-  dialogSound: {fileID: 8300000, guid: 192fbb61cc0128f4badd8e50669daa8c, type: 3}
+  ui: {fileID: 0}
 --- !u!4 &324703821
 Transform:
   m_ObjectHideFlags: 0
@@ -122588,11 +122584,20 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7522247111663242661, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: inputProvider
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
       propertyPath: m_CollideAgainst.m_Bits
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 1756585600243922493, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 4026939753501614572, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242662, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -125685,7 +125690,7 @@ PrefabInstance:
     - target: {fileID: 5942144617110176582, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       propertyPath: <CameraRecenteringUtility>k__BackingField.<VirtualCamera>k__BackingField
       value: 
-      objectReference: {fileID: 1786986327}
+      objectReference: {fileID: 0}
     - target: {fileID: 5951805850753252281, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -126312,6 +126317,12 @@ MonoBehaviour:
   targetPositionOn: {fileID: 1377364167}
   targetPositionOff: {fileID: 1416112060}
   transitionSpeed: 1
+  aimTarget: {fileID: 0}
+  aimSpeed: 0.5
+  xRange: {x: -1, y: 1}
+  yRange: {x: -0.5, y: 1}
+  fixedZ: 1
+  useWorldSpaceAiming: 1
 --- !u!43 &1135681338
 Mesh:
   m_ObjectHideFlags: 0
@@ -192055,17 +192066,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!114 &1786986327 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
-  m_PrefabInstance: {fileID: 1093230055}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1787732284
 GameObject:
   m_ObjectHideFlags: 0

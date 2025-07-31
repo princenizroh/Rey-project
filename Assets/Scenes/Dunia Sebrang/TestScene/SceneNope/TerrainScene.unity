@@ -128165,6 +128165,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4741544252191679431, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: CollideAgainst.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
       propertyPath: m_Follow
       value: 
@@ -128241,26 +128245,48 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7522247111663242661, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: inputProvider
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
       propertyPath: m_CollideAgainst.m_Bits
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812864739509691179, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: m_ControllerManager.Controllers.Array.data[0].Owner
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812864739509691179, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: m_ControllerManager.Controllers.Array.data[1].Owner
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 1756585600243922493, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 4026939753501614572, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242662, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
---- !u!114 &1037227947 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
-  m_PrefabInstance: {fileID: 1037227946}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1037781942
 GameObject:
   m_ObjectHideFlags: 0
@@ -181395,7 +181421,7 @@ PrefabInstance:
     - target: {fileID: 5942144617110176582, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       propertyPath: <CameraRecenteringUtility>k__BackingField.<VirtualCamera>k__BackingField
       value: 
-      objectReference: {fileID: 1037227947}
+      objectReference: {fileID: 0}
     - target: {fileID: 5951805850753252281, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       propertyPath: m_Layer
       value: 6

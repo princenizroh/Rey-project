@@ -10464,6 +10464,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
+  capsule: {fileID: 0}
   speed: 5
   turnSmoothTime: 0.1
   jumpPower: 5

@@ -3267,6 +3267,15 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
+  takauAIs: []
+  kuntiAIs: []
+  handAIs: []
+  chaseFearIncreaseRate: 0.5
+  tapBufferDecayRate: 5
+  naturalFearDecay: 3
+  safeTimeBeforeDecay: 1
+  useExponentialDecay: 1
+  useSmoothDecay: 0
 --- !u!43 &407598847
 Mesh:
   m_ObjectHideFlags: 0
@@ -6515,11 +6524,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77e48b161294d844d94ff4fb9a327f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogText: {fileID: 1943277314}
-  dialogUI: {fileID: 122169965}
-  dialogUIActive: 0
-  audioSource: {fileID: 861581314}
-  dialogSound: {fileID: 8300000, guid: 192fbb61cc0128f4badd8e50669daa8c, type: 3}
+  ui: {fileID: 0}
 --- !u!4 &861581313
 Transform:
   m_ObjectHideFlags: 0
@@ -8745,6 +8750,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4741544252191679431, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: CollideAgainst.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
       propertyPath: m_Follow
       value: 
@@ -8821,11 +8830,52 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7522247111663242661, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: inputProvider
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
       propertyPath: m_CollideAgainst.m_Bits
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: Target.LookAtTarget
+      value: 
+      objectReference: {fileID: 1879342043}
+    - target: {fileID: 8414552763452728691, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: Target.TrackingTarget
+      value: 
+      objectReference: {fileID: 1879342043}
+    - target: {fileID: 8812864739509691179, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: m_ControllerManager.Controllers.Array.data[0].Owner
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812864739509691179, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: m_ControllerManager.Controllers.Array.data[1].Owner
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 1756585600243922493, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 4026939753501614572, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242662, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -8931,33 +8981,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.539753, y: 1, z: 5.210293}
   m_Center: {x: 0.16656399, y: 0, z: -0.81884193}
---- !u!1 &1165604431 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6649358456881497262, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
-  m_PrefabInstance: {fileID: 4185089669572469538}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &1165604435
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1165604431}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: e3899bbc0363fdc488751330a0bcff4f, type: 3}
-  m_Controller: {fileID: 9100000, guid: 668184930344fe14ea08a9d6603294dd, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!43 &1184407885
 Mesh:
   m_ObjectHideFlags: 0
@@ -12315,6 +12338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
+  capsule: {fileID: 0}
   speed: 5
   turnSmoothTime: 0.1
   jumpPower: 5
@@ -12795,6 +12819,15 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  takauAIs: []
+  kuntiAIs: []
+  handAIs: []
+  chaseFearIncreaseRate: 0.5
+  tapBufferDecayRate: 5
+  naturalFearDecay: 3
+  safeTimeBeforeDecay: 1
+  useExponentialDecay: 1
+  useSmoothDecay: 0
 --- !u!135 &1737085933
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -14736,17 +14769,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.2151804, y: 1.0163128, z: 1.4951172}
   m_Center: {x: -0.002067089, y: 0.00815618, z: -0.76408005}
---- !u!114 &2087595611 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
-  m_PrefabInstance: {fileID: 1099203407}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2096956373
 GameObject:
   m_ObjectHideFlags: 0
@@ -16088,7 +16110,7 @@ PrefabInstance:
     - target: {fileID: 5942144617110176582, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       propertyPath: <CameraRecenteringUtility>k__BackingField.<VirtualCamera>k__BackingField
       value: 
-      objectReference: {fileID: 2087595611}
+      objectReference: {fileID: 0}
     - target: {fileID: 5951805850753252281, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -16671,10 +16693,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8368682430190168769, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       insertIndex: 0
       addedObject: {fileID: 895408138}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6649358456881497262, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1165604435}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
 --- !u!4 &8615888432203730154 stripped
 Transform:
@@ -16880,7 +16899,7 @@ PrefabInstance:
     - target: {fileID: 6428041485557984657, guid: 01f92fc18611a1d4f89bd1ccf33ab4ae, type: 3}
       propertyPath: <CameraRecenteringUtility>k__BackingField.<VirtualCamera>k__BackingField
       value: 
-      objectReference: {fileID: 2087595611}
+      objectReference: {fileID: 0}
     - target: {fileID: 8360986664162157642, guid: 01f92fc18611a1d4f89bd1ccf33ab4ae, type: 3}
       propertyPath: m_Name
       value: Lilu_AI Model

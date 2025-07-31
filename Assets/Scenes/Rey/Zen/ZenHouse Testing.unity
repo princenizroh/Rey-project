@@ -228209,17 +228209,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7522247111663242657, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
   m_PrefabInstance: {fileID: 1595227939}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &711718874 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
-  m_PrefabInstance: {fileID: 1595227939}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!43 &711938542
 Mesh:
   m_ObjectHideFlags: 0
@@ -238296,10 +238285,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 743558687}
     m_Modifications:
-    - target: {fileID: -7511558181221131132, guid: f80729783b58c284ea80ddf0d389a473, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 192e72805cbbde04e8cf60c4669c3cbc, type: 2}
     - target: {fileID: -8679921383154817045, guid: 381f07e39a71d694492343793b544eb6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.927995
@@ -238344,6 +238329,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SofaReversiReplica001 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: f80729783b58c284ea80ddf0d389a473, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 192e72805cbbde04e8cf60c4669c3cbc, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -347889,7 +347878,7 @@ PrefabInstance:
     - target: {fileID: 5942144617110176582, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       propertyPath: <CameraRecenteringUtility>k__BackingField.<VirtualCamera>k__BackingField
       value: 
-      objectReference: {fileID: 711718874}
+      objectReference: {fileID: 0}
     - target: {fileID: 5949477357483312379, guid: 1b6d77449e4cebb4485cc7cec16dd967, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 36.04916
@@ -354746,10 +354735,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 743558687}
     m_Modifications:
-    - target: {fileID: -7511558181221131132, guid: f80729783b58c284ea80ddf0d389a473, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: ab50edcedd6e83c478000784c768ce7b, type: 2}
     - target: {fileID: -8679921383154817045, guid: 381f07e39a71d694492343793b544eb6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -12.447
@@ -354794,6 +354779,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SofaReversiReplica001
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: f80729783b58c284ea80ddf0d389a473, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ab50edcedd6e83c478000784c768ce7b, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -437747,6 +437736,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7522247111663242661, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: inputProvider
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
       propertyPath: m_CollideAgainst.m_Bits
       value: 0
@@ -437758,12 +437751,14 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 7522247112809039687, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
     - {fileID: 7522247111663242660, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 1756585600243922493, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 4026939753501614572, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242662, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7522247112809039680, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1996708322}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
 --- !u!1 &1595913305
 GameObject:
@@ -500761,11 +500756,20 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7522247111663242661, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+      propertyPath: inputProvider
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
       propertyPath: m_CollideAgainst.m_Bits
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7522247111663242656, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 1756585600243922493, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 4026939753501614572, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242662, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
+    - {fileID: 7522247111663242663, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -576457,24 +576461,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!1 &1996708317 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7522247112809039680, guid: 21b667a7238e0c440b6cafd867108fcb, type: 3}
-  m_PrefabInstance: {fileID: 1595227939}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1996708322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1996708317}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36d1163fa822e8b418a0a603ec078d5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Damping: 0
 --- !u!43 &1998327065
 Mesh:
   m_ObjectHideFlags: 0
