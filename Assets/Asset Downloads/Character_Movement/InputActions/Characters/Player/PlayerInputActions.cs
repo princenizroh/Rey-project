@@ -87,7 +87,7 @@ namespace GenshinImpactMovementSystem
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""42d840d2-9d21-44e7-992a-8d5a10e30132"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -96,7 +96,7 @@ namespace GenshinImpactMovementSystem
                     ""name"": ""CursorToggle"",
                     ""type"": ""Button"",
                     ""id"": ""e2ac7a91-4e51-40b5-bfe4-735e5216687f"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -232,17 +232,6 @@ namespace GenshinImpactMovementSystem
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Sprint"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ef7c923b-bc76-4e1f-816b-2a555e093e49"",
-                    ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
