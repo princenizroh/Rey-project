@@ -34,9 +34,9 @@ public class NarratorDay1 : MonoBehaviour
         CloseEyes();
         yield return new WaitForSeconds(1f);
         narratorText.text = "Day 1 (Kelahiran)";
-        Debug.Log("Narrator: Day 1 (Kelahiran)");
-        coregame.StartCoreGame("GameData/Dialog/Rey/Dialog1");
-        Debug.Log("CoreGameManager: StartCoreGame with Dialog1");
+        yield return new WaitForSeconds(3f);
+        coregame.StartCoreGame("GameData/Dialog/Day1/DalamPerut/Seq1DalamPerut");
+        yield return new WaitForSeconds(3f);
         narratorText.gameObject.SetActive(false);
     }
 
