@@ -8,9 +8,7 @@ public class NarratorDay1 : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI narratorText;
     [SerializeField] private Image backgroundImage;
-    [SerializeField] public DeathScreenEffect deathScreenEffect;
     [SerializeField] private CanvasGroup canvasGroup;
-    private Color fadeColor = Color.black;
     public IEnumerator Narrate()
     {
         // Set the background image for Day 1 black
@@ -30,16 +28,30 @@ public class NarratorDay1 : MonoBehaviour
 
     private IEnumerator PlayNightSequence()
     {
-        backgroundImage.color = Color.black;
-        canvasGroup.alpha = 1f;
+        CloseEyes();
         yield return new WaitForSeconds(1f);
         narratorText.text = "Day 1 (Kelahiran)";
         yield return new WaitForSeconds(2f); 
         narratorText.text = "Dunia yang gelap ini.. aku selalu merasakan kehangatan";
         yield return new WaitForSeconds(3f);
         narratorText.gameObject.SetActive(false);
-        backgroundImage.gameObject.SetActive(false);
-        deathScreenEffect.TriggerFadeOut();
+    }
 
+    private void CloseEyes()
+    { 
+        Color newColor = Color.black;
+        newColor.a = 1f; // 1f = 255 penuh opacity (0 sampai 1 di Unity)
+        backgroundImage.color = newColor;
+        canvasGroup.alpha = 1f; 
+    }
+
+    private void FadeOpenEyes()
+    {
+        
+    }
+
+    private void FadeCloseEyes()
+    {
+        
     }
 }

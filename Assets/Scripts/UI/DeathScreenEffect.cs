@@ -180,7 +180,7 @@ namespace DS
         private void Start()
         {
             // Initialize fade overlay as transparent
-            InitializeFadeOverlay();
+            // InitializeFadeOverlay();
 
             if (showDebug)
             {
