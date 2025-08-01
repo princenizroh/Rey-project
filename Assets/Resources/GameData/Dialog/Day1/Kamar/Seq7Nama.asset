@@ -10,119 +10,121 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
-  m_Name: Seq4KesadaranBayi
+  m_Name: Seq7Nama
   m_EditorClassIdentifier: 
   coreBlock:
   - Type: 0
     Dialog:
-      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 
-      dialogEntry: Suara ini..
+      dialogEntry: Sayang, kira kira namanya mau dipanggil siapa
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
-      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 
-      dialogEntry: Rasa ini begitu hangat
-      audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Menangis keras
-        dialogResponses: []
-        audioDialogResponse: {fileID: 0}
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 
-      dialogEntry: Ihh... lucu sekali
-      audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        dialogResponses:
-        - NpcName: 123
-          npcResponse: 123
-        audioDialogResponse: {fileID: 0}
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 
-      dialogEntry: Iya ya dia mulai membuka matanya
+      dialogEntry: Ayah sudah menyimpan nama untuk anak kita
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
-      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 
-      dialogEntry: Halo nak ini ayah
+      dialogEntry: Apa itu sayang
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
-      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 
-      dialogEntry: Dan ini ibumu
+      dialogEntry: Namanya Gabungan dari nama kita berdua
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
-      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 
-      dialogEntry: Ayah.. Ibu..
+      dialogEntry: Rey Isayat Putri
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        dialogResponses: []
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
-      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 
-      dialogEntry: Lapar..
+      dialogEntry: Kenapa begitu?
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Neh (Lapar)
-        dialogResponses: []
-        audioDialogResponse: {fileID: 0}
-      - playerChoice: Menangis keras
-        dialogResponses: []
-        audioDialogResponse: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: Nama Rey, Ayah ambil dari namamu Linda Rey Putri sebagai pengigat
+        abadi dari ibu hebat yang telah berjuang melahirkannya
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: Seperti dalam bahasa spanyol Rey adalah ratu. Nantinya akan menjadi
+        anak yang hebat dalam menjadi pemimpin dan cerdas dalam segala situasi yang
+        ada
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      dialogEntry: Isayat dari nama ayah, Adam Gryat Isayat. Sebagai  tanda bahwa
+        dia adalah penerus keluarga kita
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 2
+      camChoice: 0
+      dialogEntry: Dan Putri adalah doanya, semoga dia tumbuh menjadi putri yang
+        menbanggakan kita semua
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      dialogType: 1
+      dialog3DLocation: 2
+      camChoice: 0
+      dialogEntry: Hmm.. aku suka dengan nama itu
+      audioDialogEntry: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
