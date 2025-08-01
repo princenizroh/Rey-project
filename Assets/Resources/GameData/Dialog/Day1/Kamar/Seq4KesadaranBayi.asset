@@ -35,10 +35,8 @@ MonoBehaviour:
       dialogEntry: Rasa ini begitu hangat
       audioDialogEntry: {fileID: 0}
       choices:
-      - playerChoice: Membuka mata
-        dialogResponses:
-        - NpcName: Mulyono
-          npcResponse: Hidup Prabowo
+      - playerChoice: Menangis keras
+        dialogResponses: []
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
@@ -68,10 +66,7 @@ MonoBehaviour:
       npcName: 
       dialogEntry: Iya ya dia mulai membuka matanya
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        dialogResponses: []
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
@@ -83,10 +78,7 @@ MonoBehaviour:
       npcName: 
       dialogEntry: Halo nak ini ayah
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        dialogResponses: []
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
@@ -98,10 +90,7 @@ MonoBehaviour:
       npcName: 
       dialogEntry: Dan ini ibumu
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        dialogResponses: []
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0

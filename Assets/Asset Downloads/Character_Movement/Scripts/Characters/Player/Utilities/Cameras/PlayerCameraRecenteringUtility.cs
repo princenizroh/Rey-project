@@ -7,17 +7,20 @@ namespace GenshinImpactMovementSystem
     [Serializable]
     public class PlayerCameraRecenteringUtility
     {
-        [field: SerializeField] public CinemachineVirtualCamera VirtualCamera { get; private set; }
+        [field: SerializeField][Obsolete] public CinemachineVirtualCamera VirtualCamera { get; private set; }
         [field: SerializeField] public float DefaultHorizontalWaitTime { get; private set; } = 0f;
         [field: SerializeField] public float DefaultHorizontalRecenteringTime { get; private set; } = 4f;
 
+        [Obsolete]
         private CinemachinePOV cinemachinePOV;
 
+        [Obsolete]
         public void Initialize()
         {
             cinemachinePOV = VirtualCamera.GetCinemachineComponent<CinemachinePOV>();
         }
 
+        [Obsolete]
         public void EnableRecentering(float waitTime = -1f, float recenteringTime = -1f, float baseMovementSpeed = 1f, float movementSpeed = 1f)
         {
             cinemachinePOV.m_HorizontalRecentering.m_enabled = true;
@@ -40,6 +43,7 @@ namespace GenshinImpactMovementSystem
             cinemachinePOV.m_HorizontalRecentering.m_RecenteringTime = recenteringTime;
         }
 
+        [Obsolete]
         public void DisableRecentering()
         {
             cinemachinePOV.m_HorizontalRecentering.m_enabled = false;
