@@ -15,9 +15,11 @@ MonoBehaviour:
   coreBlock:
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Suara ini..
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -25,95 +27,113 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Rasa ini begitu hangat
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Membuka mata
-        npcResponse: Lihat dia membuka matanya
+        dialogResponses:
+        - NpcName: Mulyono
+          npcResponse: Hidup Prabowo
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Ihh... lucu sekali
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
+        dialogResponses:
+        - NpcName: 123
+          npcResponse: 123
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Iya ya dia mulai membuka matanya
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
+        dialogResponses: []
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Halo nak ini ayah
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
+        dialogResponses: []
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Dan ini ibumu
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
+        dialogResponses: []
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Ayah.. Ibu..
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
+        dialogResponses: []
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Lapar..
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Neh (Lapar)
-        npcResponse: Dia mengeluarkan suara, apa yang dia butuhkan
+        dialogResponses: []
         audioDialogResponse: {fileID: 0}
       - playerChoice: Menangis keras
-        npcResponse: Kenapa anak ini menangis? Berisik sekali...
+        dialogResponses: []
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

@@ -935,6 +935,52 @@ public class CoreGameManager : MonoBehaviour
         Debug.Log("=== DIALOG PROGRESSION FIX COMPLETE ===");
     }
     
+    /// <summary>
+    /// Test text animation - call this to verify animation is working
+    /// </summary>
+    [ContextMenu("Test Text Animation")]
+    public void TestTextAnimation()
+    {
+        Debug.Log("=== TESTING TEXT ANIMATION ===");
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogError("No dialog instance found! Please create a dialog first.");
+            return;
+        }
+        
+        // Find the text component to animate
+        TMP_Text dialogTextComponent = null;
+        DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+        if (controller != null && controller.dialogueText != null)
+        {
+            dialogTextComponent = controller.dialogueText;
+            Debug.Log("Found DialogueText component via DialogPrefabController for test animation");
+        }
+        else
+        {
+            Transform textTransform = dialogInstance.transform.Find("DialogueText");
+            if (textTransform != null)
+            {
+                dialogTextComponent = textTransform.GetComponent<TMP_Text>();
+                Debug.Log("Found DialogueText component via direct search for test animation");
+            }
+        }
+        
+        if (dialogTextComponent != null)
+        {
+            string testText = "This is a test of the typewriter text animation system. It should appear character by character with proper timing.";
+            Debug.Log($"Starting test animation with text: '{testText}'");
+            AnimateDialogText(testText, dialogTextComponent, null);
+        }
+        else
+        {
+            Debug.LogError("Could not find DialogueText component for animation test!");
+        }
+        
+        Debug.Log("=== END TEXT ANIMATION TEST ===");
+    }
+    
     #endregion
     
     /// <summary>
@@ -1229,8 +1275,40 @@ public class CoreGameManager : MonoBehaviour
             Debug.LogWarning("NPC name is empty! DialogueName will not be updated.");
         }
         
-        // CRITICAL: Assign dialog text to DialogueText component
-        UpdateDialogTextSafe(dialog.dialogEntry);
+        // CRITICAL: Animate dialog text instead of setting it instantly
+        // Find the DialogueText component to animate
+        TMP_Text dialogTextComponent = null;
+        if (dialogInstance != null)
+        {
+            // Try DialogPrefabController first
+            DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+            if (controller != null && controller.dialogueText != null)
+            {
+                dialogTextComponent = controller.dialogueText;
+                Debug.Log("Found DialogueText component via DialogPrefabController for animation");
+            }
+            else
+            {
+                // Fallback to direct search
+                Transform textTransform = dialogInstance.transform.Find("DialogueText");
+                if (textTransform != null)
+                {
+                    dialogTextComponent = textTransform.GetComponent<TMP_Text>();
+                    Debug.Log("Found DialogueText component via direct search for animation");
+                }
+            }
+        }
+        
+        if (dialogTextComponent != null)
+        {
+            Debug.Log($"Starting dialog text animation for: '{dialog.dialogEntry}'");
+            AnimateDialogText(dialog.dialogEntry, dialogTextComponent, dialog.audioDialogEntry);
+        }
+        else
+        {
+            Debug.LogError("Could not find DialogueText component for animation! Falling back to instant text.");
+            UpdateDialogTextSafe(dialog.dialogEntry);
+        }
         
         // Handle choices if any
         if (dialog.choices != null && dialog.choices.Length > 0)
@@ -2006,14 +2084,38 @@ public class CoreGameManager : MonoBehaviour
                 Debug.LogWarning("NPC name from response is empty!");
             }
             
-            // Update dialog text safely
-            UpdateDialogTextSafe(npcResponse);
-            
-            // If there's audio, play it (you can expand this later)
-            if (audioClip != null && dialogAudioSource != null)
+            // Animate dialog response text instead of setting it instantly
+            TMP_Text dialogTextComponent = null;
+            if (dialogInstance != null)
             {
-                dialogAudioSource.clip = audioClip;
-                dialogAudioSource.Play();
+                // Try DialogPrefabController first
+                DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+                if (controller != null && controller.dialogueText != null)
+                {
+                    dialogTextComponent = controller.dialogueText;
+                    Debug.Log("Found DialogueText component via DialogPrefabController for response animation");
+                }
+                else
+                {
+                    // Fallback to direct search
+                    Transform textTransform = dialogInstance.transform.Find("DialogueText");
+                    if (textTransform != null)
+                    {
+                        dialogTextComponent = textTransform.GetComponent<TMP_Text>();
+                        Debug.Log("Found DialogueText component via direct search for response animation");
+                    }
+                }
+            }
+            
+            if (dialogTextComponent != null)
+            {
+                Debug.Log($"Starting dialog response text animation for: '{npcResponse}'");
+                AnimateDialogText(npcResponse, dialogTextComponent, audioClip);
+            }
+            else
+            {
+                Debug.LogError("Could not find DialogueText component for response animation! Falling back to instant text.");
+                UpdateDialogTextSafe(npcResponse);
             }
         }
         
