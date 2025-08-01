@@ -95,9 +95,40 @@ public class NarratorDay1 : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         bool seq4Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq4KesadaranBayi", 
+        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq4Kesadaran", 
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
+
+        yield return new WaitForSeconds(1f);
+
+        Debug.Log("Opening eyes");
+        FadeOpenEyes();
+
+        bool seq5Complete = false;
+        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq5MembukaMata", 
+            () => { seq5Complete = true; });
+        yield return new WaitUntil(() => seq5Complete);
+
+        yield return new WaitForSeconds(1f);
+
+        bool seq6Complete = false;
+        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq6Makanan", 
+            () => { seq6Complete = true; });
+        yield return new WaitUntil(() => seq6Complete);
+
+        yield return new WaitForSeconds(1f);
+
+        Debug.Log("Closing eyes");
+        FadeCloseEyes();
+
+        yield return new WaitForSeconds(1f);
+        bool seq7Complete = false;
+        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq7Nama", 
+            () => { seq7Complete = true; });
+        yield return new WaitUntil(() => seq7Complete);
+        yield return new WaitForSeconds(1f);
+
+        Debug.Log("Sequence 7 complete, closing narration.");
 
     }
 
@@ -111,12 +142,39 @@ public class NarratorDay1 : MonoBehaviour
 
     private void FadeOpenEyes()
     {
-        
+        StartCoroutine(FadeEyesCoroutine(1f, 0f, 2f)); 
     }
 
     private void FadeCloseEyes()
     {
+        StartCoroutine(FadeEyesCoroutine(0f, 1f, 2f)); 
+    }
+
+    private IEnumerator FadeEyesCoroutine(float startAlpha, float endAlpha, float duration)
+    {
+        float elapsed = 0f;
+        Color currentColor = backgroundImage.color;
         
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float normalizedTime = elapsed / duration;
+            
+            float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, normalizedTime);
+            
+            currentColor.a = currentAlpha;
+            backgroundImage.color = currentColor;
+            
+            canvasGroup.alpha = Mathf.Lerp(1f, 1f, normalizedTime);
+            
+            yield return null; 
+        }
+        
+        // Ensure final values are set exactly
+        currentColor.a = endAlpha;
+        backgroundImage.color = currentColor;
+        
+        Debug.Log($"Eye fade complete: Alpha = {endAlpha}");
     }
 
     private IEnumerator FadeOutAudio(AudioSource audioSource, float fadeTime)

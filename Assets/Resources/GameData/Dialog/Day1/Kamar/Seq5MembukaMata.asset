@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
-  m_Name: Seq4KesadaranBayi
+  m_Name: Seq5MembukaMata
   m_EditorClassIdentifier: 
   coreBlock:
   - Type: 0
@@ -18,7 +18,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      dialogEntry: Suara ini..
+      dialogEntry: Lihat dia membuka matanya
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -28,25 +28,9 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      dialogEntry: Rasa ini begitu hangat
-      audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata
-        npcResponse: Lihat dia membuka matanya
-        audioDialogResponse: {fileID: 0}
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
       dialogEntry: Ihh... lucu sekali
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
@@ -56,10 +40,7 @@ MonoBehaviour:
       camChoice: 0
       dialogEntry: Iya ya dia mulai membuka matanya
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
@@ -69,10 +50,7 @@ MonoBehaviour:
       camChoice: 0
       dialogEntry: Halo nak ini ayah
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
@@ -82,10 +60,7 @@ MonoBehaviour:
       camChoice: 0
       dialogEntry: Dan ini ibumu
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
@@ -95,10 +70,7 @@ MonoBehaviour:
       camChoice: 0
       dialogEntry: Ayah.. Ibu..
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: Membuka mata dan bergerak
-        npcResponse: 
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
