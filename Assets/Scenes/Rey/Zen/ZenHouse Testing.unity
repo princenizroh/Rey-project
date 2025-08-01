@@ -297878,6 +297878,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aac4bf546611da4495dec583dd6bf5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  npcDialogManager: {fileID: 0}
+  npcFirstTimeTalk: 1
+  dialogChoicesShown: 0
+  dialogFileName: 
+  fallbackAnswerFile: 
+  currentState: 0
   isShowingResponse: 0
 --- !u!114 &1119786651
 MonoBehaviour:
@@ -297893,6 +297899,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   npcDialogThemplate: {fileID: 3981284733392907837, guid: 031ab429f1959bc4dbf38df63bb1d977, type: 3}
   npcQuestionThemplate: {fileID: 6424010428020544295, guid: 7a51f13bad9d35643be70a1015092f0f, type: 3}
+  dialogInstance: {fileID: 0}
+  questionInstance: {fileID: 0}
 --- !u!114 &1119786652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -297925,6 +297933,9 @@ MonoBehaviour:
   npcDialogThemplate: {fileID: 3981284733392907837, guid: 031ab429f1959bc4dbf38df63bb1d977, type: 3}
   npcQuestionThemplate: {fileID: 6424010428020544295, guid: 7a51f13bad9d35643be70a1015092f0f, type: 3}
   dialogText: {fileID: 0}
+  npcNameText: {fileID: 0}
+  backgroundFade: {fileID: 0}
+  answerButtons: []
   defaultCamera: {fileID: 0}
   reyCamera: {fileID: 0}
   momCamera: {fileID: 0}
@@ -299472,7 +299483,7 @@ GameObject:
   - component: {fileID: 1134889476}
   - component: {fileID: 1134889475}
   m_Layer: 5
-  m_Name: CanvasDialog
+  m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -439488,7 +439499,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d48a7cdcb771148905990a04ef0c80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerModel: {fileID: 0}
   npcModel: {fileID: 215139504}
+  playerDetected: 0
+  dialogManager: {fileID: 0}
+  coreGameManager: {fileID: 0}
 --- !u!43 &1608502791
 Mesh:
   m_ObjectHideFlags: 0
