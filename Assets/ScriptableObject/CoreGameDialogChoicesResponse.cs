@@ -1,9 +1,8 @@
 using UnityEngine;
-
 [System.Serializable]
-public class DialogChoice
+public class CoreGameDialogChoicesResponse
 {
-    public string playerChoice;
+    public string NpcName;
     [TextArea(2, 5)]
     public string npcResponse;
 }

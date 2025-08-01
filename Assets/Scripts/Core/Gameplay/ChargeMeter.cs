@@ -36,12 +36,26 @@ public class ChargeMeter : MonoBehaviour
         Debug.Log("Charge level reset to: " + chargeLevel);
     }
 
+    [System.Obsolete]
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             spaceSpamIndicator.fontSize = 50;
             chargeLevel += chargeRate;
+
+            if (Input.GetKey(KeyCode.Space))
+            {
+                CoreGameManager coreGameManager = FindObjectOfType<CoreGameManager>();
+                if (coreGameManager != null)
+                {
+                    coreGameManager.StartCoreGame("Rey");
+                }
+                else
+                {
+                    Debug.LogError("CoreGameManager not found in the scene.");
+                }
+            }
         }
         else if (Input.GetKeyUp(KeyCode.Space))
         {
