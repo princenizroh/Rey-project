@@ -377,8 +377,8 @@ MonoBehaviour:
   m_text: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent auctor
     faucibus est in sodales. Nullam auctor neque vitae tincidunt vulputate.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3d632f2cde59ea64b8835f3465b5a01a, type: 2}
-  m_sharedMaterial: {fileID: -8184810967434301325, guid: 3d632f2cde59ea64b8835f3465b5a01a, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 152c5344fee1a1f46a5988f2bd1cc0c8, type: 2}
+  m_sharedMaterial: {fileID: -8951847174312865853, guid: 152c5344fee1a1f46a5988f2bd1cc0c8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
