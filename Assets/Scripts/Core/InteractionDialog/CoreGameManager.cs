@@ -1,7 +1,90 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// CONSOLIDATED DIALOG SYSTEM - CoreGameManager
+/// 
+/// This script now contains integrated functionality from the following removed components:
+/// 
+/// 1. PlayerAnswerManager - Choice handling with button animations
+///    - ShowChoicesWithButtons() - Display and animate choice buttons
+///    - HideChoices() - Hide and cleanup choice buttons
+///    - AnimateButtonText() - Animate button text display
+///    - Button click handling with animation skip support
+/// 
+/// 2. DialogController - Dialog UI management and animations
+///    - SummonDialogBar() - Create and animate dialog bars
+///    - SummonQuestionBar() - Create and animate question/choice bars
+///    - DestroyAllQuestionBars() - Cleanup question bar instances
+///    - Enhanced DestroyDialogInstances() with complete cleanup
+/// 
+/// 3. NPCDialogManager - Text animation and dialog processing
+///    - Legacy dialog text animation system
+///    - Special prefix handling (mapname:, exitgame:, timeline:, charge:)
+///    - Dialog progression and state management
+/// 
+/// 4. NPCDialogManagerMaster - Master dialog control and state management
+///    - InitiateStartDialog() - Legacy dialog system entry point
+///    - Dialog state management (normal, choices, response)
+///    - Input handling and dialog progression
+/// 
+/// 5. DialogButtonController/MenuButtonHandler - Button event handling
+///    - OnNPCButtonClicked() - Handle NPC interaction button clicks
+///    - NPC type detection and appropriate dialog triggering
+/// 
+/// NEW FEATURES - Multiple Response & NPC Name Support:
+/// - Support for CoreGameDialogChoicesResponse[] - multiple responses per choice
+/// - Dynamic NPC name display with UpdateNpcNameDisplay() (2D dialogs only)
+/// - Response selection system with SetResponseIndex(), UseRandomResponse()
+/// - Conditional response selection with SetResponseByCondition()
+/// - Automatic NPC name extraction from dialog text ("NpcName: dialog") for 2D dialogs
+/// - 3D dialogs ignore NPC name updates (models represent characters inherently)
+/// - Cutscene fade system with BackgroundFade image for dialog transitions
+///   * None: No fade effect
+///   * FadeIn: Transparent to dark transition
+///   * FadeOut: Dark to transparent transition
+///   * StayIn: Remain dark throughout dialog
+///   * StayOut: Remain transparent throughout dialog
+/// - Keyboard input system for better user experience
+///   * Space: Progress dialog and skip text animation
+///   * Q, W, E: Select dialog choices (buttons show [Q], [W], [E] indicators)
+///   * Escape: Skip cutscenes
+/// 
+/// Key Improvements:
+/// - All dialog functionality consolidated into one manager
+/// - Removed dependencies on FindObjectOfType calls
+/// - Better integration with CoreGame data structure
+/// - Proper cleanup and memory management
+/// - Support for both new CoreGame system and legacy dialog files
+/// - Multiple response support for varied NPC reactions
+/// - Dynamic NPC name display in 2D dialogs only (3D models represent characters inherently)
+/// 
+/// Usage:
+/// - Use the existing CoreGame system for new dialogs
+/// - Legacy support available through InitiateStartDialog() and OnNPCButtonClicked()
+/// - Choice buttons are automatically found by name in QuestionTemplate: Q, W, E
+/// - Fallback: All choice buttons can also be assigned to answerButtons[] in inspector
+/// - Dialog and question templates should be assigned to npcDialogThemplate and npcQuestionThemplate
+/// - Assign npcNameText for displaying NPC names in 2D dialogs (3D dialogs ignore this)
+/// - Assign backgroundFade image for cutscene fade transitions
+/// - Use SetResponseIndex() to choose which response to use from dialogResponses array
+/// - Use UseRandomResponse() for random NPC reactions
+/// - Use SetResponseByCondition() for conditional responses based on game state
+/// - Set cutsceneType in CoreGameDialog for fade transitions between dialogs
+/// - Input Controls: Space to progress dialogs, Q/W/E to select choices, Escape to skip cutscenes
+/// </summary>
+
+[System.Serializable]
+public class DialogChoice
+{
+    public string playerChoice;
+    [TextArea(2, 5)]
+    public string npcResponse;
+}
 
 public class CoreGameManager : MonoBehaviour
 {
@@ -14,6 +97,11 @@ public class CoreGameManager : MonoBehaviour
     
     [Header("Dialog Components")]
     public TMP_Text dialogText;
+    public TMP_Text npcNameText; // For displaying NPC names
+    public Image backgroundFade; // For fade in/out transitions
+    
+    [Header("Choice UI Components")]
+    public Button[] answerButtons; // Assign 3+ buttons in Inspector
     
     [Header("Camera References")]
     public Transform defaultCamera;
@@ -28,11 +116,17 @@ public class CoreGameManager : MonoBehaviour
     private GameObject dialogInstance;
     private GameObject questionInstance;
     private int currentBlockIndex = 0;
-    private int currentChoiceResponseIndex = -1;
+    private int currentChoiceResponseIndex = -1; // Which response in dialogResponses array is currently showing
+    private int selectedChoiceIndex = -1; // Which choice was selected by the player
     private LTDescr dialogTween;
     private bool isShowingResponse = false;
     private bool isPlayingCutscene = false;
     private bool isTextAnimating = false;
+    
+    // Choice management variables
+    private System.Action<int> onChoiceSelected;
+    private Dictionary<Button, int> buttonTweenIds = new Dictionary<Button, int>();
+    private int selectedResponseIndex = 0; // Which response to use from dialogResponses array
 
     private System.Action currentCompletionCallback;
     public bool IsSequenceRunning { get; private set; }
@@ -139,7 +233,6 @@ public class CoreGameManager : MonoBehaviour
     /// <summary>
     /// Continue to the next block in the sequence
     /// </summary>
-    [Obsolete]
     public void ContinueToNextBlock()
     {
         if (isPlayingCutscene) return;
@@ -158,7 +251,6 @@ public class CoreGameManager : MonoBehaviour
     /// <summary>
     /// Skip current cutscene if playing
     /// </summary>
-    [Obsolete]
     public void SkipCutscene()
     {
         if (isPlayingCutscene)
@@ -198,12 +290,35 @@ public class CoreGameManager : MonoBehaviour
             SkipTextAnimation();
         }
     }
+    
+    /// <summary>
+    /// Manually trigger a fade effect (useful for testing or custom scenarios)
+    /// </summary>
+    /// <param name="cutsceneType">Type of fade effect to perform</param>
+    /// <param name="onComplete">Optional callback when fade completes</param>
+    public void TriggerFadeEffect(CoreGameDialog.CutsceneType cutsceneType, System.Action onComplete = null)
+    {
+        HandleCutsceneFade(cutsceneType, onComplete);
+    }
+    
+    /// <summary>
+    /// Reset fade to default state (transparent and disabled)
+    /// </summary>
+    public void ResetFade()
+    {
+        if (backgroundFade != null)
+        {
+            backgroundFade.gameObject.SetActive(false);
+            Color fadeColor = backgroundFade.color;
+            fadeColor.a = 0f;
+            backgroundFade.color = fadeColor;
+        }
+    }
 
     #endregion
 
     #region Core Game Processing
 
-    [Obsolete]
     private void ProcessCurrentBlock()
     {
         if (currentBlockIndex >= coreGameData.coreBlock.Length) return;
@@ -222,7 +337,6 @@ public class CoreGameManager : MonoBehaviour
         }
     }
 
-    [Obsolete]
     private void ProcessDialogBlock(CoreGameBlock block)
     {
         if (block.Dialog == null)
@@ -255,7 +369,6 @@ public class CoreGameManager : MonoBehaviour
         }
     }
 
-    [Obsolete]
     private void ProcessCutsceneBlock(CoreGameBlock block)
     {
         if (block.Animation == null)
@@ -274,11 +387,776 @@ public class CoreGameManager : MonoBehaviour
 
     #endregion
 
+    #region Helper Methods for Dialog Text Assignment
+    
+    /// <summary>
+    /// Helper method to update NPC name with proper error handling
+    /// </summary>
+    public void UpdateNpcNameSafe(string npcName)
+    {
+        Debug.Log($"[SAFE] Updating NPC name to: '{npcName}'");
+        
+        if (dialogInstance != null)
+        {
+            // Try DialogPrefabController first
+            DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+            if (controller != null)
+            {
+                controller.SetDialogName(npcName);
+                Debug.Log($"[SAFE] ✓ Updated via DialogPrefabController");
+                return;
+            }
+            
+            // Fallback to direct search
+            Transform nameTransform = dialogInstance.transform.Find("DialogueName");
+            if (nameTransform != null)
+            {
+                TMP_Text nameText = nameTransform.GetComponent<TMP_Text>();
+                if (nameText != null)
+                {
+                    nameText.text = npcName;
+                    Debug.Log($"[SAFE] ✓ Updated DialogueName directly");
+                    return;
+                }
+            }
+        }
+        
+        Debug.LogWarning($"[SAFE] ✗ Could not update NPC name: {npcName}");
+    }
+    
+    /// <summary>
+    /// Helper method to update dialog text with proper error handling
+    /// </summary>
+    public void UpdateDialogTextSafe(string dialogText)
+    {
+        Debug.Log($"[SAFE] Updating dialog text to: '{dialogText}'");
+        
+        if (dialogInstance != null)
+        {
+            // Try DialogPrefabController first
+            DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+            if (controller != null)
+            {
+                controller.SetDialogText(dialogText);
+                Debug.Log($"[SAFE] ✓ Updated via DialogPrefabController");
+                return;
+            }
+            
+            // Fallback to direct search
+            Transform textTransform = dialogInstance.transform.Find("DialogueText");
+            if (textTransform != null)
+            {
+                TMP_Text textComponent = textTransform.GetComponent<TMP_Text>();
+                if (textComponent != null)
+                {
+                    textComponent.text = dialogText;
+                    Debug.Log($"[SAFE] ✓ Updated DialogueText directly");
+                    return;
+                }
+            }
+        }
+        
+        Debug.LogWarning($"[SAFE] ✗ Could not update dialog text: {dialogText}");
+    }
+    
+    /// <summary>
+    /// Helper method to update button text with proper error handling
+    /// </summary>
+    public void UpdateButtonTextSafe(string buttonName, string buttonText)
+    {
+        Debug.Log($"[SAFE] Updating button '{buttonName}' text to: '{buttonText}'");
+        
+        if (questionInstance == null)
+        {
+            Debug.LogWarning("[SAFE] Question instance is null!");
+            return;
+        }
+
+        bool updated = false;
+        
+        // Method 1: Try DialogPrefabController first
+        DialogPrefabController controller = questionInstance.GetComponent<DialogPrefabController>();
+        if (controller != null)
+        {
+            Debug.Log($"[SAFE] Found DialogPrefabController, attempting to set button text...");
+            controller.SetButtonText(buttonName, buttonText);
+            Debug.Log($"[SAFE] ✓ Updated button via DialogPrefabController");
+            updated = true;
+        }
+        
+        // Method 2: Direct search for button (always try this as backup verification)
+        Transform buttonTransform = questionInstance.transform.Find(buttonName);
+        if (buttonTransform != null)
+        {
+            Button button = buttonTransform.GetComponent<Button>();
+            if (button != null)
+            {
+                TMP_Text btnText = button.GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                {
+                    Debug.Log($"[SAFE] Found button '{buttonName}' TMP_Text component: '{btnText.transform.name}' (current text: '{btnText.text}')");
+                    btnText.text = buttonText;
+                    Debug.Log($"[SAFE] ✓ Updated button '{buttonName}' directly to: '{btnText.text}'");
+                    updated = true;
+                }
+                else
+                {
+                    Debug.LogWarning($"[SAFE] Button '{buttonName}' has no TMP_Text component!");
+                    
+                    // Debug button structure
+                    Transform[] children = button.GetComponentsInChildren<Transform>();
+                    Debug.Log($"[SAFE] Button '{buttonName}' children:");
+                    for (int i = 0; i < children.Length; i++)
+                    {
+                        Component[] components = children[i].GetComponents<Component>();
+                        string componentNames = "";
+                        for (int j = 0; j < components.Length; j++)
+                        {
+                            componentNames += components[j].GetType().Name;
+                            if (j < components.Length - 1) componentNames += ", ";
+                        }
+                        Debug.Log($"[SAFE]   - {children[i].name} (Components: {componentNames})");
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[SAFE] Found transform '{buttonName}' but no Button component!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[SAFE] Button transform '{buttonName}' not found!");
+            
+            // Debug all children in question instance
+            Debug.Log($"[SAFE] Question instance children:");
+            Transform[] allChildren = questionInstance.GetComponentsInChildren<Transform>();
+            for (int i = 0; i < allChildren.Length; i++)
+            {
+                Debug.Log($"[SAFE]   - {allChildren[i].name}");
+            }
+        }
+        
+        if (!updated)
+        {
+            Debug.LogError($"[SAFE] ✗ FAILED to update button '{buttonName}' text: {buttonText}");
+        }
+    }
+    
+    /// <summary>
+    /// Test method to manually verify dialog text assignments
+    /// Call this from Unity Inspector or console to test your setup
+    /// </summary>
+    [ContextMenu("Test Dialog Text Assignment")]
+    public void TestDialogTextAssignment()
+    {
+        Debug.Log("=== TESTING DIALOG TEXT ASSIGNMENT ===");
+        
+        // Test NPC name assignment
+        UpdateNpcNameSafe("Test NPC Name");
+        
+        // Test dialog text assignment
+        UpdateDialogTextSafe("This is a test dialog message");
+        
+        // Test button text assignment
+        UpdateButtonTextSafe("Q", "[Q] Test Choice 1");
+        UpdateButtonTextSafe("W", "[W] Test Choice 2");
+        UpdateButtonTextSafe("E", "[E] Test Choice 3");
+        
+        Debug.Log("=== END DIALOG TEXT ASSIGNMENT TEST ===");
+    }
+    
+    /// <summary>
+    /// Debug method to inspect current dialog/choice data
+    /// </summary>
+    [ContextMenu("Debug Current Dialog Data")]
+    public void DebugCurrentDialogData()
+    {
+        Debug.Log("=== DEBUGGING CURRENT DIALOG DATA ===");
+        
+        if (coreGameData == null)
+        {
+            Debug.LogError("CoreGameData is null!");
+            return;
+        }
+        
+        if (coreGameData.coreBlock == null || coreGameData.coreBlock.Length == 0)
+        {
+            Debug.LogError("CoreGameData has no blocks!");
+            return;
+        }
+        
+        Debug.Log($"CoreGameData has {coreGameData.coreBlock.Length} blocks");
+        Debug.Log($"Current block index: {currentBlockIndex}");
+        
+        if (currentBlockIndex < coreGameData.coreBlock.Length)
+        {
+            var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+            if (currentBlock.Dialog != null)
+            {
+                Debug.Log($"Current dialog:");
+                Debug.Log($"  - npcName: '{currentBlock.Dialog.npcName}'");
+                Debug.Log($"  - dialogEntry: '{currentBlock.Dialog.dialogEntry}'");
+                
+                if (currentBlock.Dialog.choices != null)
+                {
+                    Debug.Log($"  - Has {currentBlock.Dialog.choices.Length} choices:");
+                    for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+                    {
+                        var choice = currentBlock.Dialog.choices[i];
+                        if (choice != null)
+                        {
+                            Debug.Log($"    Choice {i}: '{choice.playerChoice}'");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"    Choice {i}: NULL");
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("  - No choices");
+                }
+            }
+            else
+            {
+                Debug.Log("Current block has no dialog");
+            }
+        }
+        
+        Debug.Log("=== END DIALOG DATA DEBUG ===");
+    }
+    
+    /// <summary>
+    /// Test button array access and modification
+    /// </summary>
+    [ContextMenu("Test Button Array")]
+    public void TestButtonArray()
+    {
+        Debug.Log("=== TESTING BUTTON ARRAY ACCESS ===");
+        
+        if (questionInstance == null)
+        {
+            Debug.LogError("Question instance is null! Cannot test buttons.");
+            return;
+        }
+        
+        Button[] buttonArray = questionInstance.GetComponentsInChildren<Button>();
+        Debug.Log($"Found {buttonArray.Length} buttons in question instance");
+        
+        for (int i = 0; i < buttonArray.Length; i++)
+        {
+            Button btn = buttonArray[i];
+            if (btn != null)
+            {
+                Debug.Log($"Button {i}: '{btn.name}' (GameObject: {btn.gameObject.name})");
+                
+                TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                {
+                    string testText = $"[TEST{i}] Button {i} Array Test";
+                    Debug.Log($"Setting button {i} text to: '{testText}'");
+                    btnText.text = testText;
+                    Debug.Log($"Button {i} text is now: '{btnText.text}'");
+                }
+                else
+                {
+                    Debug.LogError($"CRITICAL: Button {i} ({btn.name}) has no TMP_Text component!");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Button {i} in array is null!");
+            }
+        }
+        
+        Debug.Log("=== END BUTTON ARRAY TEST ===");
+    }
+    
+    /// <summary>
+    /// Test keyboard input functionality - simulates Q, W, E key presses
+    /// </summary>
+    [ContextMenu("Test Keyboard Input")]
+    public void TestKeyboardInput()
+    {
+        Debug.Log("=== TESTING KEYBOARD INPUT ===");
+        
+        if (onChoiceSelected == null)
+        {
+            Debug.LogWarning("No choices are currently active. Please show choices first.");
+            return;
+        }
+        
+        Debug.Log("Testing keyboard input simulation...");
+        
+        // Test Q key (choice 0)
+        Debug.Log("Simulating Q key press (choice 0):");
+        SelectChoice(0);
+        
+        // Wait a moment, then test W key (choice 1) - you can uncomment these for manual testing
+        // Debug.Log("Simulating W key press (choice 1):");
+        // SelectChoice(1);
+        
+        // Debug.Log("Simulating E key press (choice 2):");
+        // SelectChoice(2);
+        
+        Debug.Log("=== END KEYBOARD INPUT TEST ===");
+    }
+    
+    /// <summary>
+    /// Test method to simulate dialog responses with multiple entries
+    /// </summary>
+    [ContextMenu("Test Multiple Dialog Responses")]
+    public void TestMultipleDialogResponses()
+    {
+        Debug.Log("=== TESTING MULTIPLE DIALOG RESPONSES ===");
+        
+        if (coreGameData == null)
+        {
+            Debug.LogError("CoreGameData is null! Cannot test responses.");
+            return;
+        }
+        
+        Debug.Log($"Current dialog response state:");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        
+        if (isShowingResponse && selectedChoiceIndex >= 0)
+        {
+            var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+            if (currentBlock.Dialog?.choices != null && selectedChoiceIndex < currentBlock.Dialog.choices.Length)
+            {
+                var selectedChoice = currentBlock.Dialog.choices[selectedChoiceIndex];
+                if (selectedChoice.dialogResponses != null)
+                {
+                    Debug.Log($"Selected choice '{selectedChoice.playerChoice}' has {selectedChoice.dialogResponses.Length} responses:");
+                    for (int i = 0; i < selectedChoice.dialogResponses.Length; i++)
+                    {
+                        var response = selectedChoice.dialogResponses[i];
+                        string indicator = (i == currentChoiceResponseIndex) ? " <- CURRENT" : "";
+                        Debug.Log($"  Response {i}: '{response.NpcName}' says '{response.npcResponse}'{indicator}");
+                    }
+                    
+                    Debug.Log("Press SPACE to advance to next response or continue to next block.");
+                }
+                else
+                {
+                    Debug.Log("Selected choice has no dialog responses.");
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("Not currently showing responses. Select a choice first.");
+        }
+        
+        Debug.Log("=== END MULTIPLE DIALOG RESPONSES TEST ===");
+    }
+    
+    /// <summary>
+    /// Debug current dialog progression state and attempt to recover from stuck states
+    /// </summary>
+    [ContextMenu("Debug Dialog Progression State")]
+    public void DebugDialogProgressionState()
+    {
+        Debug.Log("=== DIALOG PROGRESSION STATE DEBUG ===");
+        
+        Debug.Log($"Dialog Manager State:");
+        Debug.Log($"  - isPlayingCutscene: {isPlayingCutscene}");
+        Debug.Log($"  - isTextAnimating: {isTextAnimating}");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - IsSequenceRunning: {IsSequenceRunning}");
+        
+        Debug.Log($"Block Information:");
+        Debug.Log($"  - currentBlockIndex: {currentBlockIndex}");
+        Debug.Log($"  - Total blocks: {(coreGameData?.coreBlock?.Length ?? 0)}");
+        
+        Debug.Log($"Choice State:");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        Debug.Log($"  - onChoiceSelected != null: {onChoiceSelected != null}");
+        
+        Debug.Log($"UI State:");
+        Debug.Log($"  - dialogInstance != null: {dialogInstance != null}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        
+        if (coreGameData != null && currentBlockIndex < coreGameData.coreBlock.Length)
+        {
+            var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+            Debug.Log($"Current Block:");
+            Debug.Log($"  - Type: {currentBlock.Type}");
+            
+            if (currentBlock.Dialog != null)
+            {
+                Debug.Log($"  - Dialog Type: {currentBlock.Dialog.dialogType}");
+                Debug.Log($"  - Has Choices: {currentBlock.Dialog.choices != null && currentBlock.Dialog.choices.Length > 0}");
+                if (currentBlock.Dialog.choices != null)
+                {
+                    Debug.Log($"  - Choice Count: {currentBlock.Dialog.choices.Length}");
+                }
+            }
+        }
+        
+        Debug.Log("=== ATTEMPTING PROGRESSION ===");
+        Debug.Log("Calling HandleDialogProgression() to see current behavior...");
+        HandleDialogProgression();
+        
+        Debug.Log("=== END DIALOG PROGRESSION STATE DEBUG ===");
+    }
+    
+    /// <summary>
+    /// Force reset dialog state - use this if dialog gets stuck
+    /// </summary>
+    [ContextMenu("Force Reset Dialog State")]
+    public void ForceResetDialogState()
+    {
+        Debug.Log("=== FORCE RESETTING DIALOG STATE ===");
+        
+        // Reset all dialog states
+        isShowingResponse = false;
+        isTextAnimating = false;
+        isPlayingCutscene = false;
+        selectedChoiceIndex = -1;
+        currentChoiceResponseIndex = -1;
+        onChoiceSelected = null;
+        
+        // Clear button states
+        buttonTweenIds.Clear();
+        
+        // Stop any audio
+        if (dialogAudioSource != null && dialogAudioSource.isPlaying)
+        {
+            dialogAudioSource.Stop();
+        }
+        
+        // Cancel any active tweens
+        if (dialogTween != null)
+        {
+            LeanTween.cancel(gameObject, dialogTween.id);
+            dialogTween = null;
+        }
+        
+        // Clear 3D dialogs
+        ClearAll3DDialogs();
+        
+        // Hide any active choices
+        HideChoices();
+        
+        Debug.Log("Dialog state has been reset. Try pressing SPACE or selecting a choice again.");
+        Debug.Log("If still stuck, try 'Debug Dialog Progression State' to see what's happening.");
+        
+        Debug.Log("=== DIALOG STATE RESET COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Comprehensive dialog progression fix - call this if dialog gets stuck
+    /// </summary>
+    [ContextMenu("Fix Dialog Progression")]
+    public void FixDialogProgression()
+    {
+        Debug.Log("=== ATTEMPTING TO FIX DIALOG PROGRESSION ===");
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.Log("Already at end of game");
+            FinishCoreGame();
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        Debug.Log($"Current block {currentBlockIndex}: Type={currentBlock.Type}");
+        
+        if (currentBlock.Type == CoreGameBlock.CoreType.Dialog && currentBlock.Dialog != null)
+        {
+            bool hasChoices = currentBlock.Dialog.choices != null && currentBlock.Dialog.choices.Length > 0;
+            Debug.Log($"Dialog block has choices: {hasChoices}");
+            
+            if (!hasChoices)
+            {
+                Debug.Log("No choices - this dialog should auto-advance. Forcing continuation...");
+                isShowingResponse = false;
+                isTextAnimating = false;
+                currentChoiceResponseIndex = -1;
+                selectedChoiceIndex = -1;
+                onChoiceSelected = null;
+                
+                // Force advance to next block
+                ContinueToNextBlock();
+            }
+            else
+            {
+                Debug.Log($"Dialog has {currentBlock.Dialog.choices.Length} choices - waiting for user selection");
+                
+                // Check if we're stuck in response mode
+                if (isShowingResponse)
+                {
+                    Debug.Log("Currently showing response - this might be the problem");
+                    if (selectedChoiceIndex >= 0 && selectedChoiceIndex < currentBlock.Dialog.choices.Length)
+                    {
+                        var selectedChoice = currentBlock.Dialog.choices[selectedChoiceIndex];
+                        if (selectedChoice.dialogResponses == null || selectedChoice.dialogResponses.Length == 0)
+                        {
+                            Debug.Log("Selected choice has no responses - forcing next block");
+                            isShowingResponse = false;
+                            currentChoiceResponseIndex = -1;
+                            selectedChoiceIndex = -1;
+                            ContinueToNextBlock();
+                        }
+                        else
+                        {
+                            Debug.Log($"Selected choice has {selectedChoice.dialogResponses.Length} responses, currentResponseIndex={currentChoiceResponseIndex}");
+                            if (currentChoiceResponseIndex >= selectedChoice.dialogResponses.Length - 1)
+                            {
+                                Debug.Log("All responses shown - forcing next block");
+                                isShowingResponse = false;
+                                currentChoiceResponseIndex = -1;
+                                selectedChoiceIndex = -1;
+                                ContinueToNextBlock();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"Current block is not a dialog or has no dialog data - forcing next block");
+            ContinueToNextBlock();
+        }
+        
+        Debug.Log("=== DIALOG PROGRESSION FIX COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Test text animation - call this to verify animation is working
+    /// </summary>
+    [ContextMenu("Test Text Animation")]
+    public void TestTextAnimation()
+    {
+        Debug.Log("=== TESTING TEXT ANIMATION ===");
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogError("No dialog instance found! Please create a dialog first.");
+            return;
+        }
+        
+        // Find the text component to animate
+        TMP_Text dialogTextComponent = null;
+        DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+        if (controller != null && controller.dialogueText != null)
+        {
+            dialogTextComponent = controller.dialogueText;
+            Debug.Log("Found DialogueText component via DialogPrefabController for test animation");
+        }
+        else
+        {
+            Transform textTransform = dialogInstance.transform.Find("DialogueText");
+            if (textTransform != null)
+            {
+                dialogTextComponent = textTransform.GetComponent<TMP_Text>();
+                Debug.Log("Found DialogueText component via direct search for test animation");
+            }
+        }
+        
+        if (dialogTextComponent != null)
+        {
+            string testText = "This is a test of the typewriter text animation system. It should appear character by character with proper timing.";
+            Debug.Log($"Starting test animation with text: '{testText}'");
+            AnimateDialogText(testText, dialogTextComponent, null);
+        }
+        else
+        {
+            Debug.LogError("Could not find DialogueText component for animation test!");
+        }
+        
+        Debug.Log("=== END TEXT ANIMATION TEST ===");
+    }
+    
+    #endregion
+    
+    /// <summary>
+    /// Get NPC response from CoreGameDialogChoices using current response index
+    /// </summary>
+    private string GetNpcResponseFromChoice(CoreGameDialogChoices choice)
+    {
+        if (choice.dialogResponses == null || choice.dialogResponses.Length == 0)
+        {
+            Debug.LogWarning("No dialog responses found in choice!");
+            return "No response available.";
+        }
+        
+        // Use selectedResponseIndex, but clamp it to valid range
+        int responseIndex = Mathf.Clamp(selectedResponseIndex, 0, choice.dialogResponses.Length - 1);
+        return choice.dialogResponses[responseIndex].npcResponse;
+    }
+    
+    /// <summary>
+    /// Get NPC name from CoreGameDialogChoices using current response index
+    /// </summary>
+    private string GetNpcNameFromChoice(CoreGameDialogChoices choice)
+    {
+        if (choice.dialogResponses == null || choice.dialogResponses.Length == 0)
+        {
+            Debug.LogWarning("No dialog responses found in choice!");
+            return "Unknown";
+        }
+        
+        // Use selectedResponseIndex, but clamp it to valid range
+        int responseIndex = Mathf.Clamp(selectedResponseIndex, 0, choice.dialogResponses.Length - 1);
+        return choice.dialogResponses[responseIndex].NpcName;
+    }
+    
+    /// <summary>
+    /// Set which response index to use from dialogResponses array
+    /// </summary>
+    public void SetResponseIndex(int index)
+    {
+        selectedResponseIndex = index;
+        Debug.Log($"Response index set to: {selectedResponseIndex}");
+    }
+    
+    /// <summary>
+    /// Get a random response from the available responses
+    /// </summary>
+    public void UseRandomResponse(CoreGameDialogChoices choice)
+    {
+        if (choice.dialogResponses != null && choice.dialogResponses.Length > 0)
+        {
+            selectedResponseIndex = UnityEngine.Random.Range(0, choice.dialogResponses.Length);
+            Debug.Log($"Using random response index: {selectedResponseIndex}");
+        }
+    }
+    
+    /// <summary>
+    /// Get the number of available responses for a choice
+    /// </summary>
+    public int GetResponseCount(CoreGameDialogChoices choice)
+    {
+        return choice.dialogResponses?.Length ?? 0;
+    }
+    
+    /// <summary>
+    /// Set response index based on some condition (e.g., player stats, previous choices, etc.)
+    /// </summary>
+    public void SetResponseByCondition(CoreGameDialogChoices choice, System.Func<CoreGameDialogChoicesResponse, bool> condition)
+    {
+        if (choice.dialogResponses == null || choice.dialogResponses.Length == 0)
+            return;
+            
+        for (int i = 0; i < choice.dialogResponses.Length; i++)
+        {
+            if (condition(choice.dialogResponses[i]))
+            {
+                selectedResponseIndex = i;
+                Debug.Log($"Response index set to {i} based on condition");
+                return;
+            }
+        }
+        
+        // If no condition matches, use first response
+        selectedResponseIndex = 0;
+        Debug.Log("No condition matched, using first response");
+    }
+    
+    /// <summary>
+    /// Preview all available responses for a choice (for debugging)
+    /// </summary>
+    public void LogAllResponses(CoreGameDialogChoices choice)
+    {
+        if (choice.dialogResponses == null || choice.dialogResponses.Length == 0)
+        {
+            Debug.Log("No responses available for this choice");
+            return;
+        }
+        
+        Debug.Log($"Available responses for choice '{choice.playerChoice}':");
+        for (int i = 0; i < choice.dialogResponses.Length; i++)
+        {
+            var response = choice.dialogResponses[i];
+            Debug.Log($"  [{i}] {response.NpcName}: {response.npcResponse}");
+        }
+    }
+    
+    /// <summary>
+    /// Update the NPC name display text (2D dialogs only)
+    /// </summary>
+    private void UpdateNpcNameDisplay(string npcName)
+    {
+        Debug.Log($"UpdateNpcNameDisplay called with: '{npcName}'");
+        UpdateNpcNameSafe(npcName);
+    }
+    
+    /// <summary>
+    /// Update NPC name in 3D dialog displays
+    /// </summary>
+    private void UpdateNpcNameIn3DDialog(string npcName)
+    {
+        // Update NPC names in all possible 3D dialog locations
+        string[] modelNames = { "Linda_Model", "Isayat_Model", "Rey_Baby_Model" };
+        
+        foreach (string modelName in modelNames)
+        {
+            GameObject model = GameObject.Find(modelName);
+            if (model != null)
+            {
+                // Look for NPC name text component (you might need to adjust the path)
+                Transform npcNameTransform = model.transform.Find("DialogueName");
+                if (npcNameTransform != null)
+                {
+                    var npcNameComponent = npcNameTransform.GetComponent<TMP_Text>();
+                    if (npcNameComponent != null)
+                    {
+                        npcNameComponent.text = npcName;
+                    }
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Extract NPC name from dialog text if it follows "Name: dialog" format
+    /// </summary>
+    private string ExtractNpcNameFromDialogText(string dialogText)
+    {
+        if (string.IsNullOrEmpty(dialogText))
+            return "";
+        
+        // Check if dialog follows "Name: dialog text" format
+        int colonIndex = dialogText.IndexOf(':');
+        if (colonIndex > 0 && colonIndex < 20) // Reasonable name length limit
+        {
+            string potentialName = dialogText.Substring(0, colonIndex).Trim();
+            // Simple validation - names shouldn't be too long and should be reasonable
+            if (potentialName.Length > 0 && potentialName.Length < 20 && !potentialName.Contains(' '))
+            {
+                return potentialName;
+            }
+            // Handle names with spaces (like "Rey Baby")
+            else if (potentialName.Length > 0 && potentialName.Length < 20)
+            {
+                return potentialName;
+            }
+        }
+        
+        return ""; // No name found
+    }
+
     #region Dialog Handling
 
-    [Obsolete]
     private void Show3DDialog(CoreGameDialog dialog)
     {
+        // Handle cutscene fade effect for 3D dialogs
+        HandleCutsceneFade(dialog.cutsceneType);
+        
         GameObject targetModel = null;
         
         // Find the target model based on dialog3DLocation
@@ -320,6 +1198,15 @@ public class CoreGameManager : MonoBehaviour
         }
 
         textDialog3D.gameObject.SetActive(true);
+        
+        // 3D dialogs don't need NPC name extraction - the 3D model represents the character
+        // Extract and display NPC name if present in dialog entry
+        // string npcName = ExtractNpcNameFromDialogText(dialog.dialogEntry);
+        // if (!string.IsNullOrEmpty(npcName))
+        // {
+        //     UpdateNpcNameDisplay(npcName);
+        // }
+        
         AnimateDialogText(dialog.dialogEntry, tmp3D, dialog.audioDialogEntry);
 
         // Handle choices if any
@@ -344,9 +1231,15 @@ public class CoreGameManager : MonoBehaviour
         }
     }
 
-    [Obsolete]
     private void Show2DDialog(CoreGameDialog dialog)
     {
+        Debug.Log($"=== Show2DDialog FIELD MAPPING DEBUG ===");
+        Debug.Log($"CoreGameDialog.npcName = '{dialog.npcName}' -> should go to DialogueName");
+        Debug.Log($"CoreGameDialog.dialogEntry = '{dialog.dialogEntry}' -> should go to DialogueText");
+        
+        // Validate the dialog data structure
+        ValidateDialogData(dialog);
+        
         // Only summon dialog bar if we don't have one already
         if (dialogInstance == null)
         {
@@ -359,15 +1252,62 @@ public class CoreGameManager : MonoBehaviour
             }
         }
         
-        // Get dialog text component from the existing or newly created dialog bar
-        var dialogTextComponent = dialogInstance.GetComponentInChildren<TMP_Text>();
+        // Validate the UI structure
+        ValidateDialogUI();
+        
+        // Ensure BackgroundFade reference if not assigned
+        EnsureBackgroundFadeReference();
+        
+        // Handle cutscene fade effect
+        HandleCutsceneFade(dialog.cutsceneType);
+        
+        // CRITICAL: Assign NPC name to DialogueName component
+        // Use NPC name from CoreGameDialog.npcName, or extract from dialog text as fallback
+        string npcName = !string.IsNullOrEmpty(dialog.npcName) ? dialog.npcName : ExtractNpcNameFromDialogText(dialog.dialogEntry);
+        Debug.Log($"Final npcName for DialogueName component: '{npcName}'");
+        
+        if (!string.IsNullOrEmpty(npcName))
+        {
+            UpdateNpcNameDisplay(npcName);
+        }
+        else
+        {
+            Debug.LogWarning("NPC name is empty! DialogueName will not be updated.");
+        }
+        
+        // CRITICAL: Animate dialog text instead of setting it instantly
+        // Find the DialogueText component to animate
+        TMP_Text dialogTextComponent = null;
+        if (dialogInstance != null)
+        {
+            // Try DialogPrefabController first
+            DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+            if (controller != null && controller.dialogueText != null)
+            {
+                dialogTextComponent = controller.dialogueText;
+                Debug.Log("Found DialogueText component via DialogPrefabController for animation");
+            }
+            else
+            {
+                // Fallback to direct search
+                Transform textTransform = dialogInstance.transform.Find("DialogueText");
+                if (textTransform != null)
+                {
+                    dialogTextComponent = textTransform.GetComponent<TMP_Text>();
+                    Debug.Log("Found DialogueText component via direct search for animation");
+                }
+            }
+        }
+        
         if (dialogTextComponent != null)
         {
+            Debug.Log($"Starting dialog text animation for: '{dialog.dialogEntry}'");
             AnimateDialogText(dialog.dialogEntry, dialogTextComponent, dialog.audioDialogEntry);
         }
-        else if (dialogText != null)
+        else
         {
-            AnimateDialogText(dialog.dialogEntry, dialogText, dialog.audioDialogEntry);
+            Debug.LogError("Could not find DialogueText component for animation! Falling back to instant text.");
+            UpdateDialogTextSafe(dialog.dialogEntry);
         }
         
         // Handle choices if any
@@ -377,61 +1317,810 @@ public class CoreGameManager : MonoBehaviour
         }
     }
 
-    [Obsolete]
     private void ShowChoices(CoreGameDialogChoices[] choices)
     {
         GameObject questionBar = SummonQuestionBar();
-        if (questionBar == null) return;
         
-        var playerAnswerManager = FindObjectOfType<PlayerAnswerManager>();
-        if (playerAnswerManager != null)
+        // If prefab failed, try creating a fallback question bar
+        if (questionBar == null)
         {
-            // Convert CoreGameDialogChoices to DialogChoice format
-            DialogChoice[] dialogChoices = new DialogChoice[choices.Length];
-            for (int i = 0; i < choices.Length; i++)
-            {
-                dialogChoices[i] = new DialogChoice
-                {
-                    playerChoice = choices[i].playerChoice,
-                    npcResponse = choices[i].npcResponse
-                };
-            }
+            Debug.LogWarning("Prefab question bar failed, attempting to create fallback...");
+            questionBar = CreateFallbackQuestionBar();
+        }
+        
+        if (questionBar == null) 
+        {
+            Debug.LogError("Both prefab and fallback question bar creation failed!");
+            return;
+        }
+        
+        ShowChoicesWithButtons(choices, OnPlayerChoseResponse);
+    }
+    
+    /// <summary>
+    /// Integrated choice display system from PlayerAnswerManager
+    /// UPDATED: Use button array approach for direct modification
+    /// </summary>
+    private void ShowChoicesWithButtons(CoreGameDialogChoices[] choices, System.Action<int> callback)
+    {
+        Debug.Log($"Showing {choices?.Length ?? 0} choices using button array approach...");
+
+        onChoiceSelected = callback;
+        buttonTweenIds.Clear();
+
+        if (choices == null || choices.Length == 0)
+        {
+            Debug.LogWarning("No choices provided to ShowChoicesWithButtons!");
+            return;
+        }
+        
+        // Debug the choices data
+        ValidateChoices(choices);
+        
+        // Validate the question UI structure
+        ValidateQuestionUI();
+
+        // Get all buttons from the question instance as an array
+        Button[] buttonArray = null;
+        if (questionInstance != null)
+        {
+            buttonArray = questionInstance.GetComponentsInChildren<Button>();
+            Debug.Log($"Found {buttonArray.Length} buttons in question instance");
             
-            playerAnswerManager.ShowChoices(dialogChoices, OnPlayerChoseResponse);
+            // Debug what buttons we found
+            for (int b = 0; b < buttonArray.Length; b++)
+            {
+                Debug.Log($"Button {b}: '{buttonArray[b].name}' (GameObject: {buttonArray[b].gameObject.name})");
+            }
+        }
+        
+        if (buttonArray == null || buttonArray.Length == 0)
+        {
+            Debug.LogError("No buttons found in question instance!");
+            return;
+        }
+
+        // Show up to 3 choices on screen (or all choices if less than 3), limited by available buttons
+        int choicesToShow = Mathf.Min(choices.Length, 3, buttonArray.Length);
+        
+        Debug.Log($"Total choices in data: {choices.Length}, UI will show: {choicesToShow} (Available buttons: {buttonArray.Length})");
+
+        for (int i = 0; i < choicesToShow; i++)
+        {
+            if (choices[i] != null && i < buttonArray.Length)
+            {
+                Debug.Log($"Processing choice {i}: '{choices[i].playerChoice}' -> Button {i} ({buttonArray[i].name})");
+                
+                Button btn = buttonArray[i];
+                btn.gameObject.SetActive(true);
+                btn.onClick.RemoveAllListeners();
+
+                // CRITICAL: Use choices[i].playerChoice directly from CoreGameDialogChoices data structure
+                string choiceText = choices[i].playerChoice;
+                
+                // Handle empty playerChoice
+                if (string.IsNullOrEmpty(choiceText))
+                {
+                    choiceText = $"Choice {i + 1}";
+                    Debug.LogWarning($"Choice {i} has empty playerChoice field! Using fallback: '{choiceText}'");
+                }
+                
+                // Add key indicator based on button index
+                string keyIndicator = GetKeyIndicator(i);
+                string buttonTextWithKey = $"{keyIndicator} {choiceText}";
+                
+                Debug.Log($"Setting button array[{i}] ({btn.name}) text to: '{buttonTextWithKey}'");
+                
+                // Direct TMP_Text assignment to button
+                TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                {
+                    Debug.Log($"Found TMP_Text in button {i}: '{btnText.transform.name}' (current: '{btnText.text}')");
+                    btnText.text = buttonTextWithKey;
+                    Debug.Log($"Button {i} updated to: '{btnText.text}'");
+                }
+                else
+                {
+                    Debug.LogError($"CRITICAL: Button array[{i}] ({btn.name}) has no TMP_Text component!");
+                    
+                    // Debug button structure
+                    Transform[] children = btn.GetComponentsInChildren<Transform>();
+                    Debug.Log($"Button {i} ({btn.name}) children:");
+                    for (int c = 0; c < children.Length; c++)
+                    {
+                        Component[] components = children[c].GetComponents<Component>();
+                        string componentNames = "";
+                        for (int j = 0; j < components.Length; j++)
+                        {
+                            componentNames += components[j].GetType().Name;
+                            if (j < components.Length - 1) componentNames += ", ";
+                        }
+                        Debug.Log($"  - {children[c].name} (Components: {componentNames})");
+                    }
+                }
+
+                int index = i; // Important for correct capture
+                btn.onClick.AddListener(() => {
+                    // If animation is still playing, finish it instantly
+                    if (buttonTweenIds.TryGetValue(btn, out int tweenId) && LeanTween.isTweening(tweenId))
+                    {   
+                        TMP_Text btnText2 = btn.GetComponentInChildren<TMP_Text>();
+                        if (btnText2 != null)
+                        {
+                            string keyIndicator = GetKeyIndicator(index);
+                            string choiceTextFinal = !string.IsNullOrEmpty(choices[index].playerChoice) ? choices[index].playerChoice : $"Choice {index + 1}";
+                            btnText2.text = $"{keyIndicator} {choiceTextFinal}";
+                        }
+                        LeanTween.cancel(tweenId);
+                        buttonTweenIds.Remove(btn);
+                        return; // Don't invoke choice yet, just finish animation
+                    }
+
+                    // Custom logic: Only detect "mapname:scene_name" pattern
+                    const string moveMapPrefix = "mapname:";
+                    string npcResponse = GetNpcResponseFromChoice(choices[index]);
+                    Debug.Log(npcResponse);
+                    int prefixIndex = npcResponse.IndexOf(moveMapPrefix);
+                    if (prefixIndex != -1)
+                    {
+                        int start = prefixIndex + moveMapPrefix.Length;
+                        int end = npcResponse.IndexOf(' ', start);
+                        string mapName;
+                        if (end == -1)
+                            mapName = npcResponse.Substring(start);
+                        else
+                            mapName = npcResponse.Substring(start, end - start);
+
+                        // Handle map movement logic here if needed
+                        Debug.Log($"Map movement detected: {mapName}");
+                    }
+
+                    onChoiceSelected?.Invoke(index);
+                    HideChoices(); // Hide all buttons after a choice is made
+                });
+            }
+        }
+        
+        // Hide unused buttons
+        for (int i = choicesToShow; i < buttonArray.Length; i++)
+        {
+            if (buttonArray[i] != null)
+            {
+                buttonArray[i].gameObject.SetActive(false);
+                Debug.Log($"Hidden unused button {i}: {buttonArray[i].name}");
+            }
         }
     }
-
-    [Obsolete]
-    private void OnPlayerChoseResponse(int choiceIndex)
+    
+    /// <summary>
+    /// Hide choices and clean up buttons using button array approach
+    /// </summary>
+    private void HideChoices()
     {
-        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
-        if (currentBlock.Dialog?.choices == null || choiceIndex >= currentBlock.Dialog.choices.Length)
-            return;
+        Debug.Log("Hiding choices using button array approach...");
         
-        var selectedChoice = currentBlock.Dialog.choices[choiceIndex];
-        
-        // Show the NPC response based on dialog type
-        if (currentBlock.Dialog.dialogType == CoreGameDialog.DialogType.ThreeD)
+        if (questionInstance != null)
         {
-            // Show 3D response
-            Show3DResponse(currentBlock.Dialog, selectedChoice.npcResponse, selectedChoice.audioDialogResponse);
+            Button[] buttonArray = questionInstance.GetComponentsInChildren<Button>();
+            Debug.Log($"Found {buttonArray.Length} buttons to hide in question instance");
+            
+            for (int i = 0; i < buttonArray.Length; i++)
+            {
+                Button btn = buttonArray[i];
+                if (btn != null)
+                {
+                    btn.onClick.RemoveAllListeners();
+                    TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
+                    if (btnText != null)
+                    {
+                        Debug.Log($"Clearing button {i} ({btn.name}) text: was '{btnText.text}'");
+                        btnText.text = "";
+                    }
+                    btn.gameObject.SetActive(false);
+                    Debug.Log($"Hidden button {i}: {btn.name}");
+                }
+            }
+        }
+        
+        // Also hide any buttons from the answerButtons array (fallback)
+        if (answerButtons != null)
+        {
+            Debug.Log($"Also hiding {answerButtons.Length} buttons from answerButtons fallback array");
+            for (int i = 0; i < answerButtons.Length; i++)
+            {
+                Button btn = answerButtons[i];
+                if (btn != null)
+                {
+                    btn.onClick.RemoveAllListeners();
+                    TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
+                    if (btnText != null)
+                    {
+                        btnText.text = "";
+                    }
+                    btn.gameObject.SetActive(false);
+                }
+            }
+        }
+        
+        // Clear choice selection state
+        onChoiceSelected = null;
+        buttonTweenIds.Clear();
+        
+        Debug.Log("All buttons hidden and cleared");
+    }
+    
+    /// <summary>
+    /// Get key indicator for button based on index
+    /// </summary>
+    private string GetKeyIndicator(int buttonIndex)
+    {
+        switch (buttonIndex)
+        {
+            case 0: return "[Q]";
+            case 1: return "[W]";
+            case 2: return "[E]";
+            default: return $"[{buttonIndex + 1}]"; // Fallback for additional buttons
+        }
+    }
+    
+    /// <summary>
+    /// Get choice button by name from the question instance, with fallback creation
+    /// </summary>
+    private Button GetChoiceButton(string buttonName)
+    {
+        if (questionInstance == null)
+        {
+            Debug.LogWarning("Question instance is null, cannot find button!");
+            return null;
+        }
+        
+        Transform buttonTransform = questionInstance.transform.Find(buttonName);
+        if (buttonTransform != null)
+        {
+            Button button = buttonTransform.GetComponent<Button>();
+            if (button != null)
+            {
+                return button;
+            }
+            else
+            {
+                Debug.LogWarning($"GameObject '{buttonName}' found but has no Button component!");
+            }
         }
         else
         {
-            // Show 2D response
-            var textComponent = dialogInstance?.GetComponentInChildren<TMP_Text>() ?? dialogText;
-            if (textComponent != null)
+            Debug.LogWarning($"Button '{buttonName}' not found as direct child of question instance!");
+            
+            // Try to find it deeper in the hierarchy
+            Button[] allButtons = questionInstance.GetComponentsInChildren<Button>();
+            foreach (Button btn in allButtons)
             {
-                AnimateDialogText(selectedChoice.npcResponse, textComponent, selectedChoice.audioDialogResponse);
+                if (btn.transform.name.Contains(buttonName) || btn.transform.name.Equals(buttonName))
+                {
+                    Debug.Log($"Found button '{buttonName}' deeper in hierarchy: {btn.transform.name}");
+                    return btn;
+                }
+            }
+            
+            Debug.LogWarning($"Button '{buttonName}' not found anywhere in question instance hierarchy!");
+        }
+        
+        return null;
+    }
+    
+    /// <summary>
+    /// Create a fallback question bar programmatically if prefab fails
+    /// </summary>
+    private GameObject CreateFallbackQuestionBar()
+    {
+        Debug.Log("Creating fallback question bar programmatically...");
+        
+        Canvas canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null)
+        {
+            Debug.LogError("No Canvas found for fallback question bar!");
+            return null;
+        }
+        
+        // Create main container
+        GameObject questionBar = new GameObject("FallbackQuestionBar");
+        questionBar.transform.SetParent(canvas.transform, false);
+        
+        RectTransform questionRect = questionBar.AddComponent<RectTransform>();
+        questionRect.anchorMin = new Vector2(0f, 0f);
+        questionRect.anchorMax = new Vector2(1f, 0.3f);
+        questionRect.offsetMin = Vector2.zero;
+        questionRect.offsetMax = Vector2.zero;
+        
+        // Add background image
+        Image background = questionBar.AddComponent<Image>();
+        background.color = new Color(0, 0, 0, 0.8f);
+        
+        // Create button container
+        GameObject buttonContainer = new GameObject("ButtonContainer");
+        buttonContainer.transform.SetParent(questionBar.transform, false);
+        
+        RectTransform containerRect = buttonContainer.AddComponent<RectTransform>();
+        containerRect.anchorMin = new Vector2(0.1f, 0.3f);
+        containerRect.anchorMax = new Vector2(0.9f, 0.7f);
+        containerRect.offsetMin = Vector2.zero;
+        containerRect.offsetMax = Vector2.zero;
+        
+        // Add horizontal layout group
+        HorizontalLayoutGroup layout = buttonContainer.AddComponent<HorizontalLayoutGroup>();
+        layout.spacing = 20f;
+        layout.childAlignment = TextAnchor.MiddleCenter;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = true;
+        
+        // Create Q, W, E buttons
+        string[] buttonNames = { "Q", "W", "E" };
+        for (int i = 0; i < buttonNames.Length; i++)
+        {
+            GameObject buttonObj = new GameObject(buttonNames[i]);
+            buttonObj.transform.SetParent(buttonContainer.transform, false);
+            
+            // Add button component
+            Button button = buttonObj.AddComponent<Button>();
+            
+            // Add button image
+            Image buttonImage = buttonObj.AddComponent<Image>();
+            buttonImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+            
+            // Create text child
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(buttonObj.transform, false);
+            
+            TMP_Text buttonText = textObj.AddComponent<TMP_Text>();
+            buttonText.text = $"[{buttonNames[i]}] Choice {i + 1}";
+            buttonText.fontSize = 18;
+            buttonText.color = Color.white;
+            buttonText.alignment = TextAlignmentOptions.Center;
+            
+            RectTransform textRect = textObj.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+            
+            Debug.Log($"Created fallback button: {buttonNames[i]}");
+        }
+        
+        questionInstance = questionBar;
+        Debug.Log("Fallback question bar created successfully!");
+        
+        return questionBar;
+    }
+    
+    /// <summary>
+    /// Initialize and clear all answer buttons
+    /// </summary>
+    private void InitializeButtons()
+    {
+        Debug.Log("Initializing buttons...");
+        for (int i = 0; i < answerButtons.Length; i++)
+        {
+            if (answerButtons[i] != null)
+            {
+                answerButtons[i].gameObject.SetActive(false);
+                answerButtons[i].onClick.RemoveAllListeners();
+                
+                // Find ALL TMP_Text components in the button and clear them
+                TMP_Text[] allTexts = answerButtons[i].GetComponentsInChildren<TMP_Text>();
+                foreach (var txt in allTexts)
+                {
+                    Debug.Log($"Clearing text component '{txt.transform.name}' in button {i}: was '{txt.text}'");
+                    txt.text = "";
+                }
+                
+                // Also try the direct approach
+                TMP_Text btnText = answerButtons[i].GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                {
+                    btnText.text = "";
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Validate choices for debugging purposes
+    /// </summary>
+    public void ValidateChoices(CoreGameDialogChoices[] choices)
+    {
+        if (choices == null)
+        {
+            Debug.LogError("Choices array is null!");
+            return;
+        }
+        
+        Debug.Log($"Validating {choices.Length} choices:");
+        for (int i = 0; i < choices.Length; i++)
+        {
+            if (choices[i] == null)
+            {
+                Debug.LogError($"Choice {i} is null!");
+            }
+            else
+            {
+                Debug.Log($"Choice {i}: playerChoice='{choices[i].playerChoice}', hasResponses={choices[i].dialogResponses != null && choices[i].dialogResponses.Length > 0}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Comprehensive data validation for debugging dialog/choice issues
+    /// </summary>
+    private void ValidateDialogData(CoreGameDialog dialog)
+    {
+        Debug.Log($"=== DIALOG DATA VALIDATION ===");
+        Debug.Log($"CoreGameDialog.npcName: '{dialog.npcName}' (Length: {dialog.npcName?.Length ?? 0})");
+        Debug.Log($"CoreGameDialog.dialogEntry: '{dialog.dialogEntry}' (Length: {dialog.dialogEntry?.Length ?? 0})");
+        
+        if (dialog.choices != null)
+        {
+            Debug.Log($"Dialog has {dialog.choices.Length} choices:");
+            for (int i = 0; i < dialog.choices.Length; i++)
+            {
+                var choice = dialog.choices[i];
+                if (choice != null)
+                {
+                    Debug.Log($"  Choice {i}:");
+                    Debug.Log($"    - playerChoice: '{choice.playerChoice}' (Length: {choice.playerChoice?.Length ?? 0})");
+                    
+                    if (choice.dialogResponses != null)
+                    {
+                        Debug.Log($"    - Has {choice.dialogResponses.Length} responses:");
+                        for (int j = 0; j < choice.dialogResponses.Length; j++)
+                        {
+                            var response = choice.dialogResponses[j];
+                            if (response != null)
+                            {
+                                Debug.Log($"      Response {j}:");
+                                Debug.Log($"        - NpcName: '{response.NpcName}' (Length: {response.NpcName?.Length ?? 0})");
+                                Debug.Log($"        - npcResponse: '{response.npcResponse}' (Length: {response.npcResponse?.Length ?? 0})");
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"      Response {j} is NULL!");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"    - Choice {i} has no dialogResponses array!");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"  Choice {i} is NULL!");
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("Dialog has no choices.");
+        }
+        
+        Debug.Log($"=== END DIALOG DATA VALIDATION ===");
+    }
+
+    /// <summary>
+    /// Validate UI components in dialog instance
+    /// </summary>
+    private void ValidateDialogUI()
+    {
+        Debug.Log($"=== DIALOG UI VALIDATION ===");
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogError("dialogInstance is NULL!");
+            return;
+        }
+        
+        Debug.Log($"Dialog instance: {dialogInstance.name}");
+        
+        // Check for DialogueName component
+        Transform dialogueNameTransform = dialogInstance.transform.Find("DialogueName");
+        if (dialogueNameTransform != null)
+        {
+            TMP_Text dialogueNameText = dialogueNameTransform.GetComponent<TMP_Text>();
+            if (dialogueNameText != null)
+            {
+                Debug.Log($"✓ DialogueName found: '{dialogueNameText.text}'");
+            }
+            else
+            {
+                Debug.LogWarning("DialogueName transform found but no TMP_Text component!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("DialogueName transform not found!");
+        }
+        
+        // Check for DialogueText component
+        Transform dialogueTextTransform = dialogInstance.transform.Find("DialogueText");
+        if (dialogueTextTransform != null)
+        {
+            TMP_Text dialogueTextComponent = dialogueTextTransform.GetComponent<TMP_Text>();
+            if (dialogueTextComponent != null)
+            {
+                Debug.Log($"✓ DialogueText found: '{dialogueTextComponent.text}'");
+            }
+            else
+            {
+                Debug.LogWarning("DialogueText transform found but no TMP_Text component!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("DialogueText transform not found!");
+        }
+        
+        // List all TMP_Text components
+        TMP_Text[] allTexts = dialogInstance.GetComponentsInChildren<TMP_Text>();
+        Debug.Log($"All TMP_Text components in dialog instance ({allTexts.Length}):");
+        for (int i = 0; i < allTexts.Length; i++)
+        {
+            Debug.Log($"  [{i}] {allTexts[i].transform.name}: '{allTexts[i].text}'");
+        }
+        
+        Debug.Log($"=== END DIALOG UI VALIDATION ===");
+    }
+
+    /// <summary>
+    /// Validate question bar UI components
+    /// </summary>
+    private void ValidateQuestionUI()
+    {
+        Debug.Log($"=== QUESTION UI VALIDATION ===");
+        
+        if (questionInstance == null)
+        {
+            Debug.LogError("questionInstance is NULL!");
+            return;
+        }
+        
+        Debug.Log($"Question instance: {questionInstance.name}");
+        
+        string[] buttonNames = { "Q", "W", "E" };
+        foreach (string buttonName in buttonNames)
+        {
+            Button btn = GetChoiceButton(buttonName);
+            if (btn != null)
+            {
+                TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                {
+                    Debug.Log($"✓ Button {buttonName} found with text: '{btnText.text}' on component '{btnText.transform.name}'");
+                }
+                else
+                {
+                    Debug.LogWarning($"Button {buttonName} found but no TMP_Text component!");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Button {buttonName} not found!");
             }
         }
         
-        // Hide choices
-        var playerAnswerManager = FindObjectOfType<PlayerAnswerManager>();
-        playerAnswerManager?.HideChoices();
+        Debug.Log($"=== END QUESTION UI VALIDATION ===");
+    }
+
+    /// <summary>
+    /// Manual test method - can be called from Unity Editor for debugging
+    /// </summary>
+    [ContextMenu("Test Dialog System")]
+    public void TestDialogSystem()
+    {
+        Debug.Log("=== MANUAL DIALOG SYSTEM TEST ===");
         
-        isShowingResponse = true;
-        currentChoiceResponseIndex = choiceIndex;
+        if (coreGameData == null)
+        {
+            Debug.LogError("CoreGameData is null! Please assign a ScriptableObject.");
+            return;
+        }
+        
+        if (coreGameData.coreBlock == null || coreGameData.coreBlock.Length == 0)
+        {
+            Debug.LogError("CoreGameData has no blocks!");
+            return;
+        }
+        
+        Debug.Log($"CoreGameData has {coreGameData.coreBlock.Length} blocks");
+        
+        for (int i = 0; i < coreGameData.coreBlock.Length; i++)
+        {
+            var block = coreGameData.coreBlock[i];
+            if (block.Dialog != null)
+            {
+                Debug.Log($"Block {i} - Dialog Block:");
+                ValidateDialogData(block.Dialog);
+            }
+        }
+        
+        // Test UI components
+        if (dialogInstance != null)
+        {
+            ValidateDialogUI();
+        }
+        else
+        {
+            Debug.Log("No dialog instance currently active");
+        }
+        
+        if (questionInstance != null)
+        {
+            ValidateQuestionUI();
+        }
+        else
+        {
+            Debug.Log("No question instance currently active");
+        }
+        
+        Debug.Log("=== END MANUAL DIALOG SYSTEM TEST ===");
+    }
+    
+    /// <summary>
+    /// Animate button text (from PlayerAnswerManager)
+    /// </summary>
+    private int AnimateButtonText(TMP_Text btnText, string fullText)
+    {
+        btnText.text = "";
+        int len = fullText.Length;
+        int counter = 0;
+
+        int tweenId = LeanTween.value(btnText.gameObject, 0, len, 0.3f)
+            .setOnUpdate((float val) =>
+            {
+                counter = Mathf.Clamp(Mathf.FloorToInt(val), 0, len);
+                btnText.text = fullText.Substring(0, counter);
+            })
+            .setOnComplete(() =>
+            {
+                btnText.text = fullText;
+            }).id;
+
+        return tweenId;
+    }
+
+    private void OnPlayerChoseResponse(int choiceIndex)
+    {
+        Debug.Log($"=== OnPlayerChoseResponse - Choice {choiceIndex} Selected ===");
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null || choiceIndex >= currentBlock.Dialog.choices.Length)
+        {
+            Debug.LogError($"Invalid choice index {choiceIndex} or no choices available!");
+            return;
+        }
+        
+        var selectedChoice = currentBlock.Dialog.choices[choiceIndex];
+        Debug.Log($"Selected choice: '{selectedChoice.playerChoice}'");
+        
+        // Hide choices first
+        HideChoices();
+        
+        // Store which choice was selected
+        selectedChoiceIndex = choiceIndex;
+        
+        // Check if there are dialog responses to show
+        if (selectedChoice.dialogResponses != null && selectedChoice.dialogResponses.Length > 0)
+        {
+            Debug.Log($"Found {selectedChoice.dialogResponses.Length} dialog responses to display");
+            
+            // Start showing responses from index 0
+            currentChoiceResponseIndex = 0;
+            isShowingResponse = true;
+            
+            ShowDialogResponse(selectedChoice, 0);
+        }
+        else
+        {
+            Debug.Log("No dialog responses found, continuing to next block");
+            // No responses, just continue to next block
+            ContinueToNextBlock();
+        }
+    }
+    
+    /// <summary>
+    /// Show a specific dialog response from the selected choice
+    /// </summary>
+    private void ShowDialogResponse(CoreGameDialogChoices selectedChoice, int responseIndex)
+    {
+        if (selectedChoice.dialogResponses == null || responseIndex >= selectedChoice.dialogResponses.Length)
+        {
+            Debug.LogError($"Invalid response index {responseIndex} or no responses available!");
+            ContinueToNextBlock();
+            return;
+        }
+        
+        var response = selectedChoice.dialogResponses[responseIndex];
+        string npcName = response.NpcName;
+        string npcResponse = response.npcResponse;
+        AudioClip audioClip = selectedChoice.audioDialogResponse;
+        
+        Debug.Log($"Showing dialog response {responseIndex + 1}/{selectedChoice.dialogResponses.Length}:");
+        Debug.Log($"  - NPC Name: '{npcName}' -> should go to DialogueName");
+        Debug.Log($"  - NPC Response: '{npcResponse}' -> should go to DialogueText");
+        
+        // Get current dialog type from the current block
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        
+        // Show the response based on dialog type
+        if (currentBlock.Dialog.dialogType == CoreGameDialog.DialogType.ThreeD)
+        {
+            Debug.Log("Displaying 3D dialog response");
+            Show3DResponse(currentBlock.Dialog, npcResponse, audioClip);
+        }
+        else
+        {
+            Debug.Log("Displaying 2D dialog response");
+            
+            // Ensure dialog instance exists
+            if (dialogInstance == null)
+            {
+                dialogInstance = SummonDialogBar();
+                if (dialogInstance == null)
+                {
+                    Debug.LogError("Failed to create dialog bar for response!");
+                    ContinueToNextBlock();
+                    return;
+                }
+            }
+            
+            // Update NPC name display
+            if (!string.IsNullOrEmpty(npcName))
+            {
+                Debug.Log($"Updating NPC name to: '{npcName}'");
+                UpdateNpcNameSafe(npcName);
+            }
+            else
+            {
+                Debug.LogWarning("NPC name from response is empty!");
+            }
+            
+            // Animate dialog response text instead of setting it instantly
+            TMP_Text dialogTextComponent = null;
+            if (dialogInstance != null)
+            {
+                // Try DialogPrefabController first
+                DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+                if (controller != null && controller.dialogueText != null)
+                {
+                    dialogTextComponent = controller.dialogueText;
+                    Debug.Log("Found DialogueText component via DialogPrefabController for response animation");
+                }
+                else
+                {
+                    // Fallback to direct search
+                    Transform textTransform = dialogInstance.transform.Find("DialogueText");
+                    if (textTransform != null)
+                    {
+                        dialogTextComponent = textTransform.GetComponent<TMP_Text>();
+                        Debug.Log("Found DialogueText component via direct search for response animation");
+                    }
+                }
+            }
+            
+            if (dialogTextComponent != null)
+            {
+                Debug.Log($"Starting dialog response text animation for: '{npcResponse}'");
+                AnimateDialogText(npcResponse, dialogTextComponent, audioClip);
+            }
+            else
+            {
+                Debug.LogError("Could not find DialogueText component for response animation! Falling back to instant text.");
+                UpdateDialogTextSafe(npcResponse);
+            }
+        }
+        
+        // Store the current response index for progression
+        currentChoiceResponseIndex = responseIndex;
     }
     
     [Obsolete]
@@ -498,6 +2187,143 @@ public class CoreGameManager : MonoBehaviour
                     }
                     textDialog3D.gameObject.SetActive(false); // Hide the dialog
                 }
+            }
+        }
+    }
+    
+    #endregion
+    
+    #region Fade System (Background Transitions)
+    
+    /// <summary>
+    /// Handle cutscene fade effects based on CoreGameDialog.CutsceneType
+    /// </summary>
+    /// <param name="cutsceneType">The type of fade effect to apply</param>
+    /// <param name="onComplete">Callback when fade animation completes</param>
+    public void HandleCutsceneFade(CoreGameDialog.CutsceneType cutsceneType, System.Action onComplete = null)
+    {
+        if (backgroundFade == null)
+        {
+            Debug.LogWarning("BackgroundFade image is not assigned! Fade effects will be skipped.");
+            onComplete?.Invoke();
+            return;
+        }
+        
+        switch (cutsceneType)
+        {
+            case CoreGameDialog.CutsceneType.None:
+                // No fade effect, keep current state
+                onComplete?.Invoke();
+                break;
+                
+            case CoreGameDialog.CutsceneType.FadeIn:
+                PerformFadeIn(onComplete);
+                break;
+                
+            case CoreGameDialog.CutsceneType.FadeOut:
+                PerformFadeOut(onComplete);
+                break;
+                
+            case CoreGameDialog.CutsceneType.StayIn:
+                SetFadeState(true, 1f); // Stay dark
+                onComplete?.Invoke();
+                break;
+                
+            case CoreGameDialog.CutsceneType.StayOut:
+                SetFadeState(true, 0f); // Stay transparent
+                onComplete?.Invoke();
+                break;
+        }
+    }
+    
+    /// <summary>
+    /// Perform fade in animation (transparent to dark)
+    /// </summary>
+    private void PerformFadeIn(System.Action onComplete = null)
+    {
+        backgroundFade.gameObject.SetActive(true);
+        
+        // Start from transparent
+        Color fadeColor = backgroundFade.color;
+        fadeColor.a = 0f;
+        backgroundFade.color = fadeColor;
+        
+        // Animate to dark
+        LeanTween.value(backgroundFade.gameObject, 0f, 1f, 1f)
+            .setOnUpdate((float alpha) =>
+            {
+                Color color = backgroundFade.color;
+                color.a = alpha;
+                backgroundFade.color = color;
+            })
+            .setOnComplete(() =>
+            {
+                Debug.Log("Fade In completed");
+                onComplete?.Invoke();
+            })
+            .setEase(LeanTweenType.easeInOutQuad);
+    }
+    
+    /// <summary>
+    /// Perform fade out animation (dark to transparent)
+    /// </summary>
+    private void PerformFadeOut(System.Action onComplete = null)
+    {
+        backgroundFade.gameObject.SetActive(true);
+        
+        // Start from dark
+        Color fadeColor = backgroundFade.color;
+        fadeColor.a = 1f;
+        backgroundFade.color = fadeColor;
+        
+        // Animate to transparent
+        LeanTween.value(backgroundFade.gameObject, 1f, 0f, 1f)
+            .setOnUpdate((float alpha) =>
+            {
+                Color color = backgroundFade.color;
+                color.a = alpha;
+                backgroundFade.color = color;
+            })
+            .setOnComplete(() =>
+            {
+                backgroundFade.gameObject.SetActive(false); // Disable after fade out
+                Debug.Log("Fade Out completed");
+                onComplete?.Invoke();
+            })
+            .setEase(LeanTweenType.easeInOutQuad);
+    }
+    
+    /// <summary>
+    /// Set fade state immediately without animation
+    /// </summary>
+    /// <param name="active">Whether the background fade should be active</param>
+    /// <param name="alpha">Alpha value (0 = transparent, 1 = dark)</param>
+    private void SetFadeState(bool active, float alpha)
+    {
+        backgroundFade.gameObject.SetActive(active);
+        
+        if (active)
+        {
+            Color fadeColor = backgroundFade.color;
+            fadeColor.a = alpha;
+            backgroundFade.color = fadeColor;
+            
+            Debug.Log($"Fade state set to: Active={active}, Alpha={alpha}");
+        }
+    }
+    
+    /// <summary>
+    /// Get BackgroundFade from dialog instance if not assigned in inspector
+    /// </summary>
+    private void EnsureBackgroundFadeReference()
+    {
+        if (backgroundFade == null && dialogInstance != null)
+        {
+            Transform fadeTransform = dialogInstance.transform.Find("BackgroundFade");
+            if (fadeTransform != null)
+            {
+                backgroundFade = fadeTransform.GetComponent<Image>();
+                Debug.Log("BackgroundFade reference found in dialog instance");
             }
         }
     }
@@ -604,20 +2430,26 @@ public class CoreGameManager : MonoBehaviour
 
     #endregion
 
-    #region UI Management
+    #region UI Management (Integrated from DialogController)
 
     [Obsolete]
     private GameObject SummonDialogBar()
     {
-        Canvas canvas = FindObjectOfType<Canvas>();
+        Debug.Log("Summoning dialog bar!");
+
+        Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null)
         {
-            Debug.LogError("No Canvas found!");
+            Debug.LogError("No Canvas found in the scene!");
             return null;
         }
-        
+
         GameObject instance = Instantiate(npcDialogThemplate, canvas.transform, false);
-        if (instance == null) return null;
+        if (instance == null)
+        {
+            Debug.LogError("Failed to instantiate npcDialogThemplate prefab!");
+            return null;
+        }
         
         instance.SetActive(true);
         
@@ -625,13 +2457,15 @@ public class CoreGameManager : MonoBehaviour
         RectTransform rect = instance.GetComponent<RectTransform>();
         if (rect != null)
         {
-            rect.anchorMin = new Vector2(0, 0);
-            rect.anchorMax = new Vector2(1, 0);
-            rect.pivot = new Vector2(0.5f, 0);
-            rect.sizeDelta = new Vector2(0, rect.sizeDelta.y);
+            rect.anchorMin = new Vector2(0, 0);    // left-bottom
+            rect.anchorMax = new Vector2(1, 0);    // right-bottom
+            rect.pivot = new Vector2(0.5f, 0);     // bottom center
+            rect.sizeDelta = new Vector2(0, rect.sizeDelta.y); // stretch width, keep height
+
+            // Start off the bottom of the screen
             rect.anchoredPosition = new Vector2(0, -rect.rect.height);
-            
-            // Animate up
+
+            // Animate up to visible position (flush with bottom)
             LeanTween.value(instance, rect.anchoredPosition.y, 0, 0.3f)
                 .setEaseInOutBack()
                 .setOnUpdate((float val) => {
@@ -639,6 +2473,11 @@ public class CoreGameManager : MonoBehaviour
                     pos.y = val;
                     rect.anchoredPosition = pos;
                 });
+            Debug.Log("Dialog bar summoned!");
+        }
+        else
+        {
+            Debug.LogWarning("Dialog prefab has no RectTransform!");
         }
         
         return instance;
@@ -647,34 +2486,159 @@ public class CoreGameManager : MonoBehaviour
     [Obsolete]
     private GameObject SummonQuestionBar()
     {
-        Canvas canvas = FindObjectOfType<Canvas>();
-        if (canvas == null) return null;
-        
-        GameObject instance = Instantiate(npcQuestionThemplate, canvas.transform, false);
-        if (instance == null) return null;
-        
-        instance.SetActive(true);
-        
-        // Setup positioning and animation
-        RectTransform rect = instance.GetComponent<RectTransform>();
-        if (rect != null)
+        Debug.Log("Summoning question bar!");
+
+        Canvas canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null)
         {
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0f);
-            rect.anchoredPosition = new Vector2(0, ((RectTransform)rect.parent).rect.height / 2 + rect.rect.height);
+            Debug.LogError("No Canvas found in the scene!");
+            return null;
+        }
+
+        if (npcQuestionThemplate == null)
+        {
+            Debug.LogError("npcQuestionThemplate is not assigned! Please assign the prefab in the inspector.");
+            return null;
+        }
+
+        GameObject instance = null;
+        
+        try
+        {
+            instance = Instantiate(npcQuestionThemplate, canvas.transform, false);
             
-            // Animate down
-            LeanTween.value(instance, rect.anchoredPosition.y, 0, 0.3f)
-                .setEaseInOutBack()
-                .setOnUpdate((float val) => {
-                    Vector2 pos = rect.anchoredPosition;
-                    pos.y = val;
-                    rect.anchoredPosition = pos;
-                });
+            if (instance == null)
+            {
+                Debug.LogError("Failed to instantiate npcQuestionThemplate prefab!");
+                return null;
+            }
+            
+            // Check for broken script references
+            MonoBehaviour[] scripts = instance.GetComponentsInChildren<MonoBehaviour>();
+            int brokenScripts = 0;
+            foreach (var script in scripts)
+            {
+                if (script == null)
+                {
+                    brokenScripts++;
+                }
+            }
+            
+            if (brokenScripts > 0)
+            {
+                Debug.LogWarning($"Question bar prefab has {brokenScripts} missing script references, but continuing with instantiation.");
+            }
+            
+            // CRITICAL FIX: Assign the instance to questionInstance
+            questionInstance = instance;
+            
+            instance.SetActive(true);
+            
+            // Setup positioning and animation
+            RectTransform rect = instance.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchorMin = new Vector2(0.5f, 0.5f);    // center
+                rect.anchorMax = new Vector2(0.5f, 0.5f);    // center
+                rect.pivot = new Vector2(0.5f, 0f);        // center
+                rect.anchoredPosition = new Vector2(0, ((RectTransform)rect.parent).rect.height / 2 + rect.rect.height); // Start above the screen
+
+                // Animate down to center of the screen
+                LeanTween.value(instance, rect.anchoredPosition.y, 0, 0.3f)
+                    .setEaseInOutBack()
+                    .setOnUpdate((float val) => {
+                        Vector2 pos = rect.anchoredPosition;
+                        pos.y = val;
+                        rect.anchoredPosition = pos;
+                    });
+                Debug.Log("Question bar summoned and positioned!");
+            }
+            else
+            {
+                Debug.LogWarning("Question prefab has no RectTransform!");
+            }
+            
+            Debug.Log($"questionInstance assigned: {questionInstance != null}");
+            
+            // Validate that we can find the expected buttons
+            ValidateQuestionBarStructure(instance);
+            
+            return instance;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Exception while instantiating question bar: {e.Message}");
+            if (instance != null)
+            {
+                DestroyImmediate(instance);
+            }
+            return null;
+        }
+    }
+    
+    /// <summary>
+    /// Validate that the question bar has the expected button structure
+    /// </summary>
+    private void ValidateQuestionBarStructure(GameObject questionBar)
+    {
+        Debug.Log("=== QUESTION BAR STRUCTURE VALIDATION ===");
+        
+        if (questionBar == null)
+        {
+            Debug.LogError("Question bar is null!");
+            return;
         }
         
-        return instance;
+        Debug.Log($"Question bar name: {questionBar.name}");
+        
+        // List all child objects
+        Transform[] allChildren = questionBar.GetComponentsInChildren<Transform>();
+        Debug.Log($"Question bar has {allChildren.Length} total transforms:");
+        
+        for (int i = 0; i < allChildren.Length; i++)
+        {
+            Transform child = allChildren[i];
+            Button button = child.GetComponent<Button>();
+            TMP_Text text = child.GetComponent<TMP_Text>();
+            
+            string info = $"  [{i}] {child.name}";
+            if (button != null) info += " [Button]";
+            if (text != null) info += " [TMP_Text]";
+            
+            Debug.Log(info);
+        }
+        
+        // Check for Q, W, E buttons specifically
+        string[] expectedButtons = { "Q", "W", "E" };
+        foreach (string buttonName in expectedButtons)
+        {
+            Transform buttonTransform = questionBar.transform.Find(buttonName);
+            if (buttonTransform != null)
+            {
+                Button btn = buttonTransform.GetComponent<Button>();
+                TMP_Text btnText = buttonTransform.GetComponentInChildren<TMP_Text>();
+                
+                Debug.Log($"✓ Found button '{buttonName}': Button={btn != null}, TMP_Text={btnText != null}");
+            }
+            else
+            {
+                Debug.LogWarning($"✗ Button '{buttonName}' not found as direct child!");
+            }
+        }
+        
+        Debug.Log("=== END QUESTION BAR STRUCTURE VALIDATION ===");
+    }
+    
+    /// <summary>
+    /// Destroy all question bars (integrated from DialogController)
+    /// </summary>
+    private static void DestroyAllQuestionBars()
+    {
+        // If you use a tag:
+        foreach (var obj in GameObject.FindGameObjectsWithTag("QuestionBar"))
+        {
+            GameObject.Destroy(obj);
+        }
     }
     
     private void DestroyDialogInstances()
@@ -724,6 +2688,12 @@ public class CoreGameManager : MonoBehaviour
             Destroy(questionInstance);
             questionInstance = null;
         }
+        
+        // Also destroy any remaining question bars
+        DestroyAllQuestionBars();
+        
+        // Hide choice buttons
+        HideChoices();
     }
     
     #endregion
@@ -855,45 +2825,170 @@ public class CoreGameManager : MonoBehaviour
 
     #region Input Handling
 
-    [Obsolete]
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        // Use Space key for dialog progression instead of mouse click
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            HandleMouseClick();
+            Debug.Log("SPACE KEY PRESSED - Calling HandleDialogProgression()");
+            HandleDialogProgression();
         }
+        
+        // Handle choice input with Q, W, E keys
+        HandleChoiceInput();
         
         if (Input.GetKeyDown(KeyCode.Escape) && isPlayingCutscene)
         {
             SkipCutscene();
         }
     }
-
-    [Obsolete]
-    private void HandleMouseClick()
+    
+    /// <summary>
+    /// Handle choice input using Q, W, E keys
+    /// </summary>
+    private void HandleChoiceInput()
     {
-        if (isPlayingCutscene) return;
+        // Only handle choice input if choices are currently visible
+        if (onChoiceSelected == null) return;
+        
+        // Check for Q, W, E key presses for choice selection
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            SelectChoice(0);
+        }
+        else if (Input.GetKeyDown(KeyCode.W))
+        {
+            SelectChoice(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            SelectChoice(2);
+        }
+    }
+    
+    /// <summary>
+    /// Select a choice by index using keyboard input
+    /// UPDATED: Use button array approach for consistency
+    /// </summary>
+    private void SelectChoice(int choiceIndex)
+    {
+        Debug.Log($"SelectChoice called with index {choiceIndex}");
+        
+        if (questionInstance == null)
+        {
+            Debug.LogWarning("Question instance is null, cannot select choice!");
+            return;
+        }
+        
+        // Get all buttons using the same array approach
+        Button[] buttonArray = questionInstance.GetComponentsInChildren<Button>();
+        Debug.Log($"Found {buttonArray.Length} buttons for choice selection");
+        
+        // Make sure the choice index is valid and within button array bounds
+        if (choiceIndex >= 0 && choiceIndex < buttonArray.Length)
+        {
+            Button targetButton = buttonArray[choiceIndex];
+            
+            if (targetButton != null && targetButton.gameObject.activeInHierarchy)
+            {
+                Debug.Log($"Selecting choice {choiceIndex} - Button: {targetButton.name}");
+                // Simulate button click
+                targetButton.onClick.Invoke();
+            }
+            else
+            {
+                Debug.LogWarning($"Button at index {choiceIndex} is null or inactive!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"Choice index {choiceIndex} is out of range! Available buttons: {buttonArray.Length}");
+        }
+    }
+
+    private void HandleDialogProgression()
+    {
+        Debug.Log("=== HandleDialogProgression CALLED ===");
+        Debug.Log($"Current state:");
+        Debug.Log($"  - isPlayingCutscene: {isPlayingCutscene}");
+        Debug.Log($"  - isTextAnimating: {isTextAnimating}");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - currentBlockIndex: {currentBlockIndex}/{(coreGameData?.coreBlock?.Length ?? 0)}");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        
+        if (isPlayingCutscene) 
+        {
+            Debug.Log("Blocked: Currently playing cutscene");
+            return;
+        }
         
         // If text is currently animating, skip to complete text and stop audio
         if (isTextAnimating)
         {
+            Debug.Log("Text is animating, skipping to complete...");
             SkipTextAnimation();
             return;
         }
         
         if (currentBlockIndex >= coreGameData.coreBlock.Length)
         {
+            Debug.Log("Reached end of game, finishing...");
             FinishCoreGame();
             return;
         }
         
         var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        Debug.Log($"Current block type: {currentBlock.Type}");
         
-        // If showing a choice response, continue to next block
+        // If showing a choice response, handle multiple responses
         if (isShowingResponse)
         {
-            isShowingResponse = false;
-            currentChoiceResponseIndex = -1;
+            Debug.Log("Currently showing response, checking for more responses...");
+            
+            if (selectedChoiceIndex < 0 || currentBlock.Dialog?.choices == null || selectedChoiceIndex >= currentBlock.Dialog.choices.Length)
+            {
+                Debug.LogError($"Invalid selectedChoiceIndex {selectedChoiceIndex} or no choices available!");
+                // Reset state and continue
+                isShowingResponse = false;
+                currentChoiceResponseIndex = -1;
+                selectedChoiceIndex = -1;
+                ContinueToNextBlock();
+                return;
+            }
+            
+            var selectedChoice = currentBlock.Dialog.choices[selectedChoiceIndex];
+            
+            if (selectedChoice != null && selectedChoice.dialogResponses != null)
+            {
+                int nextResponseIndex = currentChoiceResponseIndex + 1;
+                Debug.Log($"Next response index would be: {nextResponseIndex} (total responses: {selectedChoice.dialogResponses.Length})");
+                
+                // Check if there are more responses to show
+                if (nextResponseIndex < selectedChoice.dialogResponses.Length)
+                {
+                    Debug.Log($"Showing next dialog response: {nextResponseIndex + 1}/{selectedChoice.dialogResponses.Length}");
+                    ShowDialogResponse(selectedChoice, nextResponseIndex);
+                    return;
+                }
+                else
+                {
+                    Debug.Log("All dialog responses shown, continuing to next block");
+                    // All responses shown, continue to next block
+                    isShowingResponse = false;
+                    currentChoiceResponseIndex = -1;
+                    selectedChoiceIndex = -1;
+                }
+            }
+            else
+            {
+                Debug.Log("No more responses or selectedChoice is null, continuing to next block");
+                // No more responses, continue to next block
+                isShowingResponse = false;
+                currentChoiceResponseIndex = -1;
+                selectedChoiceIndex = -1;
+            }
+            
             ClearAll3DDialogs(); // Clear 3D dialogs when continuing
             
             // Only destroy dialog instances if next block is not a 2D dialog
@@ -902,6 +2997,7 @@ public class CoreGameManager : MonoBehaviour
                 DestroyDialogInstances();
             }
             
+            Debug.Log("Continuing to next block after responses...");
             ContinueToNextBlock();
             return;
         }
@@ -912,6 +3008,7 @@ public class CoreGameManager : MonoBehaviour
             var dialog = currentBlock.Dialog;
             if (dialog.choices == null || dialog.choices.Length == 0)
             {
+                Debug.Log("Current dialog has no choices, continuing to next block...");
                 ClearAll3DDialogs(); // Clear 3D dialogs when continuing
                 
                 // Only destroy dialog instances if next block is not a 2D dialog
@@ -922,7 +3019,17 @@ public class CoreGameManager : MonoBehaviour
                 
                 ContinueToNextBlock();
             }
+            else
+            {
+                Debug.Log($"Current dialog has {dialog.choices.Length} choices - waiting for user selection");
+            }
         }
+        else
+        {
+            Debug.Log($"Current block is not a dialog (type: {currentBlock.Type})");
+        }
+        
+        Debug.Log("=== END HandleDialogProgression ===");
     }
     
     /// <summary>
@@ -993,7 +3100,7 @@ public class CoreGameManager : MonoBehaviour
                 if (isShowingResponse && currentChoiceResponseIndex >= 0 && 
                     dialog.choices != null && currentChoiceResponseIndex < dialog.choices.Length)
                 {
-                    textToDisplay = ProcessSpecialPrefixes(dialog.choices[currentChoiceResponseIndex].npcResponse);
+                    textToDisplay = ProcessSpecialPrefixes(GetNpcResponseFromChoice(dialog.choices[currentChoiceResponseIndex]));
                 }
                 else
                 {
@@ -1056,6 +3163,68 @@ public class CoreGameManager : MonoBehaviour
                     tmp3D.text = textToDisplay;
                 }
             }
+        }
+    }
+    
+    #endregion
+    
+    #region Legacy Dialog System Integration (from NPCDialogManager/NPCDialogManagerMaster)
+    
+    /// <summary>
+    /// Initiate legacy dialog system (integrated from NPCDialogManagerMaster)
+    /// </summary>
+    [Obsolete]
+    public void InitiateStartDialog(string npcDialogFile)
+    {
+        // Clear any existing dialogs
+        ClearAll3DDialogs();
+        DestroyDialogInstances();
+        
+        // Load and start legacy dialog
+        GameObject dialogObj = SummonDialogBar();
+        if (dialogObj == null)
+        {
+            Debug.LogError("Dialog bar could not be summoned!");
+            return;
+        }
+
+        InitiateLegacyDialog(npcDialogFile, dialogObj);
+    }
+    
+    /// <summary>
+    /// Initialize legacy dialog system (from NPCDialogManager)
+    /// </summary>
+    [Obsolete]
+    private void InitiateLegacyDialog(string dialogFileName, GameObject dialogObj)
+    {
+        // This would integrate with your existing legacy dialog system
+        // For now, just provide a framework for backward compatibility
+        Debug.Log($"Legacy dialog system called with file: {dialogFileName}");
+        
+        // You can extend this to load DialogMasterManager files from Resources
+        // and convert them to work with the CoreGame system
+    }
+    
+    /// <summary>
+    /// Handle NPC button interactions (from DialogButtonController/MenuButtonHandler)
+    /// </summary>
+    [Obsolete]
+    public void OnNPCButtonClicked(string npcTag)
+    {
+        Debug.Log($"NPC button clicked! NPC tag: {npcTag}");
+        
+        // Handle different NPC types
+        if (npcTag.Contains("npc-nene"))
+        {
+            InitiateStartDialog("NPC_Nene");
+        }
+        else if (npcTag.Contains("npc-shopkeeper"))
+        {
+            InitiateStartDialog("NPC_Shopkeeper");
+        }
+        else if (npcTag.Contains("villager"))
+        {
+            Debug.Log("Show villager dialog options.");
         }
     }
     

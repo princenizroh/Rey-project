@@ -727,7 +727,7 @@ GameObject:
   - component: {fileID: 2053542846536197727}
   - component: {fileID: 6216365291787066952}
   - component: {fileID: 8261087611625791548}
-  - component: {fileID: 3115565282055668275}
+  - component: {fileID: 3876928433263000842}
   m_Layer: 5
   m_Name: QuestionThemplate
   m_TagString: QuestionBar
@@ -797,7 +797,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
---- !u!114 &3115565282055668275
+--- !u!114 &3876928433263000842
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -806,13 +806,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 6424010428020544295}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c200ace01b872cd44a364d5eb0adce1e, type: 3}
+  m_Script: {fileID: 11500000, guid: b4d7e3f1c2a6b4c8f9e1d2c3b4a5f6e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  answerButtons:
-  - {fileID: 2581928498170028031}
-  - {fileID: 5627541977504789422}
-  - {fileID: 1224168084234084970}
+  dialogueName: {fileID: 0}
+  dialogueText: {fileID: 0}
+  backgroundFade: {fileID: 0}
+  buttonQ: {fileID: 0}
+  buttonW: {fileID: 0}
+  buttonE: {fileID: 0}
+  autoFindComponents: 1
 --- !u!1 &8764455809647750387
 GameObject:
   m_ObjectHideFlags: 0

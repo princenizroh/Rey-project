@@ -3,7 +3,6 @@ using UnityEngine;
 public class CoreGameDialogChoices
 {
     public string playerChoice;
-    [TextArea(2, 5)]
-    public string npcResponse;
+    public CoreGameDialogChoicesResponse[] dialogResponses;
     public AudioClip audioDialogResponse;
 }

@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Rey/Zen/MainMenuIntro.unity
+    guid: e60d62809c3984541864cc0dccf8413f
+  - enabled: 1
+    path: Assets/Scenes/Rey/Zen/MainMenu.unity
+    guid: 3411e787b1ddd9c4181d31f99499eafa
+  - enabled: 1
     path: Assets/Scenes/Rey/Builder House.unity
     guid: cc19232ff6d60d143bd26a24f534dcd9
   m_configObjects:
