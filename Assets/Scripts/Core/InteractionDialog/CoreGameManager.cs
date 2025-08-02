@@ -1583,6 +1583,7 @@ public class CoreGameManager : MonoBehaviour
     /// - {+100stress}, {-50stress} - for stress changes
     /// - {animation:animationName} - for triggering animations
     /// - {scene:sceneName} - for changing scenes
+    /// - {prefab:prefabName} - for spawning prefabs
     /// Returns the cleaned text without the modifiers
     /// </summary>
     /// <param name="dialogText">Original dialog text with potential modifiers</param>
@@ -1604,6 +1605,9 @@ public class CoreGameManager : MonoBehaviour
         
         // Process scene modifiers: {scene:sceneName}
         processedText = ProcessSceneModifiers(processedText);
+        
+        // Process prefab modifiers: {prefab:prefabName}
+        processedText = ProcessPrefabModifiers(processedText);
         
         // Clean up any double spaces that might result from removing modifiers
         processedText = System.Text.RegularExpressions.Regex.Replace(processedText, @"\s+", " ").Trim();
@@ -1733,6 +1737,46 @@ public class CoreGameManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Process prefab modifiers in dialog text and spawn prefabs
+    /// Modifiers format: {prefab:prefabName}
+    /// </summary>
+    /// <param name="dialogText">Text containing prefab modifiers</param>
+    /// <returns>Text with prefab modifiers removed</returns>
+    private string ProcessPrefabModifiers(string dialogText)
+    {
+        string processedText = dialogText;
+        
+        // Regex pattern to find prefab modifiers: {prefab:prefabName}
+        System.Text.RegularExpressions.Regex prefabPattern = 
+            new System.Text.RegularExpressions.Regex(@"\{prefab:([^}]+)\}", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        
+        System.Text.RegularExpressions.MatchCollection matches = prefabPattern.Matches(dialogText);
+        
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            if (match.Success && match.Groups.Count > 1)
+            {
+                string prefabName = match.Groups[1].Value.Trim();
+                
+                if (!string.IsNullOrEmpty(prefabName))
+                {
+                    Debug.Log($"[PREFAB] Spawning prefab: '{prefabName}'");
+                    SpawnPrefab(prefabName);
+                }
+                else
+                {
+                    Debug.LogWarning($"[PREFAB] Empty prefab name in modifier: '{match.Value}'");
+                }
+                
+                // Remove the modifier from the text
+                processedText = processedText.Replace(match.Value, "");
+            }
+        }
+        
+        return processedText;
+    }
+    
+    /// <summary>
     /// Trigger an animation by name
     /// Override this method to implement your specific animation logic
     /// </summary>
@@ -1845,6 +1889,53 @@ public class CoreGameManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Spawn a prefab by name
+    /// Override this method to implement your specific prefab spawning logic
+    /// </summary>
+    /// <param name="prefabName">Name of the prefab to spawn</param>
+    protected virtual void SpawnPrefab(string prefabName)
+    {
+        Debug.Log($"[PREFAB] SpawnPrefab called with: '{prefabName}'");
+        
+        // Trigger event for external subscribers
+        OnPrefabSpawned?.Invoke(prefabName);
+        
+        try
+        {
+            // Method 1: Try to load from Resources folder
+            GameObject prefab = Resources.Load<GameObject>(prefabName);
+            if (prefab != null)
+            {
+                GameObject spawnedObject = Instantiate(prefab);
+                Debug.Log($"[PREFAB] ✓ Spawned prefab '{prefabName}' from Resources folder");
+                
+                // Optional: Position the spawned object
+                PositionSpawnedPrefab(spawnedObject, prefabName);
+                return;
+            }
+            
+            // Method 2: Try to load from Resources with "Prefabs/" path
+            prefab = Resources.Load<GameObject>("Prefabs/" + prefabName);
+            if (prefab != null)
+            {
+                GameObject spawnedObject = Instantiate(prefab);
+                Debug.Log($"[PREFAB] ✓ Spawned prefab '{prefabName}' from Resources/Prefabs folder");
+                
+                // Optional: Position the spawned object
+                PositionSpawnedPrefab(spawnedObject, prefabName);
+                return;
+            }
+            
+            // Method 3: Custom prefab handling
+            HandleCustomPrefabSpawn(prefabName);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[PREFAB] Error spawning prefab '{prefabName}': {e.Message}");
+        }
+    }
+    
+    /// <summary>
     /// Load scene asynchronously as a fallback
     /// </summary>
     /// <param name="sceneName">Name of the scene to load</param>
@@ -1867,6 +1958,89 @@ public class CoreGameManager : MonoBehaviour
         else
         {
             Debug.LogError($"[SCENE] ✗ Failed to start async load for scene '{sceneName}'");
+        }
+    }
+    
+    /// <summary>
+    /// Position a spawned prefab based on its name or type
+    /// Override this method to customize prefab positioning
+    /// </summary>
+    /// <param name="spawnedObject">The instantiated prefab</param>
+    /// <param name="prefabName">Name of the prefab for context</param>
+    protected virtual void PositionSpawnedPrefab(GameObject spawnedObject, string prefabName)
+    {
+        Debug.Log($"[PREFAB] Positioning spawned prefab: '{prefabName}'");
+        
+        // Example positioning logic - customize based on your needs
+        Vector3 spawnPosition = Vector3.zero;
+        
+        // Position based on prefab name or type
+        switch (prefabName.ToLower())
+        {
+            case "particle":
+            case "explosion":
+                // Spawn at camera position
+                if (Camera.main != null)
+                {
+                    spawnPosition = Camera.main.transform.position + Camera.main.transform.forward * 2f;
+                }
+                break;
+                
+            case "npc":
+            case "character":
+                // Spawn in front of player
+                spawnPosition = transform.position + transform.forward * 2f;
+                break;
+                
+            case "item":
+            case "pickup":
+                // Spawn near player
+                spawnPosition = transform.position + Vector3.right * 1f;
+                break;
+                
+            default:
+                // Default position in scene
+                spawnPosition = Vector3.zero;
+                break;
+        }
+        
+        spawnedObject.transform.position = spawnPosition;
+        Debug.Log($"[PREFAB] ✓ Positioned '{prefabName}' at {spawnPosition}");
+    }
+    
+    /// <summary>
+    /// Handle custom prefab spawning logic when standard methods fail
+    /// Override this method for advanced prefab management
+    /// </summary>
+    /// <param name="prefabName">Name of the prefab to spawn</param>
+    protected virtual void HandleCustomPrefabSpawn(string prefabName)
+    {
+        Debug.Log($"[PREFAB] HandleCustomPrefabSpawn called with: '{prefabName}'");
+        
+        // Example custom prefab handling
+        switch (prefabName.ToLower())
+        {
+            case "dialog":
+                // Spawn a dialog prefab
+                if (npcDialogThemplate != null)
+                {
+                    GameObject customDialog = Instantiate(npcDialogThemplate);
+                    Debug.Log($"[PREFAB] ✓ Spawned custom dialog prefab");
+                }
+                break;
+                
+            case "question":
+                // Spawn a question prefab
+                if (npcQuestionThemplate != null)
+                {
+                    GameObject customQuestion = Instantiate(npcQuestionThemplate);
+                    Debug.Log($"[PREFAB] ✓ Spawned custom question prefab");
+                }
+                break;
+                
+            default:
+                Debug.LogWarning($"[PREFAB] ✗ Unknown prefab '{prefabName}' - cannot spawn");
+                break;
         }
     }
     
@@ -2005,16 +2179,18 @@ public class CoreGameManager : MonoBehaviour
             "Multiple modifiers {+25stress} in one {+10stress} sentence.",
             "Let's trigger an animation {animation:shake} and see what happens!",
             "This will change the scene {scene:MainMenu} after the dialog.",
-            "Combined test: {+75stress} {animation:bounce} {scene:GameScene}",
+            "Let me spawn a prefab {prefab:TestPrefab} for you to see!",
+            "Combined test: {+75stress} {animation:bounce} {scene:GameScene} {prefab:ItemPickup}",
             "No modifiers in this text.",
             "{+200stress} Modifier at the beginning.",
             "Modifier at the end {-75stress}",
             "Animation at start {animation:fade} with more text.",
             "Scene change {scene:Level2} in the middle of text.",
+            "Prefab spawn {prefab:Explosion} in the middle.",
             "Invalid modifier {invalidstress} should be ignored.",
-            "Case insensitive {+30STRESS} {ANIMATION:Shake} {SCENE:Menu} modifiers.",
+            "Case insensitive {+30STRESS} {ANIMATION:Shake} {SCENE:Menu} {PREFAB:Dialog} modifiers.",
             "{0stress} Zero modifier should work.",
-            "Empty modifiers {animation:} {scene:} should be handled gracefully."
+            "Empty modifiers {animation:} {scene:} {prefab:} should be handled gracefully."
         };
         
         int initialStress = stressvariable;
@@ -2052,6 +2228,12 @@ public class CoreGameManager : MonoBehaviour
     public System.Action<string> OnSceneChangeTriggered;
     
     /// <summary>
+    /// Event triggered when a prefab modifier is processed
+    /// Subscribe to this to handle prefab spawning in external systems
+    /// </summary>
+    public System.Action<string> OnPrefabSpawned;
+    
+    /// <summary>
     /// Manually trigger an animation (can be called externally)
     /// </summary>
     /// <param name="animationName">Name of the animation to trigger</param>
@@ -2069,6 +2251,16 @@ public class CoreGameManager : MonoBehaviour
     {
         Debug.Log($"[SCENE] Manual scene change trigger: '{sceneName}'");
         TriggerSceneChange(sceneName);
+    }
+    
+    /// <summary>
+    /// Manually spawn a prefab (can be called externally)
+    /// </summary>
+    /// <param name="prefabName">Name of the prefab to spawn</param>
+    public void SpawnPrefabManual(string prefabName)
+    {
+        Debug.Log($"[PREFAB] Manual prefab spawn trigger: '{prefabName}'");
+        SpawnPrefab(prefabName);
     }
     
     /// <summary>
