@@ -15,9 +15,11 @@ MonoBehaviour:
   coreBlock:
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Suara ini..
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -25,14 +27,16 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Rasa ini begitu hangat
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Membuka mata
-        npcResponse: 
+        dialogResponses: []
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

@@ -9,6 +9,7 @@ TagManager:
   - Light
   - QuestionBar
   - NPC
+  - rayobject
   layers:
   - Default
   - TransparentFX
