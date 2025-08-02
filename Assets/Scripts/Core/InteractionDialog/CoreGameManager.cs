@@ -88,6 +88,7 @@ public class DialogChoice
 
 public class CoreGameManager : MonoBehaviour
 {
+    public int stressvariable;
     [Header("Core Game Settings")]
     public CoreGame coreGameData;
     
@@ -122,6 +123,17 @@ public class CoreGameManager : MonoBehaviour
     private bool isShowingResponse = false;
     private bool isPlayingCutscene = false;
     private bool isTextAnimating = false;
+    
+    // Enhanced input throttling to prevent spam clicking and race conditions
+    private float lastInputTime = 0f;
+    private const float INPUT_COOLDOWN = 0.5f; // Increased cooldown to prevent spam
+    private bool isProcessingInput = false; // Prevent multiple simultaneous input processing
+    private bool isInDialogTransition = false; // Prevent input during dialog transitions
+    private float lastDialogUpdateTime = 0f; // Track last dialog update time
+    
+    // Component safety tracking
+    private Dictionary<string, TMP_Text> cachedTextComponents = new Dictionary<string, TMP_Text>();
+    private bool componentsCached = false;
     
     // Choice management variables
     private System.Action<int> onChoiceSelected;
@@ -390,73 +402,477 @@ public class CoreGameManager : MonoBehaviour
     #region Helper Methods for Dialog Text Assignment
     
     /// <summary>
-    /// Helper method to update NPC name with proper error handling
+    /// Helper method to update NPC name with enhanced error handling and spam protection
     /// </summary>
     public void UpdateNpcNameSafe(string npcName)
     {
-        Debug.Log($"[SAFE] Updating NPC name to: '{npcName}'");
+        Debug.Log($"[SAFE-NAME] Updating NPC name to: '{npcName}'");
         
-        if (dialogInstance != null)
+        if (string.IsNullOrEmpty(npcName))
         {
-            // Try DialogPrefabController first
+            Debug.LogWarning("[SAFE-NAME] NPC name is null or empty, skipping update");
+            return;
+        }
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogWarning("[SAFE-NAME] Dialog instance is null, cannot update NPC name");
+            return;
+        }
+        
+        // Enhanced spam protection - prevent updates during processing or transitions
+        if (isProcessingInput || isInDialogTransition)
+        {
+            Debug.Log("[SAFE-NAME] Currently processing input or in transition, deferring NPC name update");
+            StartCoroutine(DeferredUpdateNpcName(npcName));
+            return;
+        }
+        
+        // Prevent rapid successive updates
+        float currentTime = Time.time;
+        if (currentTime - lastDialogUpdateTime < 0.1f)
+        {
+            Debug.LogWarning("[SAFE-NAME] Too rapid update attempt, skipping to prevent race condition");
+            return;
+        }
+        lastDialogUpdateTime = currentTime;
+        
+        // Cache components on first use or if cache is invalid
+        if (!componentsCached || !ValidateComponentCache())
+        {
+            CacheDialogComponents();
+        }
+        
+        bool nameUpdated = false;
+        
+        // Method 1: Try cached DialogueName component first
+        if (cachedTextComponents.ContainsKey("DialogueName"))
+        {
+            try
+            {
+                TMP_Text nameComponent = cachedTextComponents["DialogueName"];
+                if (nameComponent != null && nameComponent.gameObject != null)
+                {
+                    // Double-check this is actually the name component and not text component
+                    string componentPath = GetTransformPath(nameComponent.transform);
+                    if (componentPath.ToLower().Contains("name") && !componentPath.ToLower().Contains("text"))
+                    {
+                        nameComponent.text = npcName;
+                        Debug.Log($"[SAFE-NAME] ✓ Updated NPC name via cached DialogueName component: '{npcName}'");
+                        nameUpdated = true;
+                    }
+                    else
+                    {
+                        Debug.LogError($"[SAFE-NAME] CRITICAL: Cached component path '{componentPath}' looks like a text component, not name!");
+                        cachedTextComponents.Remove("DialogueName");
+                        componentsCached = false;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[SAFE-NAME] Cached DialogueName component is null or destroyed, clearing cache");
+                    cachedTextComponents.Remove("DialogueName");
+                    componentsCached = false;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[SAFE-NAME] Error updating cached DialogueName component: {e.Message}");
+                cachedTextComponents.Remove("DialogueName");
+                componentsCached = false;
+            }
+        }
+        
+        // Method 2: Try DialogPrefabController if caching failed
+        if (!nameUpdated)
+        {
             DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
             if (controller != null)
             {
-                controller.SetDialogName(npcName);
-                Debug.Log($"[SAFE] ✓ Updated via DialogPrefabController");
-                return;
+                try
+                {
+                    controller.SetDialogName(npcName);
+                    Debug.Log($"[SAFE-NAME] ✓ Updated NPC name via DialogPrefabController");
+                    nameUpdated = true;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[SAFE-NAME] Failed to update via DialogPrefabController: {e.Message}");
+                }
             }
-            
-            // Fallback to direct search
+        }
+        
+        // Method 3: Direct search with enhanced validation
+        if (!nameUpdated)
+        {
             Transform nameTransform = dialogInstance.transform.Find("DialogueName");
             if (nameTransform != null)
             {
                 TMP_Text nameText = nameTransform.GetComponent<TMP_Text>();
                 if (nameText != null)
                 {
-                    nameText.text = npcName;
-                    Debug.Log($"[SAFE] ✓ Updated DialogueName directly");
-                    return;
+                    // CRITICAL: Enhanced validation to ensure this is the name component
+                    string transformName = nameTransform.name.ToLower();
+                    string fullPath = GetTransformPath(nameTransform).ToLower();
+                    
+                    bool isNameComponent = (transformName.Contains("name") && !transformName.Contains("text") && !transformName.Contains("dialogue")) ||
+                                          (fullPath.Contains("name") && !fullPath.Contains("text"));
+                    
+                    if (isNameComponent)
+                    {
+                        nameText.text = npcName;
+                        Debug.Log($"[SAFE-NAME] ✓ Updated DialogueName directly: '{npcName}' -> '{nameTransform.name}'");
+                        
+                        // Cache this component for future use
+                        cachedTextComponents["DialogueName"] = nameText;
+                        nameUpdated = true;
+                    }
+                    else
+                    {
+                        Debug.LogError($"[SAFE-NAME] Component validation failed: '{nameTransform.name}' at path '{fullPath}' doesn't look like a name component");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"[SAFE-NAME] DialogueName transform found but no TMP_Text component");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[SAFE-NAME] DialogueName transform not found in dialog instance");
+            }
+        }
+        
+        if (!nameUpdated)
+        {
+            Debug.LogError($"[SAFE-NAME] ✗ CRITICAL FAILURE: Could not update NPC name: '{npcName}'");
+            LogAllDialogComponents(); // Debug helper
+        }
+    }
+    
+    /// <summary>
+    /// Deferred update for NPC name when processing is busy
+    /// </summary>
+    private IEnumerator DeferredUpdateNpcName(string npcName)
+    {
+        Debug.Log($"[SAFE-NAME] Deferring NPC name update: '{npcName}'");
+        
+        // Wait until processing is complete
+        while (isProcessingInput || isInDialogTransition)
+        {
+            yield return new WaitForSeconds(0.05f);
+        }
+        
+        // Wait a bit more for safety
+        yield return new WaitForSeconds(0.1f);
+        
+        Debug.Log($"[SAFE-NAME] Executing deferred NPC name update: '{npcName}'");
+        UpdateNpcNameSafe(npcName);
+    }
+    
+    /// <summary>
+    /// Validate that cached components are still valid and point to correct objects
+    /// </summary>
+    private bool ValidateComponentCache()
+    {
+        if (!componentsCached || cachedTextComponents.Count == 0)
+        {
+            return false;
+        }
+        
+        // Check if cached components are still valid
+        var keysToRemove = new System.Collections.Generic.List<string>();
+        
+        foreach (var kvp in cachedTextComponents)
+        {
+            if (kvp.Value == null || kvp.Value.gameObject == null)
+            {
+                Debug.LogWarning($"[CACHE] Cached component '{kvp.Key}' is invalid, marking for removal");
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+        
+        // Remove invalid entries
+        foreach (string key in keysToRemove)
+        {
+            cachedTextComponents.Remove(key);
+        }
+        
+        if (keysToRemove.Count > 0)
+        {
+            Debug.LogWarning($"[CACHE] Removed {keysToRemove.Count} invalid cached components");
+            componentsCached = false;
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /// <summary>
+    /// Cache dialog components to prevent repeated searches and ensure correct component targeting
+    /// </summary>
+    private void CacheDialogComponents()
+    {
+        if (dialogInstance == null)
+        {
+            Debug.LogWarning("[CACHE] Dialog instance is null, cannot cache components");
+            return;
+        }
+        
+        Debug.Log("[CACHE] Caching dialog components...");
+        cachedTextComponents.Clear();
+        
+        // Find and cache DialogueName component
+        Transform nameTransform = dialogInstance.transform.Find("DialogueName");
+        if (nameTransform != null)
+        {
+            TMP_Text nameText = nameTransform.GetComponent<TMP_Text>();
+            if (nameText != null)
+            {
+                cachedTextComponents["DialogueName"] = nameText;
+                Debug.Log($"[CACHE] ✓ Cached DialogueName component: {nameTransform.name}");
+            }
+        }
+        
+        // Find and cache DialogueText component
+        Transform textTransform = dialogInstance.transform.Find("DialogueText");
+        if (textTransform != null)
+        {
+            TMP_Text dialogText = textTransform.GetComponent<TMP_Text>();
+            if (dialogText != null)
+            {
+                cachedTextComponents["DialogueText"] = dialogText;
+                Debug.Log($"[CACHE] ✓ Cached DialogueText component: {textTransform.name}");
+            }
+        }
+        
+        componentsCached = true;
+        Debug.Log($"[CACHE] Caching complete. {cachedTextComponents.Count} components cached.");
+    }
+    
+    /// <summary>
+    /// Clear cached components (call when dialog instance changes)
+    /// </summary>
+    private void ClearComponentCache()
+    {
+        cachedTextComponents.Clear();
+        componentsCached = false;
+        Debug.Log("[CACHE] Component cache cleared");
+    }
+    
+    /// <summary>
+    /// Debug helper to log all dialog components
+    /// </summary>
+    private void LogAllDialogComponents()
+    {
+        if (dialogInstance == null)
+        {
+            Debug.LogError("[DEBUG] Dialog instance is null, cannot log components");
+            return;
+        }
+        
+        Debug.Log("[DEBUG] === ALL DIALOG COMPONENTS ===");
+        TMP_Text[] allTexts = dialogInstance.GetComponentsInChildren<TMP_Text>();
+        Debug.Log($"[DEBUG] Found {allTexts.Length} TMP_Text components:");
+        
+        for (int i = 0; i < allTexts.Length; i++)
+        {
+            TMP_Text text = allTexts[i];
+            string path = GetTransformPath(text.transform);
+            Debug.Log($"[DEBUG]   [{i}] Path: {path}");
+            Debug.Log($"[DEBUG]       Name: {text.transform.name}");
+            Debug.Log($"[DEBUG]       Current Text: '{text.text}'");
+            Debug.Log($"[DEBUG]       Parent: {text.transform.parent?.name ?? "None"}");
+            Debug.Log($"[DEBUG]       ---");
+        }
+        
+        Debug.Log("[DEBUG] === END DIALOG COMPONENTS ===");
+    }
+    
+    /// <summary>
+    /// Get the full path of a transform for debugging
+    /// </summary>
+    private string GetTransformPath(Transform transform)
+    {
+        string path = transform.name;
+        Transform parent = transform.parent;
+        
+        while (parent != null && parent != dialogInstance.transform)
+        {
+            path = parent.name + "/" + path;
+            parent = parent.parent;
+        }
+        
+        return path;
+    }
+    
+    /// <summary>
+    /// Helper method to update dialog text with enhanced error handling and spam protection
+    /// </summary>
+    public void UpdateDialogTextSafe(string dialogText)
+    {
+        Debug.Log($"[SAFE-TEXT] Updating dialog text to: '{dialogText}'");
+        
+        if (string.IsNullOrEmpty(dialogText))
+        {
+            Debug.LogWarning("[SAFE-TEXT] Dialog text is null or empty, skipping update");
+            return;
+        }
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogWarning("[SAFE-TEXT] Dialog instance is null, cannot update dialog text");
+            return;
+        }
+        
+        // Enhanced spam protection - prevent updates during processing or transitions
+        if (isProcessingInput || isInDialogTransition)
+        {
+            Debug.Log("[SAFE-TEXT] Currently processing input or in transition, deferring dialog text update");
+            StartCoroutine(DeferredUpdateDialogText(dialogText));
+            return;
+        }
+        
+        // Prevent rapid successive updates
+        float currentTime = Time.time;
+        if (currentTime - lastDialogUpdateTime < 0.1f)
+        {
+            Debug.LogWarning("[SAFE-TEXT] Too rapid update attempt, skipping to prevent race condition");
+            return;
+        }
+        lastDialogUpdateTime = currentTime;
+        
+        // Cache components on first use or if cache is invalid
+        if (!componentsCached || !ValidateComponentCache())
+        {
+            CacheDialogComponents();
+        }
+        
+        bool textUpdated = false;
+        
+        // Method 1: Try cached DialogueText component first
+        if (cachedTextComponents.ContainsKey("DialogueText"))
+        {
+            try
+            {
+                TMP_Text textComponent = cachedTextComponents["DialogueText"];
+                if (textComponent != null && textComponent.gameObject != null)
+                {
+                    // Double-check this is actually the dialog text component and not name component
+                    string componentPath = GetTransformPath(textComponent.transform);
+                    if ((componentPath.ToLower().Contains("text") || componentPath.ToLower().Contains("dialogue")) && !componentPath.ToLower().Contains("name"))
+                    {
+                        textComponent.text = dialogText;
+                        Debug.Log($"[SAFE-TEXT] ✓ Updated dialog text via cached DialogueText component");
+                        textUpdated = true;
+                    }
+                    else
+                    {
+                        Debug.LogError($"[SAFE-TEXT] CRITICAL: Cached component path '{componentPath}' looks like a name component, not text!");
+                        cachedTextComponents.Remove("DialogueText");
+                        componentsCached = false;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[SAFE-TEXT] Cached DialogueText component is null or destroyed, clearing cache");
+                    cachedTextComponents.Remove("DialogueText");
+                    componentsCached = false;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[SAFE-TEXT] Error updating cached DialogueText component: {e.Message}");
+                cachedTextComponents.Remove("DialogueText");
+                componentsCached = false;
+            }
+        }
+        
+        // Method 2: Try DialogPrefabController if caching failed
+        if (!textUpdated)
+        {
+            DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+            if (controller != null)
+            {
+                try
+                {
+                    controller.SetDialogText(dialogText);
+                    Debug.Log($"[SAFE-TEXT] ✓ Updated dialog text via DialogPrefabController");
+                    textUpdated = true;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[SAFE-TEXT] Failed to update via DialogPrefabController: {e.Message}");
                 }
             }
         }
         
-        Debug.LogWarning($"[SAFE] ✗ Could not update NPC name: {npcName}");
-    }
-    
-    /// <summary>
-    /// Helper method to update dialog text with proper error handling
-    /// </summary>
-    public void UpdateDialogTextSafe(string dialogText)
-    {
-        Debug.Log($"[SAFE] Updating dialog text to: '{dialogText}'");
-        
-        if (dialogInstance != null)
+        // Method 3: Direct search with enhanced validation
+        if (!textUpdated)
         {
-            // Try DialogPrefabController first
-            DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
-            if (controller != null)
-            {
-                controller.SetDialogText(dialogText);
-                Debug.Log($"[SAFE] ✓ Updated via DialogPrefabController");
-                return;
-            }
-            
-            // Fallback to direct search
             Transform textTransform = dialogInstance.transform.Find("DialogueText");
             if (textTransform != null)
             {
                 TMP_Text textComponent = textTransform.GetComponent<TMP_Text>();
                 if (textComponent != null)
                 {
-                    textComponent.text = dialogText;
-                    Debug.Log($"[SAFE] ✓ Updated DialogueText directly");
-                    return;
+                    // CRITICAL: Enhanced validation to ensure this is the dialog text component
+                    string transformName = textTransform.name.ToLower();
+                    string fullPath = GetTransformPath(textTransform).ToLower();
+                    
+                    bool isTextComponent = ((transformName.Contains("text") || transformName.Contains("dialogue")) && !transformName.Contains("name")) ||
+                                          (fullPath.Contains("text") && !fullPath.Contains("name"));
+                    
+                    if (isTextComponent)
+                    {
+                        textComponent.text = dialogText;
+                        Debug.Log($"[SAFE-TEXT] ✓ Updated DialogueText directly: '{textTransform.name}'");
+                        
+                        // Cache this component for future use
+                        cachedTextComponents["DialogueText"] = textComponent;
+                        textUpdated = true;
+                    }
+                    else
+                    {
+                        Debug.LogError($"[SAFE-TEXT] Component validation failed: '{textTransform.name}' at path '{fullPath}' doesn't look like a dialog text component");
+                    }
                 }
+                else
+                {
+                    Debug.LogWarning($"[SAFE-TEXT] DialogueText transform found but no TMP_Text component");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[SAFE-TEXT] DialogueText transform not found in dialog instance");
             }
         }
         
-        Debug.LogWarning($"[SAFE] ✗ Could not update dialog text: {dialogText}");
+        if (!textUpdated)
+        {
+            Debug.LogError($"[SAFE-TEXT] ✗ CRITICAL FAILURE: Could not update dialog text");
+            LogAllDialogComponents(); // Debug helper
+        }
+    }
+    
+    /// <summary>
+    /// Deferred update for dialog text when processing is busy
+    /// </summary>
+    private IEnumerator DeferredUpdateDialogText(string dialogText)
+    {
+        Debug.Log($"[SAFE-TEXT] Deferring dialog text update");
+        
+        // Wait until processing is complete
+        while (isProcessingInput || isInDialogTransition)
+        {
+            yield return new WaitForSeconds(0.05f);
+        }
+        
+        // Wait a bit more for safety
+        yield return new WaitForSeconds(0.1f);
+        
+        Debug.Log($"[SAFE-TEXT] Executing deferred dialog text update");
+        UpdateDialogTextSafe(dialogText);
     }
     
     /// <summary>
@@ -822,6 +1238,15 @@ public class CoreGameManager : MonoBehaviour
         currentChoiceResponseIndex = -1;
         onChoiceSelected = null;
         
+        // Reset input throttling
+        isProcessingInput = false;
+        isInDialogTransition = false;
+        lastInputTime = 0f;
+        lastDialogUpdateTime = 0f;
+        
+        // Clear component cache
+        ClearComponentCache();
+        
         // Clear button states
         buttonTweenIds.Clear();
         
@@ -1150,6 +1575,690 @@ public class CoreGameManager : MonoBehaviour
         return ""; // No name found
     }
 
+    #region Stress Modifier System
+    
+    /// <summary>
+    /// Process all modifiers in dialog text and apply them
+    /// Supported modifiers:
+    /// - {+100stress}, {-50stress} - for stress changes
+    /// - {animation:animationName} - for triggering animations
+    /// - {scene:sceneName} - for changing scenes
+    /// Returns the cleaned text without the modifiers
+    /// </summary>
+    /// <param name="dialogText">Original dialog text with potential modifiers</param>
+    /// <returns>Clean dialog text without modifiers</returns>
+    private string ProcessStressModifiers(string dialogText)
+    {
+        if (string.IsNullOrEmpty(dialogText))
+        {
+            return dialogText;
+        }
+        
+        string processedText = dialogText;
+        
+        // Process stress modifiers: {+100stress}, {-50stress}
+        processedText = ProcessStressModifiersInternal(processedText);
+        
+        // Process animation modifiers: {animation:animationName}
+        processedText = ProcessAnimationModifiers(processedText);
+        
+        // Process scene modifiers: {scene:sceneName}
+        processedText = ProcessSceneModifiers(processedText);
+        
+        // Clean up any double spaces that might result from removing modifiers
+        processedText = System.Text.RegularExpressions.Regex.Replace(processedText, @"\s+", " ").Trim();
+        
+        return processedText;
+    }
+    
+    /// <summary>
+    /// Process stress modifiers in dialog text and apply them to stressvariable
+    /// Modifiers format: {+100stress}, {-50stress}, etc.
+    /// </summary>
+    /// <param name="dialogText">Text containing stress modifiers</param>
+    /// <returns>Text with stress modifiers removed</returns>
+    private string ProcessStressModifiersInternal(string dialogText)
+    {
+        string processedText = dialogText;
+        
+        // Regex pattern to find stress modifiers: {+number stress} or {-number stress}
+        System.Text.RegularExpressions.Regex stressPattern = 
+            new System.Text.RegularExpressions.Regex(@"\{([+-]?\d+)stress\}", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        
+        System.Text.RegularExpressions.MatchCollection matches = stressPattern.Matches(dialogText);
+        
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            if (match.Success && match.Groups.Count > 1)
+            {
+                string valueStr = match.Groups[1].Value;
+                if (int.TryParse(valueStr, out int stressValue))
+                {
+                    // Apply stress modifier to stressvariable
+                    stressvariable += stressValue;
+                    
+                    Debug.Log($"[STRESS] Applied stress modifier: {stressValue} (Total stress: {stressvariable})");
+                }
+                else
+                {
+                    Debug.LogWarning($"[STRESS] Failed to parse stress value: '{valueStr}' from modifier: '{match.Value}'");
+                }
+                
+                // Remove the modifier from the text
+                processedText = processedText.Replace(match.Value, "");
+            }
+        }
+        
+        return processedText;
+    }
+    
+    /// <summary>
+    /// Process animation modifiers in dialog text and trigger animations
+    /// Modifiers format: {animation:animationName}
+    /// </summary>
+    /// <param name="dialogText">Text containing animation modifiers</param>
+    /// <returns>Text with animation modifiers removed</returns>
+    private string ProcessAnimationModifiers(string dialogText)
+    {
+        string processedText = dialogText;
+        
+        // Regex pattern to find animation modifiers: {animation:animationName}
+        System.Text.RegularExpressions.Regex animationPattern = 
+            new System.Text.RegularExpressions.Regex(@"\{animation:([^}]+)\}", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        
+        System.Text.RegularExpressions.MatchCollection matches = animationPattern.Matches(dialogText);
+        
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            if (match.Success && match.Groups.Count > 1)
+            {
+                string animationName = match.Groups[1].Value.Trim();
+                
+                if (!string.IsNullOrEmpty(animationName))
+                {
+                    Debug.Log($"[ANIMATION] Triggering animation: '{animationName}'");
+                    TriggerAnimation(animationName);
+                }
+                else
+                {
+                    Debug.LogWarning($"[ANIMATION] Empty animation name in modifier: '{match.Value}'");
+                }
+                
+                // Remove the modifier from the text
+                processedText = processedText.Replace(match.Value, "");
+            }
+        }
+        
+        return processedText;
+    }
+    
+    /// <summary>
+    /// Process scene modifiers in dialog text and trigger scene changes
+    /// Modifiers format: {scene:sceneName}
+    /// </summary>
+    /// <param name="dialogText">Text containing scene modifiers</param>
+    /// <returns>Text with scene modifiers removed</returns>
+    private string ProcessSceneModifiers(string dialogText)
+    {
+        string processedText = dialogText;
+        
+        // Regex pattern to find scene modifiers: {scene:sceneName}
+        System.Text.RegularExpressions.Regex scenePattern = 
+            new System.Text.RegularExpressions.Regex(@"\{scene:([^}]+)\}", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        
+        System.Text.RegularExpressions.MatchCollection matches = scenePattern.Matches(dialogText);
+        
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            if (match.Success && match.Groups.Count > 1)
+            {
+                string sceneName = match.Groups[1].Value.Trim();
+                
+                if (!string.IsNullOrEmpty(sceneName))
+                {
+                    Debug.Log($"[SCENE] Triggering scene change to: '{sceneName}'");
+                    TriggerSceneChange(sceneName);
+                }
+                else
+                {
+                    Debug.LogWarning($"[SCENE] Empty scene name in modifier: '{match.Value}'");
+                }
+                
+                // Remove the modifier from the text
+                processedText = processedText.Replace(match.Value, "");
+            }
+        }
+        
+        return processedText;
+    }
+    
+    /// <summary>
+    /// Trigger an animation by name
+    /// Override this method to implement your specific animation logic
+    /// </summary>
+    /// <param name="animationName">Name of the animation to trigger</param>
+    protected virtual void TriggerAnimation(string animationName)
+    {
+        Debug.Log($"[ANIMATION] TriggerAnimation called with: '{animationName}'");
+        
+        // Trigger event for external subscribers
+        OnAnimationTriggered?.Invoke(animationName);
+        
+        // Example implementation - you can customize this based on your animation system
+        try
+        {
+            // Method 1: Try to find an Animator component on this GameObject
+            Animator animator = GetComponent<Animator>();
+            if (animator != null)
+            {
+                animator.SetTrigger(animationName);
+                Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on local Animator");
+                return;
+            }
+            
+            // Method 2: Look for global animation manager or specific objects
+            GameObject animationTarget = GameObject.Find("AnimationManager");
+            if (animationTarget != null)
+            {
+                Animator targetAnimator = animationTarget.GetComponent<Animator>();
+                if (targetAnimator != null)
+                {
+                    targetAnimator.SetTrigger(animationName);
+                    Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on AnimationManager");
+                    return;
+                }
+            }
+            
+            // Method 3: Custom animation handling - you can add your own logic here
+            HandleCustomAnimation(animationName);
+            
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[ANIMATION] Error triggering animation '{animationName}': {e.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Handle custom animations that don't use Unity's Animator system
+    /// Override this method for custom animation implementations
+    /// </summary>
+    /// <param name="animationName">Name of the custom animation</param>
+    protected virtual void HandleCustomAnimation(string animationName)
+    {
+        Debug.Log($"[ANIMATION] HandleCustomAnimation called with: '{animationName}'");
+        
+        // Example custom animations
+        switch (animationName.ToLower())
+        {
+            case "shake":
+                StartCoroutine(ShakeAnimation());
+                break;
+                
+            case "fade":
+                StartCoroutine(FadeAnimation());
+                break;
+                
+            case "bounce":
+                StartCoroutine(BounceAnimation());
+                break;
+                
+            default:
+                Debug.LogWarning($"[ANIMATION] Unknown custom animation: '{animationName}'");
+                break;
+        }
+    }
+    
+    /// <summary>
+    /// Trigger a scene change by name
+    /// </summary>
+    /// <param name="sceneName">Name of the scene to load</param>
+    protected virtual void TriggerSceneChange(string sceneName)
+    {
+        Debug.Log($"[SCENE] TriggerSceneChange called with: '{sceneName}'");
+        
+        // Trigger event for external subscribers
+        OnSceneChangeTriggered?.Invoke(sceneName);
+        
+        try
+        {
+            // Check if the scene exists in build settings
+            if (UnityEngine.SceneManagement.SceneUtility.GetBuildIndexByScenePath(sceneName) >= 0)
+            {
+                Debug.Log($"[SCENE] ✓ Loading scene '{sceneName}' from build settings");
+                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            }
+            else
+            {
+                // Try loading by exact name
+                Debug.Log($"[SCENE] Attempting to load scene '{sceneName}' by name");
+                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[SCENE] Error loading scene '{sceneName}': {e.Message}");
+            
+            // Fallback: try async loading
+            StartCoroutine(LoadSceneAsync(sceneName));
+        }
+    }
+    
+    /// <summary>
+    /// Load scene asynchronously as a fallback
+    /// </summary>
+    /// <param name="sceneName">Name of the scene to load</param>
+    private IEnumerator LoadSceneAsync(string sceneName)
+    {
+        Debug.Log($"[SCENE] Attempting async load of scene: '{sceneName}'");
+        
+        var asyncLoad = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
+        
+        if (asyncLoad != null)
+        {
+            while (!asyncLoad.isDone)
+            {
+                Debug.Log($"[SCENE] Loading scene '{sceneName}': {asyncLoad.progress * 100f:F1}%");
+                yield return null;
+            }
+            
+            Debug.Log($"[SCENE] ✓ Scene '{sceneName}' loaded successfully");
+        }
+        else
+        {
+            Debug.LogError($"[SCENE] ✗ Failed to start async load for scene '{sceneName}'");
+        }
+    }
+    
+    #region Example Custom Animations
+    
+    /// <summary>
+    /// Example shake animation
+    /// </summary>
+    private IEnumerator ShakeAnimation()
+    {
+        Debug.Log("[ANIMATION] Starting shake animation");
+        
+        Vector3 originalPosition = transform.position;
+        float duration = 0.5f;
+        float magnitude = 0.1f;
+        
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            float x = UnityEngine.Random.Range(-1f, 1f) * magnitude;
+            float y = UnityEngine.Random.Range(-1f, 1f) * magnitude;
+            
+            transform.position = originalPosition + new Vector3(x, y, 0);
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        transform.position = originalPosition;
+        Debug.Log("[ANIMATION] Shake animation complete");
+    }
+    
+    /// <summary>
+    /// Example fade animation
+    /// </summary>
+    private IEnumerator FadeAnimation()
+    {
+        Debug.Log("[ANIMATION] Starting fade animation");
+        
+        if (backgroundFade != null)
+        {
+            backgroundFade.gameObject.SetActive(true);
+            
+            // Fade in
+            LeanTween.value(backgroundFade.gameObject, 0f, 1f, 0.5f)
+                .setOnUpdate((float alpha) =>
+                {
+                    Color color = backgroundFade.color;
+                    color.a = alpha;
+                    backgroundFade.color = color;
+                });
+            
+            yield return new WaitForSeconds(0.5f);
+            
+            // Fade out
+            LeanTween.value(backgroundFade.gameObject, 1f, 0f, 0.5f)
+                .setOnUpdate((float alpha) =>
+                {
+                    Color color = backgroundFade.color;
+                    color.a = alpha;
+                    backgroundFade.color = color;
+                })
+                .setOnComplete(() =>
+                {
+                    backgroundFade.gameObject.SetActive(false);
+                });
+        }
+        
+        Debug.Log("[ANIMATION] Fade animation complete");
+    }
+    
+    /// <summary>
+    /// Example bounce animation
+    /// </summary>
+    private IEnumerator BounceAnimation()
+    {
+        Debug.Log("[ANIMATION] Starting bounce animation");
+        
+        Vector3 originalScale = transform.localScale;
+        
+        // Scale up
+        LeanTween.scale(gameObject, originalScale * 1.2f, 0.2f)
+            .setEase(LeanTweenType.easeOutBack);
+        
+        yield return new WaitForSeconds(0.2f);
+        
+        // Scale back to normal
+        LeanTween.scale(gameObject, originalScale, 0.2f)
+            .setEase(LeanTweenType.easeInBack);
+        
+        yield return new WaitForSeconds(0.2f);
+        
+        Debug.Log("[ANIMATION] Bounce animation complete");
+    }
+    
+    #endregion
+    
+    /// <summary>
+    /// Get current stress value (for debugging or UI display)
+    /// </summary>
+    public int GetCurrentStress()
+    {
+        return stressvariable;
+    }
+    
+    /// <summary>
+    /// Set stress to a specific value (for debugging or save/load systems)
+    /// </summary>
+    public void SetStress(int value)
+    {
+        stressvariable = value;
+        Debug.Log($"Stress set to: {stressvariable}");
+    }
+    
+    /// <summary>
+    /// Add stress value directly (alternative to using modifiers in text)
+    /// </summary>
+    public void AddStress(int value)
+    {
+        stressvariable += value;
+        Debug.Log($"Added {value} stress (Total: {stressvariable})");
+    }
+    
+    /// <summary>
+    /// Test method for all modifier systems - can be called from Unity Editor
+    /// </summary>
+    [ContextMenu("Test All Modifier Systems")]
+    public void TestStressModifierSystem()
+    {
+        Debug.Log("=== ALL MODIFIER SYSTEMS TEST ===");
+        
+        // Test various modifier formats
+        string[] testTexts = {
+            "Hello! {+100stress} This should add 100 stress.",
+            "I'm feeling bad today. {-50stress} That should reduce stress by 50.",
+            "Multiple modifiers {+25stress} in one {+10stress} sentence.",
+            "Let's trigger an animation {animation:shake} and see what happens!",
+            "This will change the scene {scene:MainMenu} after the dialog.",
+            "Combined test: {+75stress} {animation:bounce} {scene:GameScene}",
+            "No modifiers in this text.",
+            "{+200stress} Modifier at the beginning.",
+            "Modifier at the end {-75stress}",
+            "Animation at start {animation:fade} with more text.",
+            "Scene change {scene:Level2} in the middle of text.",
+            "Invalid modifier {invalidstress} should be ignored.",
+            "Case insensitive {+30STRESS} {ANIMATION:Shake} {SCENE:Menu} modifiers.",
+            "{0stress} Zero modifier should work.",
+            "Empty modifiers {animation:} {scene:} should be handled gracefully."
+        };
+        
+        int initialStress = stressvariable;
+        Debug.Log($"Initial stress: {initialStress}");
+        
+        foreach (string test in testTexts)
+        {
+            Debug.Log($"Testing: '{test}'");
+            string processed = ProcessStressModifiers(test);
+            Debug.Log($"Result: '{processed}' | Current stress: {stressvariable}");
+            Debug.Log("---");
+        }
+        
+        int finalStress = stressvariable;
+        int totalChange = finalStress - initialStress;
+        Debug.Log($"Final stress: {finalStress} (Change: {totalChange})");
+        Debug.Log("=== END ALL MODIFIER SYSTEMS TEST ===");
+    }
+    
+    /// <summary>
+    /// Public property to access current stress value
+    /// </summary>
+    public int CurrentStress => stressvariable;
+    
+    /// <summary>
+    /// Event triggered when an animation modifier is processed
+    /// Subscribe to this to handle animations in external systems
+    /// </summary>
+    public System.Action<string> OnAnimationTriggered;
+    
+    /// <summary>
+    /// Event triggered when a scene modifier is processed
+    /// Subscribe to this to handle scene changes in external systems
+    /// </summary>
+    public System.Action<string> OnSceneChangeTriggered;
+    
+    /// <summary>
+    /// Manually trigger an animation (can be called externally)
+    /// </summary>
+    /// <param name="animationName">Name of the animation to trigger</param>
+    public void TriggerAnimationManual(string animationName)
+    {
+        Debug.Log($"[ANIMATION] Manual animation trigger: '{animationName}'");
+        TriggerAnimation(animationName);
+    }
+    
+    /// <summary>
+    /// Manually trigger a scene change (can be called externally)
+    /// </summary>
+    /// <param name="sceneName">Name of the scene to load</param>
+    public void TriggerSceneChangeManual(string sceneName)
+    {
+        Debug.Log($"[SCENE] Manual scene change trigger: '{sceneName}'");
+        TriggerSceneChange(sceneName);
+    }
+    
+    /// <summary>
+    /// Process a custom text string and apply all modifiers
+    /// Useful for testing or processing text from external sources
+    /// </summary>
+    /// <param name="text">Text containing modifiers</param>
+    /// <returns>Cleaned text with modifiers applied</returns>
+    public string ProcessCustomText(string text)
+    {
+        Debug.Log($"[MODIFIERS] Processing custom text: '{text}'");
+        string result = ProcessStressModifiers(text);
+        Debug.Log($"[MODIFIERS] Processed result: '{result}'");
+        return result;
+    }
+    
+    /// <summary>
+    /// Test spam protection during text animation
+    /// </summary>
+    [ContextMenu("Test Animation Spam Protection")]
+    public void TestAnimationSpamProtection()
+    {
+        Debug.Log("=== TESTING ANIMATION SPAM PROTECTION ===");
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogError("No dialog instance found! Please create a dialog first.");
+            return;
+        }
+        
+        // Start a long text animation
+        string longText = "This is a very long text that will take some time to animate completely. We will test what happens when we spam space during this animation.";
+        
+        // Find dialog text component safely
+        TMP_Text dialogTextComponent = null;
+        DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+        if (controller != null && controller.dialogueText != null)
+        {
+            dialogTextComponent = controller.dialogueText;
+        }
+        else
+        {
+            Transform textTransform = dialogInstance.transform.Find("DialogueText");
+            if (textTransform != null)
+            {
+                dialogTextComponent = textTransform.GetComponent<TMP_Text>();
+            }
+        }
+        
+        if (dialogTextComponent == null)
+        {
+            Debug.LogError("Could not find dialog text component for animation test!");
+            return;
+        }
+        
+        Debug.Log("Starting long text animation, then simulating spam...");
+        AnimateDialogText(longText, dialogTextComponent, null);
+        
+        // Start spam test after animation begins
+        StartCoroutine(SimulateAnimationSpam());
+    }
+    
+    /// <summary>
+    /// Simulate spam during text animation
+    /// </summary>
+    private IEnumerator SimulateAnimationSpam()
+    {
+        // Wait for animation to start
+        yield return new WaitForSeconds(0.5f);
+        
+        Debug.Log("[ANIM-SPAM-TEST] Starting spam during text animation");
+        
+        for (int i = 0; i < 5; i++)
+        {
+            Debug.Log($"[ANIM-SPAM-TEST] Spam attempt #{i + 1} - isTextAnimating: {isTextAnimating}");
+            
+            if (isTextAnimating)
+            {
+                // Simulate HandleDialogProgression call during animation
+                HandleDialogProgression();
+            }
+            
+            // Very short delay between spam attempts
+            yield return new WaitForSeconds(0.1f);
+        }
+        
+        Debug.Log("[ANIM-SPAM-TEST] Animation spam test complete");
+        Debug.Log("=== END ANIMATION SPAM PROTECTION TEST ===");
+    }
+    
+    /// <summary>
+    /// Test method to simulate rapid space key presses (spam test)
+    /// </summary>
+    [ContextMenu("Test Spam Protection")]
+    public void TestSpamProtection()
+    {
+        Debug.Log("=== TESTING SPAM PROTECTION ===");
+        Debug.Log("Simulating rapid space key presses...");
+        
+        StartCoroutine(SimulateSpamInput());
+    }
+    
+    /// <summary>
+    /// Simulate rapid input to test spam protection
+    /// </summary>
+    private IEnumerator SimulateSpamInput()
+    {
+        Debug.Log("[SPAM-TEST] Starting spam simulation");
+        
+        for (int i = 0; i < 10; i++)
+        {
+            Debug.Log($"[SPAM-TEST] Simulated input #{i + 1}");
+            
+            // Check current state before each input
+            Debug.Log($"[SPAM-TEST] Pre-input state: isProcessingInput={isProcessingInput}, isInDialogTransition={isInDialogTransition}");
+            
+            // Simulate HandleDialogProgression call
+            if (!isProcessingInput && !isInDialogTransition)
+            {
+                float currentTime = Time.time;
+                bool canProcessInput = (currentTime - lastInputTime) >= INPUT_COOLDOWN;
+                bool canUpdateDialog = (currentTime - lastDialogUpdateTime) >= 0.2f;
+                
+                if (canProcessInput && canUpdateDialog)
+                {
+                    Debug.Log($"[SPAM-TEST] Input #{i + 1} ACCEPTED");
+                    lastInputTime = currentTime;
+                    lastDialogUpdateTime = currentTime;
+                    isProcessingInput = true;
+                    isInDialogTransition = true;
+                    
+                    // Simulate quick processing
+                    yield return new WaitForSeconds(0.1f);
+                    
+                    // Reset flags
+                    isProcessingInput = false;
+                    yield return new WaitForSeconds(0.1f);
+                    isInDialogTransition = false;
+                }
+                else
+                {
+                    Debug.Log($"[SPAM-TEST] Input #{i + 1} BLOCKED - cooldown not met");
+                }
+            }
+            else
+            {
+                Debug.Log($"[SPAM-TEST] Input #{i + 1} BLOCKED - already processing");
+            }
+            
+            // Very short delay between inputs to simulate spam
+            yield return new WaitForSeconds(0.05f);
+        }
+        
+        Debug.Log("[SPAM-TEST] Spam simulation complete");
+        Debug.Log("=== END SPAM PROTECTION TEST ===");
+    }
+    
+    /// <summary>
+    /// Debug method to test component caching and separation
+    /// </summary>
+    [ContextMenu("Test Component Separation")]
+    public void TestComponentSeparation()
+    {
+        Debug.Log("=== TESTING COMPONENT SEPARATION ===");
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogError("Dialog instance is null! Create a dialog first.");
+            return;
+        }
+        
+        // Clear cache to force fresh component detection
+        ClearComponentCache();
+        
+        // Test NPC name update
+        Debug.Log("Testing NPC name update...");
+        UpdateNpcNameSafe("TEST NPC NAME");
+        
+        // Wait a moment then test dialog text update
+        Debug.Log("Testing dialog text update...");
+        UpdateDialogTextSafe("TEST DIALOG TEXT - This should appear in a different component than the name");
+        
+        // Log all components for verification
+        LogAllDialogComponents();
+        
+        Debug.Log("=== END COMPONENT SEPARATION TEST ===");
+    }
+    
+    #endregion
+
     #region Dialog Handling
 
     private void Show3DDialog(CoreGameDialog dialog)
@@ -1199,6 +2308,11 @@ public class CoreGameManager : MonoBehaviour
 
         textDialog3D.gameObject.SetActive(true);
         
+        // Process stress modifiers from the 3D dialog entry
+        string processedDialogEntry = ProcessStressModifiers(dialog.dialogEntry);
+        Debug.Log($"3D Dialog - Original: '{dialog.dialogEntry}'");
+        Debug.Log($"3D Dialog - Processed: '{processedDialogEntry}'");
+        
         // 3D dialogs don't need NPC name extraction - the 3D model represents the character
         // Extract and display NPC name if present in dialog entry
         // string npcName = ExtractNpcNameFromDialogText(dialog.dialogEntry);
@@ -1207,7 +2321,7 @@ public class CoreGameManager : MonoBehaviour
         //     UpdateNpcNameDisplay(npcName);
         // }
         
-        AnimateDialogText(dialog.dialogEntry, tmp3D, dialog.audioDialogEntry);
+        AnimateDialogText(processedDialogEntry, tmp3D, dialog.audioDialogEntry);
 
         // Handle choices if any
         if (dialog.choices != null && dialog.choices.Length > 0)
@@ -1250,6 +2364,9 @@ public class CoreGameManager : MonoBehaviour
                 ContinueToNextBlock();
                 return;
             }
+            
+            // Clear component cache when new dialog instance is created
+            ClearComponentCache();
         }
         
         // Validate the UI structure
@@ -1265,6 +2382,11 @@ public class CoreGameManager : MonoBehaviour
         // Use NPC name from CoreGameDialog.npcName, or extract from dialog text as fallback
         string npcName = !string.IsNullOrEmpty(dialog.npcName) ? dialog.npcName : ExtractNpcNameFromDialogText(dialog.dialogEntry);
         Debug.Log($"Final npcName for DialogueName component: '{npcName}'");
+        
+        // Process stress modifiers from the initial dialog entry
+        string processedDialogEntry = ProcessStressModifiers(dialog.dialogEntry);
+        Debug.Log($"Original dialog entry: '{dialog.dialogEntry}'");
+        Debug.Log($"Processed dialog entry: '{processedDialogEntry}'");
         
         if (!string.IsNullOrEmpty(npcName))
         {
@@ -1301,13 +2423,13 @@ public class CoreGameManager : MonoBehaviour
         
         if (dialogTextComponent != null)
         {
-            Debug.Log($"Starting dialog text animation for: '{dialog.dialogEntry}'");
-            AnimateDialogText(dialog.dialogEntry, dialogTextComponent, dialog.audioDialogEntry);
+            Debug.Log($"Starting dialog text animation for: '{processedDialogEntry}'");
+            AnimateDialogText(processedDialogEntry, dialogTextComponent, dialog.audioDialogEntry);
         }
         else
         {
             Debug.LogError("Could not find DialogueText component for animation! Falling back to instant text.");
-            UpdateDialogTextSafe(dialog.dialogEntry);
+            UpdateDialogTextSafe(processedDialogEntry);
         }
         
         // Handle choices if any
@@ -1988,6 +3110,7 @@ public class CoreGameManager : MonoBehaviour
         return tweenId;
     }
 
+    [Obsolete]
     private void OnPlayerChoseResponse(int choiceIndex)
     {
         Debug.Log($"=== OnPlayerChoseResponse - Choice {choiceIndex} Selected ===");
@@ -2026,10 +3149,11 @@ public class CoreGameManager : MonoBehaviour
             ContinueToNextBlock();
         }
     }
-    
+
     /// <summary>
     /// Show a specific dialog response from the selected choice
     /// </summary>
+    [Obsolete]
     private void ShowDialogResponse(CoreGameDialogChoices selectedChoice, int responseIndex)
     {
         if (selectedChoice.dialogResponses == null || responseIndex >= selectedChoice.dialogResponses.Length)
@@ -2044,9 +3168,13 @@ public class CoreGameManager : MonoBehaviour
         string npcResponse = response.npcResponse;
         AudioClip audioClip = selectedChoice.audioDialogResponse;
         
+        // Process stress modifiers from the dialog response
+        string processedResponse = ProcessStressModifiers(npcResponse);
+        
         Debug.Log($"Showing dialog response {responseIndex + 1}/{selectedChoice.dialogResponses.Length}:");
         Debug.Log($"  - NPC Name: '{npcName}' -> should go to DialogueName");
-        Debug.Log($"  - NPC Response: '{npcResponse}' -> should go to DialogueText");
+        Debug.Log($"  - Original Response: '{npcResponse}'");
+        Debug.Log($"  - Processed Response: '{processedResponse}' -> should go to DialogueText");
         
         // Get current dialog type from the current block
         var currentBlock = coreGameData.coreBlock[currentBlockIndex];
@@ -2055,7 +3183,7 @@ public class CoreGameManager : MonoBehaviour
         if (currentBlock.Dialog.dialogType == CoreGameDialog.DialogType.ThreeD)
         {
             Debug.Log("Displaying 3D dialog response");
-            Show3DResponse(currentBlock.Dialog, npcResponse, audioClip);
+            Show3DResponse(currentBlock.Dialog, processedResponse, audioClip);
         }
         else
         {
@@ -2071,6 +3199,9 @@ public class CoreGameManager : MonoBehaviour
                     ContinueToNextBlock();
                     return;
                 }
+                
+                // Clear component cache when new dialog instance is created
+                ClearComponentCache();
             }
             
             // Update NPC name display
@@ -2109,13 +3240,13 @@ public class CoreGameManager : MonoBehaviour
             
             if (dialogTextComponent != null)
             {
-                Debug.Log($"Starting dialog response text animation for: '{npcResponse}'");
-                AnimateDialogText(npcResponse, dialogTextComponent, audioClip);
+                Debug.Log($"Starting dialog response text animation for: '{processedResponse}'");
+                AnimateDialogText(processedResponse, dialogTextComponent, audioClip);
             }
             else
             {
                 Debug.LogError("Could not find DialogueText component for response animation! Falling back to instant text.");
-                UpdateDialogTextSafe(npcResponse);
+                UpdateDialogTextSafe(processedResponse);
             }
         }
         
@@ -2827,20 +3958,86 @@ public class CoreGameManager : MonoBehaviour
 
     private void Update()
     {
-        // Use Space key for dialog progression instead of mouse click
-        if (Input.GetKeyDown(KeyCode.Space))
+        float currentTime = Time.time;
+        
+        // Enhanced input throttling - prevent spam input with multiple checks
+        if (isProcessingInput || isInDialogTransition)
         {
-            Debug.Log("SPACE KEY PRESSED - Calling HandleDialogProgression()");
-            HandleDialogProgression();
+            return; // Don't process new input while already processing or transitioning
         }
         
-        // Handle choice input with Q, W, E keys
-        HandleChoiceInput();
+        // Additional safety: ensure minimum time between inputs
+        bool canProcessInput = (currentTime - lastInputTime) >= INPUT_COOLDOWN;
         
+        // Extra safety: ensure minimum time between dialog updates
+        bool canUpdateDialog = (currentTime - lastDialogUpdateTime) >= 0.2f;
+        
+        // Use Space key for dialog progression with enhanced protection
+        if (Input.GetKeyDown(KeyCode.Space) && canProcessInput && canUpdateDialog)
+        {
+            // Set all protection flags immediately
+            lastInputTime = currentTime;
+            lastDialogUpdateTime = currentTime;
+            isProcessingInput = true;
+            isInDialogTransition = true;
+            
+            Debug.Log($"[INPUT] SPACE KEY PRESSED - Time: {currentTime:F2}, Starting HandleDialogProgression()");
+            
+            try
+            {
+                HandleDialogProgression();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[INPUT] Error in HandleDialogProgression: {e.Message}");
+            }
+            finally
+            {
+                // Always reset flags even if there's an error
+                StartCoroutine(ResetInputProcessingFlags());
+            }
+        }
+        
+        // Handle choice input with enhanced throttling
+        if (canProcessInput && !isInDialogTransition)
+        {
+            HandleChoiceInput();
+        }
+        
+        // Escape key for cutscenes (no throttling needed)
         if (Input.GetKeyDown(KeyCode.Escape) && isPlayingCutscene)
         {
             SkipCutscene();
         }
+    }
+    
+    /// <summary>
+    /// Reset transition flag after text skip to prevent getting stuck
+    /// </summary>
+    private IEnumerator ResetTransitionFlagAfterSkip()
+    {
+        // Wait a short time for text completion to finish
+        yield return new WaitForSeconds(0.1f);
+        isInDialogTransition = false;
+        Debug.Log("[PROGRESSION] Transition flag reset after text skip");
+    }
+    
+    /// <summary>
+    /// Reset input processing flags after a delay to prevent spam
+    /// </summary>
+    private IEnumerator ResetInputProcessingFlags()
+    {
+        // Wait for a minimum delay before allowing new input
+        yield return new WaitForSeconds(0.2f);
+        
+        // Reset processing flags
+        isProcessingInput = false;
+        
+        // Wait a bit longer before allowing dialog transitions
+        yield return new WaitForSeconds(0.1f);
+        isInDialogTransition = false;
+        
+        Debug.Log("[INPUT] Input processing flags reset - ready for new input");
     }
     
     /// <summary>
@@ -2908,107 +4105,109 @@ public class CoreGameManager : MonoBehaviour
 
     private void HandleDialogProgression()
     {
-        Debug.Log("=== HandleDialogProgression CALLED ===");
-        Debug.Log($"Current state:");
-        Debug.Log($"  - isPlayingCutscene: {isPlayingCutscene}");
-        Debug.Log($"  - isTextAnimating: {isTextAnimating}");
-        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
-        Debug.Log($"  - currentBlockIndex: {currentBlockIndex}/{(coreGameData?.coreBlock?.Length ?? 0)}");
-        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
-        Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        Debug.Log("[PROGRESSION] === HandleDialogProgression CALLED ===");
+        Debug.Log($"[PROGRESSION] Current state:");
+        Debug.Log($"[PROGRESSION]   - isPlayingCutscene: {isPlayingCutscene}");
+        Debug.Log($"[PROGRESSION]   - isTextAnimating: {isTextAnimating}");
+        Debug.Log($"[PROGRESSION]   - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"[PROGRESSION]   - isProcessingInput: {isProcessingInput}");
+        Debug.Log($"[PROGRESSION]   - isInDialogTransition: {isInDialogTransition}");
+        Debug.Log($"[PROGRESSION]   - currentBlockIndex: {currentBlockIndex}/{(coreGameData?.coreBlock?.Length ?? 0)}");
+        Debug.Log($"[PROGRESSION]   - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"[PROGRESSION]   - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
         
-        if (isPlayingCutscene) 
+        try
         {
-            Debug.Log("Blocked: Currently playing cutscene");
-            return;
-        }
-        
-        // If text is currently animating, skip to complete text and stop audio
-        if (isTextAnimating)
-        {
-            Debug.Log("Text is animating, skipping to complete...");
-            SkipTextAnimation();
-            return;
-        }
-        
-        if (currentBlockIndex >= coreGameData.coreBlock.Length)
-        {
-            Debug.Log("Reached end of game, finishing...");
-            FinishCoreGame();
-            return;
-        }
-        
-        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
-        Debug.Log($"Current block type: {currentBlock.Type}");
-        
-        // If showing a choice response, handle multiple responses
-        if (isShowingResponse)
-        {
-            Debug.Log("Currently showing response, checking for more responses...");
-            
-            if (selectedChoiceIndex < 0 || currentBlock.Dialog?.choices == null || selectedChoiceIndex >= currentBlock.Dialog.choices.Length)
+            // Safety check: Ensure we have valid data
+            if (coreGameData == null || coreGameData.coreBlock == null)
             {
-                Debug.LogError($"Invalid selectedChoiceIndex {selectedChoiceIndex} or no choices available!");
-                // Reset state and continue
-                isShowingResponse = false;
-                currentChoiceResponseIndex = -1;
-                selectedChoiceIndex = -1;
-                ContinueToNextBlock();
+                Debug.LogError("[PROGRESSION] CoreGameData is null or has no blocks!");
                 return;
             }
             
-            var selectedChoice = currentBlock.Dialog.choices[selectedChoiceIndex];
-            
-            if (selectedChoice != null && selectedChoice.dialogResponses != null)
+            if (isPlayingCutscene) 
             {
-                int nextResponseIndex = currentChoiceResponseIndex + 1;
-                Debug.Log($"Next response index would be: {nextResponseIndex} (total responses: {selectedChoice.dialogResponses.Length})");
+                Debug.Log("[PROGRESSION] Blocked: Currently playing cutscene");
+                return;
+            }
+            
+            // If text is currently animating, skip to complete text and stop audio
+            if (isTextAnimating)
+            {
+                Debug.Log("[PROGRESSION] Text is animating, skipping to complete...");
                 
-                // Check if there are more responses to show
-                if (nextResponseIndex < selectedChoice.dialogResponses.Length)
+                // Set transition flag to prevent further input during completion
+                isInDialogTransition = true;
+                
+                SkipTextAnimation();
+                
+                // Reset transition flag after a short delay
+                StartCoroutine(ResetTransitionFlagAfterSkip());
+                return;
+            }
+            
+            if (currentBlockIndex >= coreGameData.coreBlock.Length)
+            {
+                Debug.Log("[PROGRESSION] Reached end of game, finishing...");
+                FinishCoreGame();
+                return;
+            }
+            
+            var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+            Debug.Log($"[PROGRESSION] Current block type: {currentBlock.Type}");
+            
+            // If showing a choice response, handle multiple responses
+            if (isShowingResponse)
+            {
+                Debug.Log("[PROGRESSION] Currently showing response, checking for more responses...");
+                
+                if (selectedChoiceIndex < 0 || currentBlock.Dialog?.choices == null || selectedChoiceIndex >= currentBlock.Dialog.choices.Length)
                 {
-                    Debug.Log($"Showing next dialog response: {nextResponseIndex + 1}/{selectedChoice.dialogResponses.Length}");
-                    ShowDialogResponse(selectedChoice, nextResponseIndex);
+                    Debug.LogError($"[PROGRESSION] Invalid selectedChoiceIndex {selectedChoiceIndex} or no choices available!");
+                    // Reset state and continue
+                    ResetDialogResponseState();
+                    ContinueToNextBlock();
                     return;
+                }
+                
+                var selectedChoice = currentBlock.Dialog.choices[selectedChoiceIndex];
+                
+                if (selectedChoice != null && selectedChoice.dialogResponses != null)
+                {
+                    int nextResponseIndex = currentChoiceResponseIndex + 1;
+                    Debug.Log($"[PROGRESSION] Next response index would be: {nextResponseIndex} (total responses: {selectedChoice.dialogResponses.Length})");
+                    
+                    // Check if there are more responses to show
+                    if (nextResponseIndex < selectedChoice.dialogResponses.Length)
+                    {
+                        Debug.Log($"[PROGRESSION] Showing next dialog response: {nextResponseIndex + 1}/{selectedChoice.dialogResponses.Length}");
+                        
+                        // Ensure we're not in a transition state
+                        if (!isInDialogTransition)
+                        {
+                            isInDialogTransition = true;
+                            ShowDialogResponse(selectedChoice, nextResponseIndex);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[PROGRESSION] Already in transition, skipping duplicate response display");
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        Debug.Log("[PROGRESSION] All dialog responses shown, continuing to next block");
+                        // All responses shown, continue to next block
+                        ResetDialogResponseState();
+                    }
                 }
                 else
                 {
-                    Debug.Log("All dialog responses shown, continuing to next block");
-                    // All responses shown, continue to next block
-                    isShowingResponse = false;
-                    currentChoiceResponseIndex = -1;
-                    selectedChoiceIndex = -1;
+                    Debug.Log("[PROGRESSION] No more responses or selectedChoice is null, continuing to next block");
+                    // No more responses, continue to next block
+                    ResetDialogResponseState();
                 }
-            }
-            else
-            {
-                Debug.Log("No more responses or selectedChoice is null, continuing to next block");
-                // No more responses, continue to next block
-                isShowingResponse = false;
-                currentChoiceResponseIndex = -1;
-                selectedChoiceIndex = -1;
-            }
-            
-            ClearAll3DDialogs(); // Clear 3D dialogs when continuing
-            
-            // Only destroy dialog instances if next block is not a 2D dialog
-            if (!IsNext2DDialog())
-            {
-                DestroyDialogInstances();
-            }
-            
-            Debug.Log("Continuing to next block after responses...");
-            ContinueToNextBlock();
-            return;
-        }
-        
-        // If current block is dialog and has no choices, continue
-        if (currentBlock.Type == CoreGameBlock.CoreType.Dialog)
-        {
-            var dialog = currentBlock.Dialog;
-            if (dialog.choices == null || dialog.choices.Length == 0)
-            {
-                Debug.Log("Current dialog has no choices, continuing to next block...");
+                
                 ClearAll3DDialogs(); // Clear 3D dialogs when continuing
                 
                 // Only destroy dialog instances if next block is not a 2D dialog
@@ -3017,19 +4216,62 @@ public class CoreGameManager : MonoBehaviour
                     DestroyDialogInstances();
                 }
                 
+                Debug.Log("[PROGRESSION] Continuing to next block after responses...");
                 ContinueToNextBlock();
+                return;
+            }
+            
+            // If current block is dialog and has no choices, continue
+            if (currentBlock.Type == CoreGameBlock.CoreType.Dialog)
+            {
+                var dialog = currentBlock.Dialog;
+                if (dialog.choices == null || dialog.choices.Length == 0)
+                {
+                    Debug.Log("[PROGRESSION] Current dialog has no choices, continuing to next block...");
+                    ClearAll3DDialogs(); // Clear 3D dialogs when continuing
+                    
+                    // Only destroy dialog instances if next block is not a 2D dialog
+                    if (!IsNext2DDialog())
+                    {
+                        DestroyDialogInstances();
+                    }
+                    
+                    ContinueToNextBlock();
+                }
+                else
+                {
+                    Debug.Log($"[PROGRESSION] Current dialog has {dialog.choices.Length} choices - waiting for user selection");
+                }
             }
             else
             {
-                Debug.Log($"Current dialog has {dialog.choices.Length} choices - waiting for user selection");
+                Debug.Log($"[PROGRESSION] Current block is not a dialog (type: {currentBlock.Type})");
             }
         }
-        else
+        catch (System.Exception e)
         {
-            Debug.Log($"Current block is not a dialog (type: {currentBlock.Type})");
+            Debug.LogError($"[PROGRESSION] Exception in HandleDialogProgression: {e.Message}");
+            Debug.LogError($"[PROGRESSION] Stack trace: {e.StackTrace}");
+            
+            // Reset state to prevent getting stuck
+            ResetDialogResponseState();
         }
-        
-        Debug.Log("=== END HandleDialogProgression ===");
+        finally
+        {
+            Debug.Log("[PROGRESSION] === END HandleDialogProgression ===");
+        }
+    }
+    
+    /// <summary>
+    /// Reset dialog response state to prevent getting stuck
+    /// </summary>
+    private void ResetDialogResponseState()
+    {
+        Debug.Log("[PROGRESSION] Resetting dialog response state");
+        isShowingResponse = false;
+        currentChoiceResponseIndex = -1;
+        selectedChoiceIndex = -1;
+        isInDialogTransition = false;
     }
     
     /// <summary>
@@ -3053,13 +4295,26 @@ public class CoreGameManager : MonoBehaviour
     
     private void SkipTextAnimation()
     {
+        Debug.Log("[SKIP-ANIM] Skipping text animation...");
+        
+        // Prevent multiple simultaneous skip attempts
+        if (!isTextAnimating)
+        {
+            Debug.Log("[SKIP-ANIM] No text animation running, nothing to skip");
+            return;
+        }
+        
+        // Set flag immediately to prevent race conditions
+        bool wasTextAnimating = isTextAnimating;
+        isTextAnimating = false;
+        
         try
         {
             // Stop audio immediately
             if (dialogAudioSource != null && dialogAudioSource.isPlaying)
             {
                 dialogAudioSource.Stop();
-                Debug.Log("Dialog audio stopped due to skip.");
+                Debug.Log("[SKIP-ANIM] Dialog audio stopped due to skip.");
             }
             
             // Complete the tween immediately
@@ -3067,19 +4322,25 @@ public class CoreGameManager : MonoBehaviour
             {
                 LeanTween.cancel(gameObject, dialogTween.id);
                 dialogTween = null;
+                Debug.Log("[SKIP-ANIM] Dialog tween cancelled");
             }
             
-            isTextAnimating = false;
-            
-            // Force complete the text display
-            CompleteCurrentTextDisplay();
-            
-            Debug.Log("Text animation skipped successfully.");
+            // Only complete text display if we were actually animating
+            if (wasTextAnimating)
+            {
+                // Force complete the text display with enhanced safety
+                CompleteCurrentTextDisplay();
+                Debug.Log("[SKIP-ANIM] Text animation skipped and completed successfully.");
+            }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error skipping text animation: {e.Message}");
-            // Ensure we still set the flag to false even if there's an error
+            Debug.LogError($"[SKIP-ANIM] Error skipping text animation: {e.Message}");
+            Debug.LogError($"[SKIP-ANIM] Stack trace: {e.StackTrace}");
+        }
+        finally
+        {
+            // Ensure the flag is always set to false, even if there's an error
             isTextAnimating = false;
         }
     }
@@ -3122,15 +4383,106 @@ public class CoreGameManager : MonoBehaviour
     
     private void Complete2DText(string textToDisplay)
     {
-        // Complete 2D dialog text
-        var dialogTextComponent = dialogInstance?.GetComponentInChildren<TMP_Text>();
-        if (dialogTextComponent != null)
+        Debug.Log($"[COMPLETE-TEXT] Completing 2D text animation with: '{textToDisplay}'");
+        
+        // CRITICAL FIX: Use the same safe methods instead of generic GetComponentInChildren
+        // This prevents targeting the wrong component during spam
+        if (dialogInstance != null)
         {
-            dialogTextComponent.text = textToDisplay;
+            bool textCompleted = false;
+            
+            // Method 1: Try cached DialogueText component first
+            if (cachedTextComponents.ContainsKey("DialogueText"))
+            {
+                try
+                {
+                    TMP_Text textComponent = cachedTextComponents["DialogueText"];
+                    if (textComponent != null && textComponent.gameObject != null)
+                    {
+                        // Validate this is actually the dialog text component
+                        string componentPath = GetTransformPath(textComponent.transform);
+                        if ((componentPath.ToLower().Contains("text") || componentPath.ToLower().Contains("dialogue")) && !componentPath.ToLower().Contains("name"))
+                        {
+                            textComponent.text = textToDisplay;
+                            Debug.Log($"[COMPLETE-TEXT] ✓ Completed text via cached DialogueText component");
+                            textCompleted = true;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[COMPLETE-TEXT] Cached component validation failed: '{componentPath}' looks like name component");
+                            cachedTextComponents.Remove("DialogueText");
+                        }
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"[COMPLETE-TEXT] Error with cached component: {e.Message}");
+                    cachedTextComponents.Remove("DialogueText");
+                }
+            }
+            
+            // Method 2: Try DialogPrefabController if caching failed
+            if (!textCompleted)
+            {
+                DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+                if (controller != null && controller.dialogueText != null)
+                {
+                    controller.dialogueText.text = textToDisplay;
+                    Debug.Log($"[COMPLETE-TEXT] ✓ Completed text via DialogPrefabController");
+                    textCompleted = true;
+                }
+            }
+            
+            // Method 3: Direct search with strict validation
+            if (!textCompleted)
+            {
+                Transform textTransform = dialogInstance.transform.Find("DialogueText");
+                if (textTransform != null)
+                {
+                    TMP_Text textComponent = textTransform.GetComponent<TMP_Text>();
+                    if (textComponent != null)
+                    {
+                        // CRITICAL: Validate this is the dialog text component, not name
+                        string transformName = textTransform.name.ToLower();
+                        string fullPath = GetTransformPath(textTransform).ToLower();
+                        
+                        bool isTextComponent = ((transformName.Contains("text") || transformName.Contains("dialogue")) && !transformName.Contains("name")) ||
+                                              (fullPath.Contains("text") && !fullPath.Contains("name"));
+                        
+                        if (isTextComponent)
+                        {
+                            textComponent.text = textToDisplay;
+                            Debug.Log($"[COMPLETE-TEXT] ✓ Completed text via direct search");
+                            textCompleted = true;
+                        }
+                        else
+                        {
+                            Debug.LogError($"[COMPLETE-TEXT] Component validation failed: '{transformName}' at '{fullPath}' is not dialog text");
+                        }
+                    }
+                }
+            }
+            
+            if (!textCompleted)
+            {
+                Debug.LogError($"[COMPLETE-TEXT] ✗ FAILED to complete text display - no valid dialog text component found");
+                // Fallback to inspector-assigned dialogText if available
+                if (dialogText != null)
+                {
+                    dialogText.text = textToDisplay;
+                    Debug.Log($"[COMPLETE-TEXT] ✓ Completed text via inspector-assigned dialogText fallback");
+                }
+            }
         }
-        else if (dialogText != null)
+        else
         {
-            dialogText.text = textToDisplay;
+            Debug.LogWarning("[COMPLETE-TEXT] Dialog instance is null, cannot complete text");
+            // Fallback to inspector-assigned dialogText if available
+            if (dialogText != null)
+            {
+                dialogText.text = textToDisplay;
+                Debug.Log($"[COMPLETE-TEXT] ✓ Completed text via inspector-assigned dialogText fallback");
+            }
         }
     }
     

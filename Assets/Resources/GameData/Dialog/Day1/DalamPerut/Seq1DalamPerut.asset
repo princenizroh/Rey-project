@@ -15,9 +15,11 @@ MonoBehaviour:
   coreBlock:
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Dunia yang gelap ini.. aku selalu merasakan kehangatan
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -25,9 +27,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Aku selalu mendengar suara detak jantung yang selalu menenangkanku
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -35,9 +39,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Suara asing dari seseorang yang tidak aku kenal...
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -45,9 +51,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Dan itu adalah ibuku
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -55,9 +63,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Suara Ibuku teredam, seperti musik dari kejauhan
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -65,9 +75,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Aku mengambang, tubuhku ringan, dan semua kebutuhanku terpenuhi
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -75,9 +87,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Sampai suatu ketika duniaku yang nyaman mulai mendorongku
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -85,9 +99,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Rasa ini yang tidak aku kenal
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -95,9 +111,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Dingin.. Sakit.. Terang.. Sesak..
       audioDialogEntry: {fileID: 0}
       choices: []

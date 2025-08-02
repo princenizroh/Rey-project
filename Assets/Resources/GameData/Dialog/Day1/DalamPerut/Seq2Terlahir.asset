@@ -15,9 +15,11 @@ MonoBehaviour:
   coreBlock:
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Lihat kepalanya sudah muncul
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -25,9 +27,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: ???
       dialogEntry: Selamat ya bu anaknyaa perempuan
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -35,9 +39,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 2
       camChoice: 0
+      npcName: ???
       dialogEntry: Sayang kamu berhasil
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -45,9 +51,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 2
       camChoice: 0
+      npcName: ???
       dialogEntry: Aku mau mati rasanya
       audioDialogEntry: {fileID: 0}
       choices: []
