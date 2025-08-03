@@ -36,7 +36,9 @@ MonoBehaviour:
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: Membuka mata
-        dialogResponses: []
+        dialogResponses:
+        - NpcName: 
+          npcResponse: '{prefab:ChargeMeter}'
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
