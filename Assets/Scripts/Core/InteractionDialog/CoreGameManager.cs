@@ -135,6 +135,10 @@ public class CoreGameManager : MonoBehaviour
     private Dictionary<string, TMP_Text> cachedTextComponents = new Dictionary<string, TMP_Text>();
     private bool componentsCached = false;
     
+    // DialogSpace management for animation control
+    private GameObject cachedDialogSpace = null;
+    private bool dialogSpaceCached = false;
+    
     // Choice management variables
     private System.Action<int> onChoiceSelected;
     private Dictionary<Button, int> buttonTweenIds = new Dictionary<Button, int>();
@@ -657,7 +661,96 @@ public class CoreGameManager : MonoBehaviour
     {
         cachedTextComponents.Clear();
         componentsCached = false;
-        Debug.Log("[CACHE] Component cache cleared");
+        
+        // Clear DialogSpace cache when dialog instance changes
+        cachedDialogSpace = null;
+        dialogSpaceCached = false;
+        
+        Debug.Log("[CACHE] Component cache cleared including DialogSpace");
+    }
+    
+    /// <summary>
+    /// Find and cache the DialogSpace GameObject in the current dialog instance
+    /// </summary>
+    private void CacheDialogSpace()
+    {
+        cachedDialogSpace = null;
+        dialogSpaceCached = false;
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogWarning("[DIALOGSPACE] Dialog instance is null, cannot cache DialogSpace");
+            return;
+        }
+        
+        // Look for DialogSpace GameObject in the dialog instance
+        Transform dialogSpaceTransform = dialogInstance.transform.Find("DialogSpace");
+        if (dialogSpaceTransform != null)
+        {
+            cachedDialogSpace = dialogSpaceTransform.gameObject;
+            dialogSpaceCached = true;
+            Debug.Log($"[DIALOGSPACE] ✓ Found and cached DialogSpace: {cachedDialogSpace.name}");
+        }
+        else
+        {
+            // Try finding it in children with recursive search
+            Transform[] allChildren = dialogInstance.GetComponentsInChildren<Transform>();
+            foreach (Transform child in allChildren)
+            {
+                if (child.name.Equals("DialogSpace", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    cachedDialogSpace = child.gameObject;
+                    dialogSpaceCached = true;
+                    Debug.Log($"[DIALOGSPACE] ✓ Found DialogSpace via recursive search: {cachedDialogSpace.name}");
+                    break;
+                }
+            }
+            
+            if (cachedDialogSpace == null)
+            {
+                Debug.LogWarning("[DIALOGSPACE] DialogSpace GameObject not found in dialog instance");
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Set DialogSpace active/inactive state with proper error handling
+    /// </summary>
+    private void SetDialogSpaceActive(bool active)
+    {
+        // Cache DialogSpace if not already cached or if cache is invalid
+        if (!dialogSpaceCached || cachedDialogSpace == null)
+        {
+            CacheDialogSpace();
+        }
+        
+        if (cachedDialogSpace != null)
+        {
+            try
+            {
+                bool currentState = cachedDialogSpace.activeSelf;
+                if (currentState != active)
+                {
+                    cachedDialogSpace.SetActive(active);
+                    Debug.Log($"[DIALOGSPACE] DialogSpace set to {(active ? "ENABLED" : "DISABLED")}");
+                }
+                else
+                {
+                    Debug.Log($"[DIALOGSPACE] DialogSpace already {(active ? "enabled" : "disabled")}, no change needed");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[DIALOGSPACE] Error setting DialogSpace active state: {e.Message}");
+                // Clear cache if GameObject is destroyed
+                cachedDialogSpace = null;
+                dialogSpaceCached = false;
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[DIALOGSPACE] Cannot set DialogSpace to {(active ? "enabled" : "disabled")} - DialogSpace not found");
+        }
     }
     
     /// <summary>
@@ -1404,6 +1497,53 @@ public class CoreGameManager : MonoBehaviour
         }
         
         Debug.Log("=== END TEXT ANIMATION TEST ===");
+    }
+    
+    /// <summary>
+    /// Test DialogSpace control during text animation
+    /// </summary>
+    [ContextMenu("Test DialogSpace Control")]
+    public void TestDialogSpaceControl()
+    {
+        Debug.Log("=== TESTING DIALOGSPACE CONTROL ===");
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogError("Dialog instance is null! Please show a dialog first.");
+            return;
+        }
+        
+        // Test caching DialogSpace
+        CacheDialogSpace();
+        
+        if (cachedDialogSpace != null)
+        {
+            Debug.Log($"DialogSpace found: {cachedDialogSpace.name}");
+            Debug.Log($"Current state: {(cachedDialogSpace.activeSelf ? "ENABLED" : "DISABLED")}");
+            
+            // Test disable
+            Debug.Log("Testing DISABLE...");
+            SetDialogSpaceActive(false);
+            
+            // Wait a moment then test enable
+            StartCoroutine(TestDialogSpaceDelayed());
+        }
+        else
+        {
+            Debug.LogError("DialogSpace not found in dialog instance!");
+        }
+        
+        Debug.Log("=== END DIALOGSPACE CONTROL TEST ===");
+    }
+    
+    private IEnumerator TestDialogSpaceDelayed()
+    {
+        yield return new WaitForSeconds(2f);
+        
+        Debug.Log("Testing ENABLE...");
+        SetDialogSpaceActive(true);
+        
+        Debug.Log("DialogSpace control test complete!");
     }
     
     #endregion
@@ -4017,6 +4157,9 @@ public class CoreGameManager : MonoBehaviour
         
         // Hide choice buttons
         HideChoices();
+        
+        // Clear component and DialogSpace cache when dialog instances are destroyed
+        ClearComponentCache();
     }
     
     #endregion
@@ -4038,18 +4181,15 @@ public class CoreGameManager : MonoBehaviour
         textComponent.text = "";
         int len = displayText.Length;
         
-        // Determine animation duration
-        float animationDuration;
+        // Always use normal text-based animation duration (no audio sync)
+        float animationDuration = len * 0.02f; // Normal typing speed regardless of audio
         bool hasValidAudio = false;
         
-        // Check if audio clip is valid and not null
+        // Play audio if available, but don't sync text animation to audio duration
         if (audioClip != null && audioClip.length > 0)
         {
             try
             {
-                // Use audio clip duration for text animation
-                animationDuration = audioClip.length;
-                
                 // Play the audio clip if AudioSource is available
                 if (dialogAudioSource != null)
                 {
@@ -4057,30 +4197,27 @@ public class CoreGameManager : MonoBehaviour
                     dialogAudioSource.Play();
                     hasValidAudio = true;
                     Debug.Log($"Playing audio for dialog: {audioClip.name} (Duration: {audioClip.length}s)");
+                    Debug.Log($"Text animation will use normal speed, not synced to audio duration");
                 }
                 else
                 {
-                    Debug.LogWarning("DialogAudioSource is null, cannot play audio. Using default text timing.");
-                    animationDuration = len * 0.02f;
+                    Debug.LogWarning("DialogAudioSource is null, cannot play audio.");
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning($"Failed to play audio clip '{audioClip.name}': {e.Message}. Using default text timing.");
-                animationDuration = len * 0.02f;
+                Debug.LogWarning($"Failed to play audio clip '{audioClip.name}': {e.Message}");
             }
         }
         else
         {
-            // No audio file provided or invalid audio - use default duration based on text length
-            animationDuration = len * 0.02f;
             if (audioClip == null)
             {
-                Debug.Log("No audio file provided for dialog. Using default text animation timing.");
+                Debug.Log("No audio file provided for dialog. Using normal text animation timing.");
             }
             else
             {
-                Debug.LogWarning($"Audio clip provided but has invalid length ({audioClip.length}). Using default text timing.");
+                Debug.LogWarning($"Audio clip provided but has invalid length ({audioClip.length}). Using normal text timing.");
             }
         }
         
@@ -4088,6 +4225,9 @@ public class CoreGameManager : MonoBehaviour
         animationDuration = Mathf.Max(animationDuration, 0.1f);
         
         isTextAnimating = true;
+        
+        // DISABLE DialogSpace when text animation starts
+        SetDialogSpaceActive(false);
         
         dialogTween = LeanTween.value(gameObject, 0, len, animationDuration)
             .setOnUpdate((float val) => {
@@ -4097,6 +4237,9 @@ public class CoreGameManager : MonoBehaviour
             .setOnComplete(() => {
                 textComponent.text = displayText;
                 isTextAnimating = false;
+                
+                // RE-ENABLE DialogSpace when text animation completes
+                SetDialogSpaceActive(true);
                 
                 // Log completion
                 if (hasValidAudio)
@@ -4522,6 +4665,10 @@ public class CoreGameManager : MonoBehaviour
             {
                 // Force complete the text display with enhanced safety
                 CompleteCurrentTextDisplay();
+                
+                // RE-ENABLE DialogSpace when text animation is skipped
+                SetDialogSpaceActive(true);
+                
                 Debug.Log("[SKIP-ANIM] Text animation skipped and completed successfully.");
             }
         }
