@@ -1,0 +1,120 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
+  m_Name: Seq5MembukaMata
+  m_EditorClassIdentifier: 
+  coreBlock:
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: Ayah
+      dialogEntry: Lihat dia membuka matanya
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: Ayah
+      dialogEntry: Ihh... lucu sekali
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: Ibu
+      dialogEntry: Iya ya dia mulai membuka matanya
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: Ayah
+      dialogEntry: Halo nak ini ayah
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: Ayah
+      dialogEntry: Dan ini ibumu
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: ???
+      dialogEntry: Ayah.. Ibu..
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: ???
+      dialogEntry: Lapar..
+      audioDialogEntry: {fileID: 0}
+      choices:
+      - playerChoice: Neh (Lapar)
+        dialogResponses:
+        - NpcName: Ayah
+          npcResponse: Dia mengeluarkan suara, apa yang dia butuhkan
+        audioDialogResponse: {fileID: 8300000, guid: 34fc5efa1b0dcce4c8ec06157917fae7, type: 3}
+      - playerChoice: Menangis keras
+        dialogResponses:
+        - NpcName: Ibu
+          npcResponse: Kenapa anak ini menangis? Berisik sekali
+        - NpcName: Bidan
+          npcResponse: Kalau anaknya menangis terus itu tandanya dia butuh sesuatu
+            ibu
+        - NpcName: Bidan
+          npcResponse: Karena bayinya baru lahir sepertinya anaknya sedang lapar
+        - NpcName: Bidan
+          npcResponse: Ibu bisa beri ASI untuk kebutuhan bayinya
+        - NpcName: Ayah
+          npcResponse: Iya sayang kasih ASI untuk anak kita
+        - NpcName: Ibu
+          npcResponse: Iya deh daripada berisik terus
+        audioDialogResponse: {fileID: 8300000, guid: 117a016d2cb1f9446b8b68e56a57a9f7, type: 3}
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}

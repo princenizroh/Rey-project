@@ -18,6 +18,14 @@ public class NarratorDay1 : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private CoreGameManager coregame;
 
+    [Header("Movement System")]
+    [SerializeField] private Transform babyObject; 
+    [SerializeField] private Transform motherObject; 
+    [SerializeField] private Transform fatherObject; 
+    
+    [Header("Story Positions")]
+    [SerializeField] private Transform[] storyPositions;
+
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClipData[] audioClips;
 
@@ -53,7 +61,13 @@ public class NarratorDay1 : MonoBehaviour
     [System.Obsolete]
     private IEnumerator PlayNightSequence()
     {
-        CloseEyes();
+        // CloseEyes();
+        // Memainkan animasi ibu sedang duduk, ayah sedang duduk
+        Debug.Log("Playing sitting animations for mother and father.");
+        PlayCharacterAnimation("mother", "Sit");
+        PlayCharacterAnimation("father", "Sit");
+        Debug.Log("Playing narration for Day 1 Night sequence.");
+        
         yield return new WaitForSeconds(1f);
         narratorText.text = "Day 1\nKelahiran";
         yield return new WaitForSeconds(5f);
@@ -82,31 +96,36 @@ public class NarratorDay1 : MonoBehaviour
         yield return new WaitForSeconds(3f);
       
         bool seq3Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq3Kesehatan", 
+        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq3Kesehatan", 
             () => { seq3Complete = true; });
         yield return new WaitUntil(() => seq3Complete);
 
         yield return new WaitForSeconds(1f);
 
         bool seq4Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq4Kesadaran", 
+        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq4Kesadaran", 
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
 
         yield return new WaitForSeconds(1f);
 
+        yield return new WaitForSeconds(0.5f);
         Debug.Log("Opening eyes");
         FadeOpenEyes();
 
         bool seq5Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq5MembukaMata", 
+        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq5MembukaMata", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
 
         yield return new WaitForSeconds(1f);
+        // pergeseran bayi makin dekat ke ibu
+        
+        // Memainkan animasi
+        yield return new WaitForSeconds(2f);
 
         bool seq6Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq6Makanan", 
+        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq6Makanan", 
             () => { seq6Complete = true; });
         yield return new WaitUntil(() => seq6Complete);
 
@@ -117,13 +136,12 @@ public class NarratorDay1 : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         bool seq7Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq7Nama", 
+        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq7Nama", 
             () => { seq7Complete = true; });
         yield return new WaitUntil(() => seq7Complete);
         yield return new WaitForSeconds(1f);
 
         Debug.Log("Sequence 7 complete, closing narration.");
-
     }
 
     private void CloseEyes()
@@ -214,5 +232,52 @@ public class NarratorDay1 : MonoBehaviour
         yield return new WaitForSeconds(duration);
         StopAudio();
     }
+    private IEnumerator MoveObjectToPosition(Transform obj, int positionIndex, float duration = 1f)
+    {
+        if (obj == null || positionIndex >= storyPositions.Length) 
+        {
+            Debug.LogError($"Invalid object or position index: {positionIndex}");
+            yield break;
+        }
+        
+        Vector3 startPos = obj.position;
+        Vector3 targetPos = storyPositions[positionIndex].position;
+        float elapsed = 0f;
+        
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            obj.position = Vector3.Lerp(startPos, targetPos, t);
+            yield return null;
+        }
+        
+        obj.position = targetPos;
+        Debug.Log($"Moved {obj.name} to position {positionIndex}");
+    }
 
+    // Character animation triggers
+    private void PlayCharacterAnimation(string characterName, string animationName)
+    {
+        switch (characterName.ToLower())
+        {
+            case "mother":
+                if (motherObject != null)
+                {
+                    Animator motherAnim = motherObject.GetComponentInChildren<Animator>();
+                    if (motherAnim != null)
+                        motherAnim.SetTrigger(animationName);
+                }
+                break;
+                
+            case "father":
+                if (fatherObject != null)
+                {
+                    Animator fatherAnim = fatherObject.GetComponentInChildren<Animator>();
+                    if (fatherAnim != null)
+                        fatherAnim.SetTrigger(animationName);
+                }
+                break;
+        }
+    }
 }
