@@ -15,9 +15,35 @@ MonoBehaviour:
   coreBlock:
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
+      dialogEntry: '*Detukan jam'
+      audioDialogEntry: {fileID: 8300000, guid: f849bd72e5256c44b827389360e754ae, type: 3}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 
+      dialogEntry: '*KocokanPil'
+      audioDialogEntry: {fileID: 8300000, guid: fedc7171d42cb414a82bc8629fd7fbfd, type: 3}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 
       dialogEntry: Ibu, ini ada vitamin zat besi sama asam folat untuk pemulihan
         Ibu
       audioDialogEntry: {fileID: 0}
@@ -26,9 +52,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Diminum sehari sekali setelah makan ya
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -36,9 +64,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Usahakan makan makanan bergizi dan minum air putih yang banyak
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -46,9 +76,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Ini penting untuk membantu produksi ASI Ibu
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -56,9 +88,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Nanti akan ada pendarahan nifas, seperti haid tapi lebih banyak
         di awal
       audioDialogEntry: {fileID: 0}
@@ -67,9 +101,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Lama nggak?
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -77,9 +113,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Sekitar 40 hari bu, paling banyak minggu pertama
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -87,9 +125,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Jaga kebersihan area jalan lahir biar nggak infeksi
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -97,9 +137,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 
       dialogEntry: Yang penting, kalau bayi tidur, ibu juga tidur. Istirahat itu
         yang terpenting
       audioDialogEntry: {fileID: 0}
@@ -108,9 +150,11 @@ MonoBehaviour:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
     Dialog:
+      cutsceneType: 0
       dialogType: 1
       dialog3DLocation: 2
       camChoice: 0
+      npcName: 
       dialogEntry: Ya udah
       audioDialogEntry: {fileID: 0}
       choices: []

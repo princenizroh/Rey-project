@@ -55,7 +55,6 @@ public class NarratorDay1 : MonoBehaviour
     {
         CloseEyes();
         yield return new WaitForSeconds(1f);
-        PlayAudio("day1_night");
         narratorText.text = "Day 1\nKelahiran";
         yield return new WaitForSeconds(5f);
         narratorText.gameObject.SetActive(false);
@@ -80,10 +79,7 @@ public class NarratorDay1 : MonoBehaviour
         {
             StartCoroutine(FadeOutAudio(audioSource, 4f)); 
         }
-        yield return new WaitForSeconds(1f);
-        PlayAudio("clock_ticking"); 
-        PlayAudio("medicine_sound");
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(3f);
       
         bool seq3Complete = false;
         coregame.StartCoreGame("GameData/Dialog/Day1/Kamar/Seq3Kesehatan", 
