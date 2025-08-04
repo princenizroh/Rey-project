@@ -1,66 +1,12 @@
 using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using System.Collections;
-using UnityEngine.AI;
 
-[System.Serializable]
-public class AudioClipData
+public class NarratorDay1 : NarratorBase
 {
-    public string clipName;
-    public AudioClip audioClip;
-    [Range(0f, 1f)] public float volume = 1f;
-    public bool loop = false;
-}
-public class NarratorDay1 : MonoBehaviour
-{
-    [Header("Day 1 Setup")]
-    [SerializeField] private GameObject[] day1_activeObjects;   
-    [SerializeField] private GameObject[] day1_inactiveObjects; 
 
-    [Header("UI Elements")]
-    [SerializeField] private TextMeshProUGUI narratorText;
-    [SerializeField] private Image backgroundImage;
-    [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private CoreGameManager coregame;
-
-    [Header("Object Move")]
-    [SerializeField] private Transform babyObject; 
-    [SerializeField] private Transform motherObject; 
-    [SerializeField] private Transform fatherObject;
-    [SerializeField] private Transform bidanObject;
-    
-    [Header("Story Positions")]
-    [SerializeField] private Transform[] storyPositions;
-
-    [Header("Audio Clips")]
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClipData[] audioClips;
-
-    private NavMeshAgent bidanAgent;
-    private NavMeshAgent fatherAgent;
-    private NavMeshAgent motherAgent;
-    private System.Collections.Generic.Dictionary<string, AudioClipData> audioDict;
-
-    private void Start()
-    {
-        bidanAgent = bidanObject.GetComponent<NavMeshAgent>();
-        fatherAgent = fatherObject.GetComponent<NavMeshAgent>();
-        motherAgent = motherObject.GetComponent<NavMeshAgent>();
-    }
-    private void Awake()
-    {
-        // Build dictionary dari array
-        audioDict = new System.Collections.Generic.Dictionary<string, AudioClipData>();
-        foreach (var clipData in audioClips)
-        {
-            audioDict[clipData.clipName] = clipData;
-        }
-    }
     [System.Obsolete]
     public IEnumerator Narrate()
     {
-        // Set the background image for Day 1 black
         ResetUIState();
 
         switch (NarratorManager.Instance.currentTime)
@@ -71,15 +17,16 @@ public class NarratorDay1 : MonoBehaviour
         }
     }
 
-    private void ResetUIState()
-    {
-    }
 
     [System.Obsolete]
     private IEnumerator PlayNightSequence()
     {
         TimeManager.instance.TimeOfDay = 1.0f;
         SetupDay1NightObjects();
+        // SetCharacterSpawn("mother", 0);  // Ibu ke kasur
+        // SetCharacterSpawn("father", 0);  // Ayah ke kursi  
+        // SetCharacterSpawn("bidan", 0);   // Bidan posisi A
+        // SetCharacterSpawn("baby", 0);    // Baby posisi awal
         CloseEyes();
         // Memainkan animasi ibu sedang duduk, ayah sedang duduk
         Debug.Log("Playing sitting animations for mother and father.");
@@ -93,7 +40,7 @@ public class NarratorDay1 : MonoBehaviour
         narratorText.gameObject.SetActive(false);
 
         bool seq1Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/DalamPerut/Seq1DalamPerut", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/DalamPerut/Seq1DalamPerut", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
 
@@ -104,7 +51,7 @@ public class NarratorDay1 : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         bool seq2Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/DalamPerut/Seq2Terlahir", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/DalamPerut/Seq2Terlahir", 
             () => { seq2Complete = true; });
         yield return new WaitUntil(() => seq2Complete);
 
@@ -115,14 +62,14 @@ public class NarratorDay1 : MonoBehaviour
         yield return new WaitForSeconds(3f);
       
         bool seq3Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq3Kesehatan", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq3Kesehatan", 
             () => { seq3Complete = true; });
         yield return new WaitUntil(() => seq3Complete);
 
         yield return new WaitForSeconds(1f);
 
         bool seq4Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq4Kesadaran", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq4Kesadaran", 
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
 
@@ -133,20 +80,20 @@ public class NarratorDay1 : MonoBehaviour
         FadeOpenEyes();
 
         bool seq5Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq5MembukaMata", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq5MembukaMata", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
 
         yield return new WaitForSeconds(1f);
         // pergeseran bayi makin dekat ke ibu
-        yield return StartCoroutine(MoveObjectToPosition(babyObject, 1, 2f));
+        yield return StartCoroutine(MoveObjectToPosition(babyObject.transform, 1, 2f));
         
         // Memainkan animasi
         
         yield return new WaitForSeconds(2f);
 
         bool seq6Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq6Makanan", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq6Makanan", 
             () => { seq6Complete = true; });
         yield return new WaitUntil(() => seq6Complete);
 
@@ -160,7 +107,7 @@ public class NarratorDay1 : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         bool seq7Complete = false;
-        coregame.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq7Nama", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq7Nama", 
             () => { seq7Complete = true; });
         yield return new WaitUntil(() => seq7Complete);
         yield return new WaitForSeconds(1f);
@@ -168,162 +115,4 @@ public class NarratorDay1 : MonoBehaviour
         Debug.Log("Sequence 7 complete, closing narration.");
     }
 
-    private void CloseEyes()
-    { 
-        Color newColor = Color.black;
-        newColor.a = 1f; 
-        backgroundImage.color = newColor;
-        canvasGroup.alpha = 1f; 
-    }
-
-    private void FadeOpenEyes()
-    {
-        StartCoroutine(FadeEyesCoroutine(1f, 0f, 2f)); 
-    }
-
-    private void FadeCloseEyes()
-    {
-        StartCoroutine(FadeEyesCoroutine(0f, 1f, 2f)); 
-    }
-
-    private IEnumerator FadeEyesCoroutine(float startAlpha, float endAlpha, float duration)
-    {
-        float elapsed = 0f;
-        Color currentColor = backgroundImage.color;
-        
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float normalizedTime = elapsed / duration;
-            
-            float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, normalizedTime);
-            
-            currentColor.a = currentAlpha;
-            backgroundImage.color = currentColor;
-            
-            canvasGroup.alpha = Mathf.Lerp(1f, 1f, normalizedTime);
-            
-            yield return null; 
-        }
-        
-        currentColor.a = endAlpha;
-        backgroundImage.color = currentColor;
-        
-        Debug.Log($"Eye fade complete: Alpha = {endAlpha}");
-    }
-
-    private IEnumerator FadeOutAudio(AudioSource audioSource, float fadeTime)
-    {
-        float startVolume = audioSource.volume;
-        while (audioSource.volume > 0)
-        {
-            audioSource.volume -= startVolume * Time.deltaTime / fadeTime;
-            yield return null;
-        }
-        audioSource.Stop();
-        audioSource.volume = startVolume; 
-    }
-
-    private void PlayAudio(string clipName)
-    {
-        if (audioDict.ContainsKey(clipName))
-        {
-            var clipData = audioDict[clipName];
-            audioSource.clip = clipData.audioClip;
-            audioSource.volume = clipData.volume;
-            audioSource.loop = clipData.loop;
-            audioSource.Play();
-            Debug.Log($"Playing audio: {clipName}");
-        }
-        else
-        {
-            Debug.LogWarning($"Audio clip '{clipName}' not found!");
-        }
-    }
-    
-    private void StopAudio()
-    {
-        if (audioSource.isPlaying)
-        {
-            audioSource.Stop();
-        }
-    }
-
-    private IEnumerator PlayAudioForDuration(string clipName, float duration)
-    {
-        PlayAudio(clipName);
-        yield return new WaitForSeconds(duration);
-        StopAudio();
-    }
-    private IEnumerator MoveObjectToPosition(Transform obj, int positionIndex, float duration = 1f)
-    {
-        if (obj == null || positionIndex >= storyPositions.Length) 
-        {
-            Debug.LogError($"Invalid object or position index: {positionIndex}");
-            yield break;
-        }
-        
-        Vector3 startPos = obj.position;
-        Vector3 targetPos = storyPositions[positionIndex].position;
-        
-        // Tambah rotation handling
-        Quaternion startRot = obj.rotation;
-        Quaternion targetRot = storyPositions[positionIndex].rotation; // Ambil rotation dari marker
-        
-        float elapsed = 0f;
-        
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            
-            obj.position = Vector3.Lerp(startPos, targetPos, t);
-            obj.rotation = Quaternion.Lerp(startRot, targetRot, t); // Lerp rotation juga
-            
-            yield return null;
-        }
-        
-        obj.position = targetPos;
-        obj.rotation = targetRot; // Set exact final rotation
-        Debug.Log($"Moved {obj.name} to position {positionIndex}");
-    }
-
-    private void PlayCharacterAnimation(string characterName, string animationName)
-    {
-        switch (characterName.ToLower())
-        {
-            case "mother":
-                if (motherObject != null)
-                {
-                    Animator motherAnim = motherObject.GetComponentInChildren<Animator>();
-                    if (motherAnim != null)
-                        motherAnim.SetTrigger(animationName);
-                }
-                break;
-                
-            case "father":
-                if (fatherObject != null)
-                {
-                    Animator fatherAnim = fatherObject.GetComponentInChildren<Animator>();
-                    if (fatherAnim != null)
-                        fatherAnim.SetTrigger(animationName);
-                }
-                break;
-        }
-    }
-
-
-    private void SetupDay1NightObjects()
-    {
-        foreach (GameObject obj in day1_activeObjects)
-        {
-            if (obj != null) obj.SetActive(true);
-        }
-
-        foreach (GameObject obj in day1_inactiveObjects)
-        {
-            if (obj != null) obj.SetActive(false);
-            
-        }
-    }
 }
