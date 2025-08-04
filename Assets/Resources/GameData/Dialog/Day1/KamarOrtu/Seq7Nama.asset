@@ -133,7 +133,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: Ayah
       dialogEntry: Dan Putri adalah doanya, semoga dia tumbuh menjadi putri yang
-        menbanggakan kita semua
+        membanggakan kita semua
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
