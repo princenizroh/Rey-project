@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.AI;
 
 [System.Serializable]
 public class AudioClipData
@@ -13,24 +14,40 @@ public class AudioClipData
 }
 public class NarratorDay1 : MonoBehaviour
 {
+    [Header("Day 1 Setup")]
+    [SerializeField] private GameObject[] day1_activeObjects;   
+    [SerializeField] private GameObject[] day1_inactiveObjects; 
+
+    [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI narratorText;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private CoreGameManager coregame;
 
-    [Header("Movement System")]
+    [Header("Object Move")]
     [SerializeField] private Transform babyObject; 
     [SerializeField] private Transform motherObject; 
-    [SerializeField] private Transform fatherObject; 
+    [SerializeField] private Transform fatherObject;
+    [SerializeField] private Transform bidanObject;
     
     [Header("Story Positions")]
     [SerializeField] private Transform[] storyPositions;
 
+    [Header("Audio Clips")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClipData[] audioClips;
 
+    private NavMeshAgent bidanAgent;
+    private NavMeshAgent fatherAgent;
+    private NavMeshAgent motherAgent;
     private System.Collections.Generic.Dictionary<string, AudioClipData> audioDict;
 
+    private void Start()
+    {
+        bidanAgent = bidanObject.GetComponent<NavMeshAgent>();
+        fatherAgent = fatherObject.GetComponent<NavMeshAgent>();
+        motherAgent = motherObject.GetComponent<NavMeshAgent>();
+    }
     private void Awake()
     {
         // Build dictionary dari array
@@ -61,7 +78,9 @@ public class NarratorDay1 : MonoBehaviour
     [System.Obsolete]
     private IEnumerator PlayNightSequence()
     {
-        // CloseEyes();
+        TimeManager.instance.TimeOfDay = 1.0f;
+        SetupDay1NightObjects();
+        CloseEyes();
         // Memainkan animasi ibu sedang duduk, ayah sedang duduk
         Debug.Log("Playing sitting animations for mother and father.");
         PlayCharacterAnimation("mother", "Sit");
@@ -120,8 +139,10 @@ public class NarratorDay1 : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         // pergeseran bayi makin dekat ke ibu
+        yield return StartCoroutine(MoveObjectToPosition(babyObject, 1, 2f));
         
         // Memainkan animasi
+        
         yield return new WaitForSeconds(2f);
 
         bool seq6Complete = false;
@@ -131,6 +152,9 @@ public class NarratorDay1 : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
+        // navmesh agent bidan
+        // bidan akan bergerak dengan posisi yang telah ditentukan
+        // Setelah sampai posisi yang ditentukan bidan berpindah di ruang keluarga
         Debug.Log("Closing eyes");
         FadeCloseEyes();
 
@@ -182,7 +206,6 @@ public class NarratorDay1 : MonoBehaviour
             yield return null; 
         }
         
-        // Ensure final values are set exactly
         currentColor.a = endAlpha;
         backgroundImage.color = currentColor;
         
@@ -198,7 +221,7 @@ public class NarratorDay1 : MonoBehaviour
             yield return null;
         }
         audioSource.Stop();
-        audioSource.volume = startVolume; // Reset for next use
+        audioSource.volume = startVolume; 
     }
 
     private void PlayAudio(string clipName)
@@ -242,21 +265,29 @@ public class NarratorDay1 : MonoBehaviour
         
         Vector3 startPos = obj.position;
         Vector3 targetPos = storyPositions[positionIndex].position;
+        
+        // Tambah rotation handling
+        Quaternion startRot = obj.rotation;
+        Quaternion targetRot = storyPositions[positionIndex].rotation; // Ambil rotation dari marker
+        
         float elapsed = 0f;
         
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
+            
             obj.position = Vector3.Lerp(startPos, targetPos, t);
+            obj.rotation = Quaternion.Lerp(startRot, targetRot, t); // Lerp rotation juga
+            
             yield return null;
         }
         
         obj.position = targetPos;
+        obj.rotation = targetRot; // Set exact final rotation
         Debug.Log($"Moved {obj.name} to position {positionIndex}");
     }
 
-    // Character animation triggers
     private void PlayCharacterAnimation(string characterName, string animationName)
     {
         switch (characterName.ToLower())
@@ -278,6 +309,21 @@ public class NarratorDay1 : MonoBehaviour
                         fatherAnim.SetTrigger(animationName);
                 }
                 break;
+        }
+    }
+
+
+    private void SetupDay1NightObjects()
+    {
+        foreach (GameObject obj in day1_activeObjects)
+        {
+            if (obj != null) obj.SetActive(true);
+        }
+
+        foreach (GameObject obj in day1_inactiveObjects)
+        {
+            if (obj != null) obj.SetActive(false);
+            
         }
     }
 }

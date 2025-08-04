@@ -34,8 +34,21 @@ public class TimeManager : MonoBehaviour
         }
         private void Start()
         {
-            TimeOfDay = 6.0f; // 6 AM
+            // TimeOfDay = 6.0f; // 6 AM
             DetectScene();
+        }
+
+        private void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         private void DetectScene()
@@ -51,7 +64,7 @@ public class TimeManager : MonoBehaviour
 
         private void Update()
         {
-            SetTimeOfDay();
+            // SetTimeOfDay();
         }
 
         public void SetTimeOfDay()
