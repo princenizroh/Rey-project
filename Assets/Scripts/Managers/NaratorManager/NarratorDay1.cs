@@ -23,21 +23,22 @@ public class NarratorDay1 : NarratorBase
     {
         TimeManager.instance.TimeOfDay = 1.0f;
         SetupDay1NightObjects();
-        // SetCharacterSpawn("mother", 0);  // Ibu ke kasur
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
+        SetCharacterSpawn(CharacterType.Mother, 0);  // Ibu ke kasur
         // SetCharacterSpawn("father", 0);  // Ayah ke kursi  
         // SetCharacterSpawn("bidan", 0);   // Bidan posisi A
         // SetCharacterSpawn("baby", 0);    // Baby posisi awal
         CloseEyes();
         // Memainkan animasi ibu sedang duduk, ayah sedang duduk
         Debug.Log("Playing sitting animations for mother and father.");
-        PlayCharacterAnimation("mother", "Sit");
-        PlayCharacterAnimation("father", "Sit");
+        PlayCharacterAnimation(CharacterType.Mother, "Sit");
+        PlayCharacterAnimation(CharacterType.Father, "Sit");
         Debug.Log("Playing narration for Day 1 Night sequence.");
         
         yield return new WaitForSeconds(1f);
-        narratorText.text = "Day 1\nKelahiran";
+        uiElements.narratorText.text = "Day 1\nKelahiran";
         yield return new WaitForSeconds(5f);
-        narratorText.gameObject.SetActive(false);
+        uiElements.narratorText.gameObject.SetActive(false);
 
         bool seq1Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/DalamPerut/Seq1DalamPerut", 
@@ -86,7 +87,7 @@ public class NarratorDay1 : NarratorBase
 
         yield return new WaitForSeconds(1f);
         // pergeseran bayi makin dekat ke ibu
-        yield return StartCoroutine(MoveObjectToPosition(babyObject.transform, 1, 2f));
+        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Baby, 1, 2f));
         
         // Memainkan animasi
         

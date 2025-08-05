@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: Ayah
-      dialogEntry: Tuh sayang bayinya berhenti menangis
+      dialogEntry: Tuh sayang bayinya menyusu dengan tenang
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,8 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: Ibu
-      dialogEntry: iya sudah berenti, kupikir akan mendengar bayi ini menangis setiap
-        hari
+      dialogEntry: 'iya. Kupikir aku akan mendengar tangisan setiap hari '
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

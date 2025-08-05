@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class AudioClipData
@@ -13,56 +14,132 @@ public class AudioClipData
     public bool loop = false;
 }
 
+public enum CharacterType
+{
+    Mother,
+    Father,
+    Bidan,
+    Baby
+}
+
+[System.Serializable]
+public class CharacterData
+{
+    [Header("Character Info")]
+    public CharacterType characterType;
+    public GameObject characterObject;
+    
+    [Header("Positions")]
+    public Transform[] spawnPositions;
+    public Transform[] movementPositions;
+    
+    // Runtime references (initialized automatically)
+    [System.NonSerialized] public NavMeshAgent agent;
+    [System.NonSerialized] public Animator animator;
+    
+    public void Initialize()
+    {
+        if (characterObject != null)
+        {
+            agent = characterObject.GetComponent<NavMeshAgent>();
+            animator = characterObject.GetComponentInChildren<Animator>();
+        }
+    }
+    
+    public bool HasValidSpawnPosition(int index)
+    {
+        return spawnPositions != null && 
+               index >= 0 && 
+               index < spawnPositions.Length && 
+               spawnPositions[index] != null;
+    }
+    
+    public bool HasValidMovementPosition(int index)
+    {
+        return movementPositions != null && 
+               index >= 0 && 
+               index < movementPositions.Length && 
+               movementPositions[index] != null;
+    }
+}
+
+[System.Serializable]
+public class UIElements
+{
+    public TextMeshProUGUI narratorText;
+    public Image backgroundImage;
+    public CanvasGroup canvasGroup;
+}
+
+[System.Serializable]
+public class GameObjects
+{
+    [Header("Day 1 Setup")]
+    public GameObject[] activeObjects;
+    public GameObject[] inActiveObjects;    
+}
+
 public abstract class NarratorBase : MonoBehaviour
 {
-
-    [Header("Day 1 Setup")]
-    [SerializeField] protected GameObject[] activeObjects;   
-    [SerializeField] protected GameObject[] inActiveObjects; 
-
     [Header("UI Elements")]
-    [SerializeField] protected TextMeshProUGUI narratorText;
-    [SerializeField] protected Image backgroundImage;
-    [SerializeField] protected CanvasGroup canvasGroup;
+    [SerializeField] protected UIElements uiElements;
+
+    [Header("Game Objects")]
+    [SerializeField] protected GameObjects gameObjects;   
+
+    [Header("Core Manager")]
     [SerializeField] protected CoreGameManager dialogGameManager;
 
-    [Header("Object Move")]
-    [SerializeField] protected GameObject babyObject; 
-    [SerializeField] protected GameObject motherObject; 
-    [SerializeField] protected GameObject fatherObject;
-    [SerializeField] protected GameObject bidanObject;
+    [Header("Characters")]
     
-    [Header("Story Positions")]
-    [SerializeField] protected Transform[] storyPositions;
-
-    [Header("Initial Spawn Positions")]
-    [SerializeField] protected Transform[] motherSpawnPositions;   
-    [SerializeField] protected Transform[] fatherSpawnPositions;     
-    [SerializeField] protected Transform[] bidanSpawnPositions;  
-    [SerializeField] protected Transform[] babySpawnPositions;
+    [SerializeField] protected CharacterData[] charactersDataArray;
 
     [Header("Audio Clips")]
     [SerializeField] protected AudioSource audioSource;
     [SerializeField] protected AudioClipData[] audioClips;
 
-    protected NavMeshAgent bidanAgent;
-    protected NavMeshAgent fatherAgent;
-    protected NavMeshAgent motherAgent;
-    protected System.Collections.Generic.Dictionary<string, AudioClipData> audioDict;
+    private Dictionary<string, AudioClipData> audioDict;
+    private Dictionary<CharacterType, CharacterData> characterDict;
 
-    protected void Start()
+    protected virtual void Awake()
     {
-        bidanAgent = bidanObject.GetComponent<NavMeshAgent>();
-        fatherAgent = fatherObject.GetComponent<NavMeshAgent>();
-        motherAgent = motherObject.GetComponent<NavMeshAgent>();
+        InitializeAudioSystem();
+        InitializeCharacterSystem();
     }
-    protected void Awake()
+
+    private void InitializeCharacterSystem()
     {
-        // Build dictionary dari array
-        audioDict = new System.Collections.Generic.Dictionary<string, AudioClipData>();
+        characterDict = new Dictionary<CharacterType, CharacterData>();
+
+        foreach (var characterData in charactersDataArray)
+        {
+            if (characterData != null)
+            {
+                characterDict[characterData.characterType] = characterData;
+            }
+        }
+    }
+
+    protected virtual void Start()
+    {
+        InitializeCharacterComponents();
+    }
+    private void InitializeAudioSystem()
+    {
+        audioDict = new Dictionary<string, AudioClipData>();
         foreach (var clipData in audioClips)
         {
-            audioDict[clipData.clipName] = clipData;
+            if (!string.IsNullOrEmpty(clipData.clipName))
+            {
+                audioDict[clipData.clipName] = clipData;
+            }
+        }
+    }
+    private void InitializeCharacterComponents()
+    {
+        foreach (var characterData in charactersDataArray)
+        {
+            characterData.Initialize();
         }
     }
 
@@ -73,8 +150,8 @@ public abstract class NarratorBase : MonoBehaviour
     { 
         Color newColor = Color.black;
         newColor.a = 1f; 
-        backgroundImage.color = newColor;
-        canvasGroup.alpha = 1f; 
+        uiElements.backgroundImage.color = newColor;
+        uiElements.canvasGroup.alpha = 1f; 
     }
 
     protected void FadeOpenEyes()
@@ -87,10 +164,10 @@ public abstract class NarratorBase : MonoBehaviour
         StartCoroutine(FadeEyesCoroutine(0f, 1f, 2f)); 
     }
 
-    protected IEnumerator FadeEyesCoroutine(float startAlpha, float endAlpha, float duration)
+    private IEnumerator FadeEyesCoroutine(float startAlpha, float endAlpha, float duration)
     {
         float elapsed = 0f;
-        Color currentColor = backgroundImage.color;
+        Color currentColor = uiElements.backgroundImage.color;
         
         while (elapsed < duration)
         {
@@ -100,17 +177,16 @@ public abstract class NarratorBase : MonoBehaviour
             float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, normalizedTime);
             
             currentColor.a = currentAlpha;
-            backgroundImage.color = currentColor;
+            uiElements.backgroundImage.color = currentColor;
             
-            canvasGroup.alpha = Mathf.Lerp(1f, 1f, normalizedTime);
+            uiElements.canvasGroup.alpha = Mathf.Lerp(1f, 1f, normalizedTime);
             
             yield return null; 
         }
         
         currentColor.a = endAlpha;
-        backgroundImage.color = currentColor;
-        
-        Debug.Log($"Eye fade complete: Alpha = {endAlpha}");
+        uiElements.backgroundImage.color = currentColor;
+       
     }
 
     protected IEnumerator FadeOutAudio(AudioSource audioSource, float fadeTime)
@@ -142,7 +218,7 @@ public abstract class NarratorBase : MonoBehaviour
         }
     }
     
-    protected void StopAudio()
+    private void StopAudio()
     {
         if (audioSource.isPlaying)
         {
@@ -150,138 +226,161 @@ public abstract class NarratorBase : MonoBehaviour
         }
     }
 
-    protected IEnumerator PlayAudioForDuration(string clipName, float duration)
+    private IEnumerator PlayAudioForDuration(string clipName, float duration)
     {
         PlayAudio(clipName);
         yield return new WaitForSeconds(duration);
         StopAudio();
     }
-    protected IEnumerator MoveObjectToPosition(Transform obj, int positionIndex, float duration = 1f)
+    protected IEnumerator MoveCharacterToPosition(CharacterType characterType, int positionIndex, float duration = 1f)
     {
-        if (obj == null || positionIndex >= storyPositions.Length) 
+        if (characterDict.TryGetValue(characterType, out CharacterData character))
         {
-            Debug.LogError($"Invalid object or position index: {positionIndex}");
+            if (!character.HasValidMovementPosition(positionIndex))
+            {
+                Debug.LogError($"Invalid movement position index {positionIndex} for {characterType}");
+                yield break;
+            }
+
+            Transform targetTransform = character.movementPositions[positionIndex];
+            yield return StartCoroutine(MoveObjectToPosition(character.characterObject.transform, targetTransform, duration));
+            
+            Debug.Log($"Moved {characterType} to movement position {positionIndex}");
+        }
+        else
+        {
+            Debug.LogWarning($"Character '{characterType}' not found for movement!");
+        }
+    }
+    private IEnumerator MoveObjectToPosition(Transform obj, Transform targetTransform, float duration)
+    {
+        if (obj == null || targetTransform == null)
+        {
+            Debug.LogError("Invalid object or target transform for movement");
             yield break;
         }
-        
-        Vector3 startPos = obj.position;
-        Vector3 targetPos = storyPositions[positionIndex].position;
-        
-        // Tambah rotation handling
-        Quaternion startRot = obj.rotation;
-        Quaternion targetRot = storyPositions[positionIndex].rotation; // Ambil rotation dari marker
-        
+
+        var startPos = obj.position;
+        var targetPos = targetTransform.position;
+        var startRot = obj.rotation;
+        var targetRot = targetTransform.rotation;
+
         float elapsed = 0f;
-        
+
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
-            
+
             obj.position = Vector3.Lerp(startPos, targetPos, t);
-            obj.rotation = Quaternion.Lerp(startRot, targetRot, t); // Lerp rotation juga
-            
+            obj.rotation = Quaternion.Lerp(startRot, targetRot, t);
+
             yield return null;
         }
-        
+
         obj.position = targetPos;
-        obj.rotation = targetRot; // Set exact final rotation
-        Debug.Log($"Moved {obj.name} to position {positionIndex}");
+        obj.rotation = targetRot;
     }
-
-    protected void PlayCharacterAnimation(string characterName, string animationName)
+    protected IEnumerator MoveAgentToTarget(CharacterType characterType, Transform target)
     {
-        switch (characterName.ToLower())
+        if (characterDict.TryGetValue(characterType, out CharacterData character))
         {
-            case "mother":
-                if (motherObject != null)
-                {
-                    Animator motherAnim = motherObject.GetComponentInChildren<Animator>();
-                    if (motherAnim != null)
-                        motherAnim.SetTrigger(animationName);
-                }
-                break;
-                
-            case "father":
-                if (fatherObject != null)
-                {
-                    Animator fatherAnim = fatherObject.GetComponentInChildren<Animator>();
-                    if (fatherAnim != null)
-                        fatherAnim.SetTrigger(animationName);
-                }
-                break;
-        }
-    }
+            character.agent.SetDestination(target.position);
 
+            while (character.agent.pathPending)
+            {
+                yield return null;
+            }
 
-    protected void SetupDay1NightObjects()
-    {
-        foreach (GameObject obj in activeObjects)
-        {
-            if (obj != null) obj.SetActive(true);
-        }
+            PlayCharacterAnimation(characterType, "Walk");
 
-        foreach (GameObject obj in inActiveObjects)
-        {
-            if (obj != null) obj.SetActive(false);
-            
-        }
-    }
+            while (character.agent.remainingDistance > character.agent.stoppingDistance)
+            {
+                yield return null;
+            }
 
-    protected void SetCharacterSpawn(string characterName, int spawnIndex)
-    {
-        Transform targetTransform = null;
-        GameObject characterObject = null;
-        
-        switch (characterName.ToLower())
-        {
-            case "mother":
-                if (spawnIndex < motherSpawnPositions.Length && motherSpawnPositions[spawnIndex] != null)
-                {
-                    targetTransform = motherSpawnPositions[spawnIndex];
-                    characterObject = motherObject;
-                }
-                break;
-            case "father":
-                if (spawnIndex < fatherSpawnPositions.Length && fatherSpawnPositions[spawnIndex] != null)
-                {
-                    targetTransform = fatherSpawnPositions[spawnIndex];
-                    characterObject = fatherObject;
-                }
-                break;
-            case "bidan":
-                if (spawnIndex < bidanSpawnPositions.Length && bidanSpawnPositions[spawnIndex] != null)
-                {
-                    targetTransform = bidanSpawnPositions[spawnIndex];
-                    characterObject = bidanObject;
-                }
-                break;
-            case "baby":
-                if (spawnIndex < babySpawnPositions.Length && babySpawnPositions[spawnIndex] != null)
-                {
-                    targetTransform = babySpawnPositions[spawnIndex];
-                    characterObject = babyObject;
-                }
-                break;
-        }
-        
-        if (targetTransform != null && characterObject != null)
-        {            
-            // Disable GameObject untuk reset semua component
-            characterObject.SetActive(false);
-            
-            // Set posisi dan rotasi saat disabled
-            characterObject.transform.position = targetTransform.position;
-            characterObject.transform.rotation = targetTransform.rotation;
-            
-            // Enable kembali GameObject
-            characterObject.SetActive(true);
-            
-            Debug.Log($"Set {characterName} spawn to position {spawnIndex} at {targetTransform.position}");
+            PlayCharacterAnimation(characterType, "Idle");
+            Debug.Log($"{characterType} reached destination and switched to Idle");
         }
         else
         {
-            Debug.LogWarning($"Failed to set spawn for {characterName} at index {spawnIndex}");
+            Debug.LogWarning($"Character '{characterType}' not found for movement!");
         }
+    }
+
+    protected IEnumerator MoveAgentToMovementPosition(CharacterType characterType, int positionIndex)
+    {
+        if (characterDict.TryGetValue(characterType, out CharacterData character))
+        {
+            if (!character.HasValidMovementPosition(positionIndex))
+            {
+                Debug.LogWarning($"Invalid movement position index {positionIndex} for {characterType}");
+                yield break;
+            }
+            Transform target = character.movementPositions[positionIndex];
+            yield return StartCoroutine(MoveAgentToTarget(characterType, target));
+        }
+        else
+        {
+            Debug.LogWarning($"Character '{characterType}' not found!");
+        }
+    }
+
+
+    protected void PlayCharacterAnimation(CharacterType characterType, string animationName)
+    {
+        if (characterDict.TryGetValue(characterType, out CharacterData characterData))
+        {
+            if (characterData.animator != null)
+            {
+                if (characterType == CharacterType.Bidan)
+                {
+                    characterData.animator.Play(animationName);
+                }
+                else
+                {
+                    characterData.animator.SetTrigger(animationName);
+                }
+
+            }
+        }
+    }
+
+    protected void SetupDay1NightObjects()
+    {
+        SetObjectsActive(gameObjects.activeObjects, true);
+        SetObjectsActive(gameObjects.inActiveObjects, false);
+    }
+
+    private void SetObjectsActive(GameObject[] objects, bool active)
+    {
+        foreach (var obj in objects)
+        {
+            if (obj != null)
+            {
+                obj.SetActive(active);
+            }
+        }
+    }
+
+
+    protected void SetCharacterSpawn(CharacterType characterType, int spawnIndex)
+    {
+        if (characterDict.TryGetValue(characterType, out CharacterData characterData))
+        {
+            if (characterData.HasValidSpawnPosition(spawnIndex))
+            {
+                SetCharacterPosition(characterData.characterObject, characterData.spawnPositions[spawnIndex]);
+            }
+        }
+    }
+    private void SetCharacterPosition(GameObject character, Transform targetTransform)
+    {
+        if (character == null || targetTransform == null) return;
+
+        character.SetActive(false);
+        character.transform.position = targetTransform.position;
+        character.transform.rotation = targetTransform.rotation;
+        character.SetActive(true);
     }
 }
