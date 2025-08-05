@@ -21,6 +21,7 @@ public class TimeManager : MonoBehaviour
         [SerializeField] private Light globalLightNight;
 
         [SerializeField, Range(0, 24)] private float timeOfDay;
+        [SerializeField] private bool isTimeOfDayEnabled = false;
         [SerializeField] private float sunRotationSpeed;
 
         public float TimeOfDay
@@ -64,7 +65,10 @@ public class TimeManager : MonoBehaviour
 
         private void Update()
         {
-            // SetTimeOfDay();
+            if (isTimeOfDayEnabled == true)
+            {
+                SetTimeOfDay();
+            }
         }
 
         public void SetTimeOfDay()

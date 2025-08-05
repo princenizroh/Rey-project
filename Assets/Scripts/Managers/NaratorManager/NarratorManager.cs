@@ -1,21 +1,15 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-public enum NarratorDay
-{
-    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13, Day14
-}
-
-public enum TimeOfDay
-{
-    Morning, Afternoon, Evening, Night, Midnight
-}
 public class NarratorManager : MonoBehaviour
 {
     public static NarratorManager Instance;
     public NarratorDay currentDay;
     public TimeOfDay currentTime;
 
-    public NarratorDay1 day1Narrator;
+    [Header("Narrators")]
+    [SerializeField] private NarratorBase[] dayNarrators;
+    private Dictionary<NarratorDay, NarratorBase> narratorDict;
 
     public void Awake()
     {
@@ -23,6 +17,7 @@ public class NarratorManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            InitializeNarrators();
         }
         else
         {
@@ -30,31 +25,68 @@ public class NarratorManager : MonoBehaviour
         }
     }
 
-    public void Start()
+    private void InitializeNarrators()
     {
-        StartNarration(NarratorDay.Day1, TimeOfDay.Night);
+        narratorDict = new Dictionary<NarratorDay, NarratorBase>();
+
+        for (int i = 0; i < dayNarrators.Length && i < 14; i++)
+        {
+            if (dayNarrators[i] != null)
+            {
+                narratorDict[(NarratorDay)i] = dayNarrators[i];
+            }
+        }
     }
 
+    [System.Obsolete]
+    public void Start()
+    {
+        StartNarration(currentDay, currentTime);
+    }
+
+    [System.Obsolete]
     public void StartNarration(NarratorDay day, TimeOfDay time)
     {
         currentDay = day;
         currentTime = time;
 
-        switch (day)
+        if (narratorDict.TryGetValue(day, out NarratorBase narrator))
         {
-          case NarratorDay.Day1:
-                NarrationDay1();
-                break;
+            StartCoroutine(narrator.Narrate());
+        }
+        else
+        {
+            Debug.LogWarning($"Narrator for {day} not found!");
         }
     }
 
-    private void NarrationDay1()
+
+    [System.Obsolete]
+    public void ChangeNarrator(NarratorDay newDay, TimeOfDay newTime)
     {
-        StartCoroutine(day1Narrator.Narrate());
+        StartNarration(newDay, newTime);
     }
 
-    private void ChangeNarrator(NarratorDay newDay, TimeOfDay newTime)
+    [System.Obsolete]
+    public void NextDay()
     {
-        
+        if ((int)currentDay < 13) // Day14 is the last (index 13)
+        {
+            StartNarration(currentDay + 1, TimeOfDay.Morning);
+        }
+    }
+    [System.Obsolete]
+    
+    public void NextTimeOfDay()
+    {
+        TimeOfDay nextTime = currentTime + 1;
+        if ((int)nextTime > 4) // Midnight is the last (index 4)
+        {
+            NextDay();
+        }
+        else
+        {
+            StartNarration(currentDay, nextTime);
+        }
     }
 }
