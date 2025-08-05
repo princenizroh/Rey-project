@@ -21,17 +21,17 @@ public class NarratorDay1 : NarratorBase
     private IEnumerator PlayNightSequence()
     {
         TimeManager.instance.TimeOfDay = 1.0f;
-        AppearObjects();
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
-        SetCharacterSpawn(CharacterType.Mother, 0);  // Ibu ke kasur
+        // AppearObjects();
+        // yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
+        // SetCharacterSpawn(CharacterType.Mother, 0);  // Ibu ke kasur
         // SetCharacterSpawn(CharacterType.Father, 0);  // Ayah ke kursi  
         // SetCharacterSpawn(CharacterType.Bidan, 0);   // Bidan posisi A
         // SetCharacterSpawn(CharacterType.Baby, 0);    // Baby posisi awal
         CloseEyes();
         // Memainkan animasi ibu sedang duduk, ayah sedang duduk
         Debug.Log("Playing sitting animations for mother and father.");
-        PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        PlayCharacterAnimation(CharacterType.Father, "Sit");
+        // PlayCharacterAnimation(CharacterType.Mother, "Sit");
+        // PlayCharacterAnimation(CharacterType.Father, "Sit");
         Debug.Log("Playing narration for Day 1 Night sequence.");
         
         yield return new WaitForSeconds(1f);
