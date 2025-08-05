@@ -271,21 +271,87 @@ public abstract class NarratorBase : MonoBehaviour
 
     protected void PlayCharacterAnimation(CharacterType characterType, string animationName)
     {
+        // Lazy initialization - ensure character is initialized when needed
+        if (!EnsureCharacterInitialized(characterType))
+        {
+            Debug.LogError($"Failed to initialize {characterType} for animation!");
+            return;
+        }
+        
         if (characterDict.TryGetValue(characterType, out CharacterData characterData))
         {
             if (characterData.animator != null)
             {
+                // Check if GameObject is active
+                if (!characterData.characterObject.activeInHierarchy)
+                {
+                    Debug.LogWarning($"{characterType} GameObject is not active!");
+                    return;
+                }
+                
+                // Check if Animator is enabled
+                if (!characterData.animator.enabled)
+                {
+                    Debug.LogWarning($"{characterType} Animator is not enabled!");
+                    return;
+                }
+                
+                Debug.Log($"Playing animation '{animationName}' for {characterType}");
+                
                 if (characterType == CharacterType.Bidan)
                 {
                     characterData.animator.Play(animationName);
+                }
+                if (characterType == CharacterType.Mother)
+                {
+                    characterData.animator.Play(animationName); // Play from start
                 }
                 else
                 {
                     characterData.animator.SetTrigger(animationName);
                 }
-
+            }
+            else
+            {
+                Debug.LogError($"Animator for {characterType} is still null after initialization!");
             }
         }
+        else
+        {
+            Debug.LogError($"Character data for {characterType} not found!");
+        }
+    }
+
+    private bool EnsureCharacterInitialized(CharacterType characterType)
+    {
+        if (characterDict.TryGetValue(characterType, out CharacterData characterData))
+        {
+            // Check if needs reinitialization
+            if (characterData.animator == null || characterData.agent == null)
+            {
+                Debug.Log($"Re-initializing {characterType}");
+                
+                // Ensure GameObject is active
+                bool wasActive = characterData.characterObject.activeInHierarchy;
+                if (!wasActive)
+                {
+                    characterData.characterObject.SetActive(true);
+                }
+                
+                // Re-initialize
+                characterData.Initialize();
+                
+                // Restore state
+                if (!wasActive)
+                {
+                    characterData.characterObject.SetActive(wasActive);
+                }
+            }
+            
+            return characterData.animator != null;
+        }
+        
+        return false;
     }
 
     protected IEnumerator MoveAgentToTarget(CharacterType characterType, Transform target)
@@ -375,10 +441,8 @@ public abstract class NarratorBase : MonoBehaviour
             Debug.LogWarning($"Character '{characterType}' not found!");
         }
     }
-
-
-
 #endregion
+
     protected void AppearObjects()
     {
         SetObjectsActive(gameObjects.activeObjects, true);
@@ -395,6 +459,4 @@ public abstract class NarratorBase : MonoBehaviour
             }
         }
     }
-
-
 }

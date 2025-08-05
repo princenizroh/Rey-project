@@ -29,9 +29,10 @@ public class NarratorDay1 : NarratorBase
         // SetCharacterSpawn(CharacterType.Baby, 0);    // Baby posisi awal
         CloseEyes();
         // Memainkan animasi ibu sedang duduk, ayah sedang duduk
+    
         Debug.Log("Playing sitting animations for mother and father.");
-        // PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        // PlayCharacterAnimation(CharacterType.Father, "Sit");
+        PlayCharacterAnimation(CharacterType.Mother, "Sit");
+        PlayCharacterAnimation(CharacterType.Father, "Sit");
         Debug.Log("Playing narration for Day 1 Night sequence.");
         
         yield return new WaitForSeconds(1f);
