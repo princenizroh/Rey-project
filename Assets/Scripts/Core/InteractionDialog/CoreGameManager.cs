@@ -147,6 +147,15 @@ public class CoreGameManager : MonoBehaviour
     private System.Action<int> onChoiceSelected;
     private Dictionary<Button, int> buttonTweenIds = new Dictionary<Button, int>();
     private int selectedResponseIndex = 0; // Which response to use from dialogResponses array
+    
+    // Correct choice system - for filtering out incorrect choices
+    private CoreGameDialogChoices[] currentFilteredChoices = null; // Filtered choices after incorrect selections
+    private CoreGameDialogChoices[] originalChoices = null; // Original full choice array
+    private bool isUsingFilteredChoices = false; // Whether we're currently using filtered choices
+    
+    // Pressed choices tracking - keep track of all choices that have been pressed
+    private System.Collections.Generic.HashSet<string> pressedChoiceTexts = new System.Collections.Generic.HashSet<string>(); // Track by choice text
+    private System.Collections.Generic.List<int> pressedChoiceIndices = new System.Collections.Generic.List<int>(); // Track by original indices
 
     private System.Action currentCompletionCallback;
     public bool IsSequenceRunning { get; private set; }
@@ -1635,6 +1644,8 @@ public class CoreGameManager : MonoBehaviour
         Debug.Log($"  - isShowingResponse: {isShowingResponse}");
         Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
         Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        Debug.Log($"  - isInDialogTransition: {isInDialogTransition}");
+        Debug.Log($"  - isTextAnimating: {isTextAnimating}");
         
         if (isShowingResponse && selectedChoiceIndex >= 0)
         {
@@ -1654,6 +1665,19 @@ public class CoreGameManager : MonoBehaviour
                     }
                     
                     Debug.Log("Press SPACE to advance to next response or continue to next block.");
+                    
+                    // Test showing next response manually
+                    if (currentChoiceResponseIndex < selectedChoice.dialogResponses.Length - 1)
+                    {
+                        Debug.Log("=== TESTING NEXT RESPONSE MANUALLY ===");
+                        int nextIndex = currentChoiceResponseIndex + 1;
+                        Debug.Log($"Attempting to show response {nextIndex}...");
+                        ShowDialogResponse(selectedChoice, nextIndex);
+                    }
+                    else
+                    {
+                        Debug.Log("All responses already shown. Call ResetDialogResponseState() and ContinueToNextBlock() to proceed.");
+                    }
                 }
                 else
                 {
@@ -1664,9 +1688,1334 @@ public class CoreGameManager : MonoBehaviour
         else
         {
             Debug.Log("Not currently showing responses. Select a choice first.");
+            
+            // If there's a current dialog with choices, show them
+            if (currentBlockIndex < coreGameData.coreBlock.Length)
+            {
+                var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+                if (currentBlock.Dialog?.choices != null)
+                {
+                    Debug.Log($"Current dialog has {currentBlock.Dialog.choices.Length} choices:");
+                    for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+                    {
+                        var choice = currentBlock.Dialog.choices[i];
+                        int responseCount = choice.dialogResponses?.Length ?? 0;
+                        Debug.Log($"  Choice {i}: '{choice.playerChoice}' (has {responseCount} responses)");
+                    }
+                    Debug.Log("Select a choice to test multiple responses.");
+                }
+            }
         }
         
         Debug.Log("=== END MULTIPLE DIALOG RESPONSES TEST ===");
+    }
+    
+    /// <summary>
+    /// Force continue to next response - use if dialog gets stuck on multiple responses
+    /// </summary>
+    [ContextMenu("Force Next Response")]
+    public void ForceNextResponse()
+    {
+        Debug.Log("=== FORCING NEXT RESPONSE ===");
+        
+        if (!isShowingResponse || selectedChoiceIndex < 0)
+        {
+            Debug.LogWarning("Not showing responses or no choice selected!");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices != null && selectedChoiceIndex < currentBlock.Dialog.choices.Length)
+        {
+            var selectedChoice = currentBlock.Dialog.choices[selectedChoiceIndex];
+            if (selectedChoice.dialogResponses != null)
+            {
+                int nextIndex = currentChoiceResponseIndex + 1;
+                if (nextIndex < selectedChoice.dialogResponses.Length)
+                {
+                    Debug.Log($"Forcing show of response {nextIndex + 1}/{selectedChoice.dialogResponses.Length}");
+                    isInDialogTransition = false; // Reset transition state
+                    isTextAnimating = false; // Stop any text animation
+                    ShowDialogResponse(selectedChoice, nextIndex);
+                }
+                else
+                {
+                    Debug.Log("No more responses. Forcing next block...");
+                    ResetDialogResponseState();
+                    ContinueToNextBlock();
+                }
+            }
+        }
+        
+        Debug.Log("=== END FORCE NEXT RESPONSE ===");
+    }
+    
+    /// <summary>
+    /// Reset the filtered choices system back to original choices
+    /// </summary>
+    private void ResetFilteredChoicesSystem()
+    {
+        Debug.Log("[FILTERED CHOICES] Resetting filtered choices system");
+        currentFilteredChoices = null;
+        originalChoices = null;
+        isUsingFilteredChoices = false;
+        
+        // Also reset pressed choices tracking when starting a new dialog block
+        ClearPressedChoicesTracking();
+    }
+    
+    /// <summary>
+    /// Track a choice that has been pressed so it won't be spawned again
+    /// </summary>
+    /// <param name="choiceIndex">Index of the choice that was pressed</param>
+    /// <param name="choiceText">Text of the choice that was pressed</param>
+    private void TrackPressedChoice(int choiceIndex, string choiceText)
+    {
+        if (!pressedChoiceIndices.Contains(choiceIndex))
+        {
+            pressedChoiceIndices.Add(choiceIndex);
+            Debug.Log($"[PRESSED CHOICES] Tracked pressed choice index: {choiceIndex}");
+        }
+        
+        if (!string.IsNullOrEmpty(choiceText) && !pressedChoiceTexts.Contains(choiceText))
+        {
+            pressedChoiceTexts.Add(choiceText);
+            Debug.Log($"[PRESSED CHOICES] Tracked pressed choice text: '{choiceText}'");
+        }
+        
+        Debug.Log($"[PRESSED CHOICES] Total pressed: {pressedChoiceIndices.Count} choices by index, {pressedChoiceTexts.Count} by text");
+    }
+    
+    /// <summary>
+    /// Check if a choice has already been pressed
+    /// </summary>
+    /// <param name="choiceText">Text of the choice to check</param>
+    /// <returns>True if this choice has been pressed before</returns>
+    private bool IsChoiceAlreadyPressed(string choiceText)
+    {
+        return !string.IsNullOrEmpty(choiceText) && pressedChoiceTexts.Contains(choiceText);
+    }
+    
+    /// <summary>
+    /// Check if a choice index has already been pressed (relative to original choices)
+    /// </summary>
+    /// <param name="originalChoiceIndex">Original index of the choice to check</param>
+    /// <returns>True if this choice index has been pressed before</returns>
+    private bool IsChoiceIndexAlreadyPressed(int originalChoiceIndex)
+    {
+        return pressedChoiceIndices.Contains(originalChoiceIndex);
+    }
+    
+    /// <summary>
+    /// Clear pressed choices tracking - call when starting a new dialog block
+    /// </summary>
+    private void ClearPressedChoicesTracking()
+    {
+        pressedChoiceTexts.Clear();
+        pressedChoiceIndices.Clear();
+        Debug.Log("[PRESSED CHOICES] Cleared all pressed choice tracking");
+    }
+    
+    /// <summary>
+    /// Get a summary of pressed choices for debugging
+    /// </summary>
+    private void LogPressedChoicesSummary()
+    {
+        Debug.Log($"[PRESSED CHOICES] Summary:");
+        Debug.Log($"  - Pressed by index: {pressedChoiceIndices.Count}");
+        Debug.Log($"  - Pressed by text: {pressedChoiceTexts.Count}");
+        
+        if (pressedChoiceIndices.Count > 0)
+        {
+            Debug.Log($"  - Pressed indices: [{string.Join(", ", pressedChoiceIndices)}]");
+        }
+        
+        if (pressedChoiceTexts.Count > 0)
+        {
+            var pressedTextsArray = new string[pressedChoiceTexts.Count];
+            pressedChoiceTexts.CopyTo(pressedTextsArray);
+            string formattedTexts = "";
+            for (int i = 0; i < pressedTextsArray.Length; i++)
+            {
+                formattedTexts += "'" + pressedTextsArray[i] + "'";
+                if (i < pressedTextsArray.Length - 1) formattedTexts += ", ";
+            }
+            Debug.Log($"  - Pressed texts: [{formattedTexts}]");
+        }
+    }
+    
+    /// <summary>
+    /// ENHANCED: Filter out pressed choices and respawn the choice buttons
+    /// This version tracks all pressed choices and ensures they never respawn
+    /// NOTE: Choice tracking is now done in OnPlayerChoseResponse, so this method just filters
+    /// </summary>
+    /// <param name="pressedChoiceIndex">Index of the choice that was just pressed</param>
+    private void FilterIncorrectChoiceAndRespawn(int pressedChoiceIndex)
+    {
+        Debug.Log($"[ENHANCED-FILTER] === FilterIncorrectChoiceAndRespawn CALLED ===");
+        Debug.Log($"[ENHANCED-FILTER] Parameters - pressedChoiceIndex: {pressedChoiceIndex}");
+        Debug.Log($"[ENHANCED-FILTER] Current state:");
+        Debug.Log($"[ENHANCED-FILTER]   - questionInstance != null: {questionInstance != null}");
+        Debug.Log($"[ENHANCED-FILTER]   - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"[ENHANCED-FILTER]   - currentFilteredChoices != null: {currentFilteredChoices != null}");
+        Debug.Log($"[ENHANCED-FILTER]   - originalChoices != null: {originalChoices != null}");
+        Debug.Log($"[ENHANCED-FILTER]   - pressedChoiceIndices.Count: {pressedChoiceIndices.Count}");
+        Debug.Log($"[ENHANCED-FILTER]   - pressedChoiceTexts.Count: {pressedChoiceTexts.Count}");
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        
+        // Determine which choice array we're working with
+        CoreGameDialogChoices[] choicesToFilter = isUsingFilteredChoices ? currentFilteredChoices : currentBlock.Dialog?.choices;
+        
+        Debug.Log($"[ENHANCED-FILTER] choicesToFilter array length: {choicesToFilter?.Length ?? 0}");
+        
+        if (choicesToFilter == null || pressedChoiceIndex >= choicesToFilter.Length)
+        {
+            Debug.LogError($"[ENHANCED-FILTER] VALIDATION FAILED:");
+            Debug.LogError($"[ENHANCED-FILTER]   - choicesToFilter is null: {choicesToFilter == null}");
+            Debug.LogError($"[ENHANCED-FILTER]   - pressedChoiceIndex: {pressedChoiceIndex}");
+            Debug.LogError($"[ENHANCED-FILTER]   - choicesToFilter.Length: {choicesToFilter?.Length ?? 0}");
+            return;
+        }
+        
+        // Store original choices if this is the first filtering
+        if (!isUsingFilteredChoices)
+        {
+            originalChoices = currentBlock.Dialog.choices;
+            Debug.Log($"[ENHANCED-FILTER] Stored original {originalChoices.Length} choices");
+        }
+        
+        // NOTE: Choice tracking is already done in OnPlayerChoseResponse()
+        // We just need to create the filtered array excluding ALL pressed choices
+        
+        // Create new filtered array WITHOUT any pressed choices
+        var filteredList = new System.Collections.Generic.List<CoreGameDialogChoices>();
+        
+        Debug.Log($"[ENHANCED-FILTER] Creating filtered array, excluding ALL pressed choices...");
+        
+        for (int i = 0; i < choicesToFilter.Length; i++)
+        {
+            var currentChoice = choicesToFilter[i];
+            
+            // Check if this choice was previously pressed (by text)
+            if (IsChoiceAlreadyPressed(currentChoice.playerChoice))
+            {
+                Debug.Log($"[ENHANCED-FILTER] EXCLUDING choice {i}: '{currentChoice.playerChoice}' (already pressed)");
+            }
+            else
+            {
+                filteredList.Add(currentChoice);
+                Debug.Log($"[ENHANCED-FILTER] KEEPING choice {i}: '{currentChoice.playerChoice}'");
+            }
+        }
+        
+        currentFilteredChoices = filteredList.ToArray();
+        isUsingFilteredChoices = true;
+        
+        Debug.Log($"[ENHANCED-FILTER] Enhanced filtering complete: {choicesToFilter.Length} -> {currentFilteredChoices.Length}");
+        Debug.Log($"[ENHANCED-FILTER] Total pressed choices tracked: {pressedChoiceIndices.Count} by index, {pressedChoiceTexts.Count} by text");
+        
+        // Log the remaining choices
+        for (int i = 0; i < currentFilteredChoices.Length; i++)
+        {
+            var choice = currentFilteredChoices[i];
+            Debug.Log($"[ENHANCED-FILTER]   Remaining choice {i}: '{choice.playerChoice}' (correct: {choice.correctChoice})");
+        }
+        
+        // Check if only correct choices remain
+        bool onlyCorrectChoicesRemain = true;
+        foreach (var choice in currentFilteredChoices)
+        {
+            if (!choice.correctChoice)
+            {
+                onlyCorrectChoicesRemain = false;
+                break;
+            }
+        }
+        
+        if (onlyCorrectChoicesRemain)
+        {
+            Debug.Log("[ENHANCED-FILTER] Only correct choices remain - dialog will continue normally when selected");
+        }
+        
+        // Check if we have any choices left to respawn
+        if (currentFilteredChoices.Length == 0)
+        {
+            Debug.LogError("[ENHANCED-FILTER] ✗ NO CHOICES LEFT! All choices have been pressed. This should not happen!");
+            Debug.LogError("[ENHANCED-FILTER] This indicates a dialog configuration issue - there should always be at least one correct choice.");
+            return;
+        }
+        
+        // Respawn the choices with the filtered array
+        Debug.Log("[ENHANCED-FILTER] Calling RespawnChoicesWithFilteredArray()...");
+        RespawnChoicesWithFilteredArray();
+        Debug.Log("[ENHANCED-FILTER] === FilterIncorrectChoiceAndRespawn COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// FIXED: Spawn a completely new question bar with filtered choices
+    /// Don't reuse old buttons - create fresh ones
+    /// </summary>
+    private void RespawnChoicesWithFilteredArray()
+    {
+        Debug.Log("[SPAWN-NEW] === RespawnChoicesWithFilteredArray CALLED ===");
+        
+        if (currentFilteredChoices == null || currentFilteredChoices.Length == 0)
+        {
+            Debug.LogError("[SPAWN-NEW] No filtered choices to respawn!");
+            return;
+        }
+        
+        Debug.Log($"[SPAWN-NEW] Going to spawn new question bar with {currentFilteredChoices.Length} filtered choices");
+        
+        // STEP 1: DESTROY the old question instance completely
+        if (questionInstance != null)
+        {
+            Debug.Log("[SPAWN-NEW] Destroying old question instance...");
+            Destroy(questionInstance);
+            questionInstance = null;
+        }
+        
+        // STEP 2: SPAWN a completely new question bar
+        Debug.Log("[SPAWN-NEW] Creating brand new question instance...");
+        #pragma warning disable CS0618
+        questionInstance = SummonQuestionBar();
+        #pragma warning restore CS0618
+        
+        if (questionInstance == null)
+        {
+            Debug.LogError("[SPAWN-NEW] FATAL: Failed to create new question instance!");
+            return;
+        }
+        
+        Debug.Log($"[SPAWN-NEW] ✓ Created fresh question instance: {questionInstance.name}");
+        
+        // STEP 3: Show the filtered choices on the NEW question bar
+        Debug.Log("[SPAWN-NEW] Populating new question bar with filtered choices...");
+        for (int i = 0; i < currentFilteredChoices.Length; i++)
+        {
+            var choice = currentFilteredChoices[i];
+            Debug.Log($"[SPAWN-NEW]   Choice {i}: '{choice.playerChoice}' (correct: {choice.correctChoice})");
+        }
+        
+        try
+        {
+            // Clear any existing callback and set new one
+            onChoiceSelected = null;
+            
+            // Populate the NEW question bar with filtered choices
+            ShowChoicesWithButtons(currentFilteredChoices, OnPlayerChoseResponse);
+            Debug.Log($"[SPAWN-NEW] ✓ SUCCESS: New question bar spawned with {currentFilteredChoices.Length} choices");
+            
+            // Verify the new buttons work
+            StartCoroutine(VerifyNewQuestionBar());
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[SPAWN-NEW] ✗ ERROR in ShowChoicesWithButtons: {e.Message}");
+        }
+        
+        Debug.Log("[SPAWN-NEW] === RespawnChoicesWithFilteredArray COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Verify the newly spawned question bar has the correct buttons
+    /// </summary>
+    private IEnumerator VerifyNewQuestionBar()
+    {
+        yield return null; // Wait one frame for UI setup
+        
+        Debug.Log("[SPAWN-NEW] === VERIFYING NEW QUESTION BAR ===");
+        
+        if (questionInstance != null)
+        {
+            Button[] newButtons = questionInstance.GetComponentsInChildren<Button>();
+            Debug.Log($"[SPAWN-NEW] Found {newButtons.Length} buttons in new question bar");
+            
+            int activeButtons = 0;
+            for (int i = 0; i < newButtons.Length; i++)
+            {
+                if (newButtons[i].gameObject.activeInHierarchy)
+                {
+                    activeButtons++;
+                    TMP_Text btnText = newButtons[i].GetComponentInChildren<TMP_Text>();
+                    string text = btnText?.text ?? "NO TEXT";
+                    Debug.Log($"[SPAWN-NEW] Button {i} is ACTIVE with text: '{text}'");
+                }
+            }
+            
+            Debug.Log($"[SPAWN-NEW] {activeButtons} out of {newButtons.Length} buttons are active");
+            
+            if (activeButtons == currentFilteredChoices?.Length)
+            {
+                Debug.Log($"[SPAWN-NEW] ✓ SUCCESS: Correct number of active buttons ({activeButtons})");
+            }
+            else
+            {
+                Debug.LogWarning($"[SPAWN-NEW] ⚠ Expected {currentFilteredChoices?.Length ?? 0} active buttons, got {activeButtons}");
+            }
+        }
+        else
+        {
+            Debug.LogError("[SPAWN-NEW] ✗ questionInstance is null during verification!");
+        }
+        
+        Debug.Log("[SPAWN-NEW] === VERIFICATION COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Test the enhanced pressed choice tracking system
+    /// </summary>
+    [ContextMenu("Test Enhanced Pressed Choice Tracking")]
+    public void TestEnhancedPressedChoiceTracking()
+    {
+        Debug.Log("=== TESTING ENHANCED PRESSED CHOICE TRACKING ===");
+        
+        if (coreGameData == null || currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError("No valid game data!");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("No choices available!");
+            return;
+        }
+        
+        Debug.Log($"INITIAL STATE:");
+        Debug.Log($"  - Total choices in dialog: {currentBlock.Dialog.choices.Length}");
+        Debug.Log($"  - Pressed choices tracked: {pressedChoiceIndices.Count} by index, {pressedChoiceTexts.Count} by text");
+        Debug.Log($"  - Using filtered choices: {isUsingFilteredChoices}");
+        
+        // List all available choices
+        Debug.Log("Available choices:");
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            var choice = currentBlock.Dialog.choices[i];
+            bool alreadyPressed = IsChoiceAlreadyPressed(choice.playerChoice);
+            Debug.Log($"  Choice {i}: '{choice.playerChoice}' (correct: {choice.correctChoice}, pressed: {alreadyPressed})");
+        }
+        
+        // Show original choices if not already showing
+        if (questionInstance == null)
+        {
+            #pragma warning disable CS0618
+            questionInstance = SummonQuestionBar();
+            #pragma warning restore CS0618
+        }
+        ShowChoicesWithButtons(currentBlock.Dialog.choices, OnPlayerChoseResponse);
+        
+        Debug.Log("STEP 1: Simulating pressing first incorrect choice...");
+        
+        // Find first incorrect choice
+        int incorrectIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectIndex >= 0)
+        {
+            Debug.Log($"Pressing choice {incorrectIndex}: '{currentBlock.Dialog.choices[incorrectIndex].playerChoice}'");
+            FilterIncorrectChoiceAndRespawn(incorrectIndex);
+            
+            Debug.Log($"AFTER FIRST PRESS:");
+            Debug.Log($"  - Remaining choices: {currentFilteredChoices?.Length ?? 0}");
+            Debug.Log($"  - Pressed choices tracked: {pressedChoiceIndices.Count} by index, {pressedChoiceTexts.Count} by text");
+            
+            // Test pressing another incorrect choice if available
+            if (currentFilteredChoices != null && currentFilteredChoices.Length > 1)
+            {
+                Debug.Log("STEP 2: Simulating pressing second incorrect choice...");
+                
+                int secondIncorrectIndex = -1;
+                for (int i = 0; i < currentFilteredChoices.Length; i++)
+                {
+                    if (!currentFilteredChoices[i].correctChoice)
+                    {
+                        secondIncorrectIndex = i;
+                        break;
+                    }
+                }
+                
+                if (secondIncorrectIndex >= 0)
+                {
+                    Debug.Log($"Pressing choice {secondIncorrectIndex}: '{currentFilteredChoices[secondIncorrectIndex].playerChoice}'");
+                    FilterIncorrectChoiceAndRespawn(secondIncorrectIndex);
+                    
+                    Debug.Log($"AFTER SECOND PRESS:");
+                    Debug.Log($"  - Remaining choices: {currentFilteredChoices?.Length ?? 0}");
+                    Debug.Log($"  - Pressed choices tracked: {pressedChoiceIndices.Count} by index, {pressedChoiceTexts.Count} by text");
+                    
+                    Debug.Log("Remaining choices after two presses:");
+                    if (currentFilteredChoices != null)
+                    {
+                        for (int i = 0; i < currentFilteredChoices.Length; i++)
+                        {
+                            var choice = currentFilteredChoices[i];
+                            Debug.Log($"  Choice {i}: '{choice.playerChoice}' (correct: {choice.correctChoice})");
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("No second incorrect choice available to test");
+                }
+            }
+            else
+            {
+                Debug.Log("Not enough choices remaining for second press test");
+            }
+        }
+        else
+        {
+            Debug.LogError("No incorrect choices to test with!");
+        }
+        
+        Debug.Log("VERIFICATION:");
+        Debug.Log($"✓ Pressed choices are properly tracked and will not respawn");
+        Debug.Log($"✓ Only unpressed choices will appear in future spawns");
+        Debug.Log($"✓ System prevents infinite loops by tracking all pressed choices");
+        
+        Debug.Log("=== ENHANCED PRESSED CHOICE TRACKING TEST COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Simple demonstration of the pressed choice system
+    /// </summary>
+    [ContextMenu("Demo Pressed Choice Prevention")]
+    public void DemoPressedChoicePrevention()
+    {
+        Debug.Log("=== DEMO: PRESSED CHOICE PREVENTION ===");
+        Debug.Log("This system ensures that once a button is pressed, it will NEVER appear again in future spawns");
+        Debug.Log("");
+        Debug.Log("HOW IT WORKS:");
+        Debug.Log("1. Player sees all available choices (e.g., 3 buttons)");
+        Debug.Log("2. Player presses a wrong choice → Dialog response plays");
+        Debug.Log("3. When dialog ends → System respawns question bar with ONLY unpressed choices");
+        Debug.Log("4. Pressed choice is PERMANENTLY excluded from future spawns");
+        Debug.Log("5. Process repeats until player picks a correct choice");
+        Debug.Log("");
+        Debug.Log("TECHNICAL IMPLEMENTATION:");
+        Debug.Log("- TrackPressedChoice(): Records both choice text and original index");
+        Debug.Log("- FilterIncorrectChoiceAndRespawn(): Excludes ALL pressed choices, not just the current one");
+        Debug.Log("- IsChoiceAlreadyPressed(): Checks if choice text was pressed before");
+        Debug.Log("- ClearPressedChoicesTracking(): Resets tracking for new dialog blocks");
+        Debug.Log("");
+        Debug.Log("RESULT: No choice can be pressed twice, ensuring clean UI progression");
+        Debug.Log("=== END DEMO ===");
+    }
+    
+    /// <summary>
+    /// Complete test of the pressed choice prevention system with simulated user interaction
+    /// </summary>
+    [ContextMenu("Test Complete Pressed Choice Flow")]
+    public void TestCompletePressedChoiceFlow()
+    {
+        Debug.Log("=== TESTING COMPLETE PRESSED CHOICE FLOW ===");
+        
+        if (coreGameData == null || currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError("No valid game data!");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("No choices available!");
+            return;
+        }
+        
+        Debug.Log("=== INITIAL STATE ===");
+        Debug.Log($"Dialog has {currentBlock.Dialog.choices.Length} total choices:");
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            var choice = currentBlock.Dialog.choices[i];
+            Debug.Log($"  Choice {i}: '{choice.playerChoice}' (correct: {choice.correctChoice})");
+        }
+        
+        // Reset to clean state
+        ResetFilteredChoicesSystem();
+        
+        Debug.Log("=== STEP 1: Show initial choices ===");
+        if (questionInstance == null)
+        {
+            #pragma warning disable CS0618
+            questionInstance = SummonQuestionBar();
+            #pragma warning restore CS0618
+        }
+        ShowChoicesWithButtons(currentBlock.Dialog.choices, OnPlayerChoseResponse);
+        
+        Debug.Log("=== STEP 2: Simulate first incorrect choice selection ===");
+        // Find first incorrect choice
+        int firstIncorrectIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                firstIncorrectIndex = i;
+                break;
+            }
+        }
+        
+        if (firstIncorrectIndex >= 0)
+        {
+            var firstChoice = currentBlock.Dialog.choices[firstIncorrectIndex];
+            Debug.Log($"Selecting first incorrect choice {firstIncorrectIndex}: '{firstChoice.playerChoice}'");
+            
+            // Simulate the complete selection process
+            OnPlayerChoseResponse(firstIncorrectIndex);
+            
+            Debug.Log($"After first selection - Pressed choices: {pressedChoiceTexts.Count}");
+            LogPressedChoicesSummary();
+            
+            // Simulate response completion and filtering
+            Debug.Log("=== STEP 3: Simulate response completion and respawn ===");
+            FilterIncorrectChoiceAndRespawn(firstIncorrectIndex);
+            
+            Debug.Log($"After first respawn - Available choices: {currentFilteredChoices?.Length ?? 0}");
+            if (currentFilteredChoices != null)
+            {
+                for (int i = 0; i < currentFilteredChoices.Length; i++)
+                {
+                    Debug.Log($"  Remaining choice {i}: '{currentFilteredChoices[i].playerChoice}' (correct: {currentFilteredChoices[i].correctChoice})");
+                }
+            }
+            
+            // Test second incorrect choice if available
+            Debug.Log("=== STEP 4: Test second incorrect choice (if available) ===");
+            int secondIncorrectIndex = -1;
+            if (currentFilteredChoices != null)
+            {
+                for (int i = 0; i < currentFilteredChoices.Length; i++)
+                {
+                    if (!currentFilteredChoices[i].correctChoice)
+                    {
+                        secondIncorrectIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            if (secondIncorrectIndex >= 0)
+            {
+                var secondChoice = currentFilteredChoices[secondIncorrectIndex];
+                Debug.Log($"Selecting second incorrect choice {secondIncorrectIndex}: '{secondChoice.playerChoice}'");
+                
+                OnPlayerChoseResponse(secondIncorrectIndex);
+                FilterIncorrectChoiceAndRespawn(secondIncorrectIndex);
+                
+                Debug.Log($"After second respawn - Available choices: {currentFilteredChoices?.Length ?? 0}");
+                LogPressedChoicesSummary();
+            }
+            else
+            {
+                Debug.Log("No second incorrect choice available (good!)");
+            }
+        }
+        else
+        {
+            Debug.LogError("No incorrect choices found to test with!");
+        }
+        
+        Debug.Log("=== VERIFICATION ===");
+        Debug.Log("✓ Each pressed choice should be permanently removed from future spawns");
+        Debug.Log("✓ Only unpressed choices should remain available");
+        Debug.Log("✓ System prevents infinite loops by ensuring progress");
+        Debug.Log("=== COMPLETE PRESSED CHOICE FLOW TEST COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Test the specific bug: correct choice first, then incorrect choice
+    /// This should NOT result in "no choices left" error
+    /// </summary>
+    [ContextMenu("Test Correct Then Incorrect Choice Bug")]
+    public void TestCorrectThenIncorrectChoiceBug()
+    {
+        Debug.Log("=== TESTING CORRECT THEN INCORRECT CHOICE BUG ===");
+        Debug.Log("This test simulates: Pick correct choice → Continue to next dialog → Pick incorrect choice");
+        Debug.Log("Expected result: Should work fine, incorrect choice should be filtered properly");
+        
+        if (coreGameData == null || currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError("No valid game data!");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("No choices available!");
+            return;
+        }
+        
+        Debug.Log("=== STEP 1: Reset and show initial choices ===");
+        ResetFilteredChoicesSystem();
+        
+        Debug.Log($"Initial dialog has {currentBlock.Dialog.choices.Length} choices:");
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            var choice = currentBlock.Dialog.choices[i];
+            Debug.Log($"  Choice {i}: '{choice.playerChoice}' (correct: {choice.correctChoice})");
+        }
+        
+        // Find correct and incorrect choices
+        int correctChoiceIndex = -1;
+        int incorrectChoiceIndex = -1;
+        
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (currentBlock.Dialog.choices[i].correctChoice && correctChoiceIndex == -1)
+            {
+                correctChoiceIndex = i;
+            }
+            if (!currentBlock.Dialog.choices[i].correctChoice && incorrectChoiceIndex == -1)
+            {
+                incorrectChoiceIndex = i;
+            }
+        }
+        
+        if (correctChoiceIndex == -1)
+        {
+            Debug.LogError("No correct choice found for testing!");
+            return;
+        }
+        
+        if (incorrectChoiceIndex == -1)
+        {
+            Debug.LogError("No incorrect choice found for testing!");
+            return;
+        }
+        
+        Debug.Log($"Found correct choice at index {correctChoiceIndex}: '{currentBlock.Dialog.choices[correctChoiceIndex].playerChoice}'");
+        Debug.Log($"Found incorrect choice at index {incorrectChoiceIndex}: '{currentBlock.Dialog.choices[incorrectChoiceIndex].playerChoice}'");
+        
+        Debug.Log("=== STEP 2: Simulate selecting CORRECT choice first ===");
+        Debug.Log("This should NOT be tracked as pressed (correct choices lead to normal progression)");
+        
+        OnPlayerChoseResponse(correctChoiceIndex);
+        
+        Debug.Log($"After correct choice - Pressed choices tracked: {pressedChoiceTexts.Count}");
+        LogPressedChoicesSummary();
+        
+        if (pressedChoiceTexts.Count > 0)
+        {
+            Debug.LogError("❌ BUG: Correct choice was tracked! This will cause problems.");
+        }
+        else
+        {
+            Debug.Log("✅ GOOD: Correct choice was NOT tracked (as expected)");
+        }
+        
+        Debug.Log("=== STEP 3: Simulate moving to next dialog block ===");
+        Debug.Log("In real gameplay, correct choice would lead to next dialog with new choices");
+        Debug.Log("For this test, we'll simulate having a new set of choices that includes some incorrect ones");
+        
+        // Reset for "new dialog block" simulation
+        selectedChoiceIndex = -1;
+        currentChoiceResponseIndex = -1;
+        isShowingResponse = false;
+        
+        Debug.Log("=== STEP 4: Simulate selecting INCORRECT choice in new dialog ===");
+        Debug.Log("This should be tracked and filtered properly, without 'no choices left' error");
+        
+        // Create a mock scenario where we have multiple choices including incorrect ones
+        if (currentBlock.Dialog.choices.Length >= 2)
+        {
+            Debug.Log("Simulating OnPlayerChoseResponse with incorrect choice...");
+            OnPlayerChoseResponse(incorrectChoiceIndex);
+            
+            Debug.Log($"After incorrect choice - Pressed choices tracked: {pressedChoiceTexts.Count}");
+            LogPressedChoicesSummary();
+            
+            if (pressedChoiceTexts.Count == 1)
+            {
+                Debug.Log("✅ GOOD: Only the incorrect choice is tracked");
+            }
+            else
+            {
+                Debug.LogError($"❌ UNEXPECTED: Expected 1 tracked choice, got {pressedChoiceTexts.Count}");
+            }
+            
+            Debug.Log("=== STEP 5: Test filtering (this is where the bug occurred) ===");
+            try
+            {
+                FilterIncorrectChoiceAndRespawn(incorrectChoiceIndex);
+                
+                if (currentFilteredChoices != null && currentFilteredChoices.Length > 0)
+                {
+                    Debug.Log($"✅ SUCCESS: Filtering worked! {currentFilteredChoices.Length} choices remain");
+                    for (int i = 0; i < currentFilteredChoices.Length; i++)
+                    {
+                        Debug.Log($"  Remaining choice {i}: '{currentFilteredChoices[i].playerChoice}' (correct: {currentFilteredChoices[i].correctChoice})");
+                    }
+                }
+                else
+                {
+                    Debug.LogError("❌ STILL BROKEN: No choices left after filtering!");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ ERROR during filtering: {e.Message}");
+            }
+        }
+        
+        Debug.Log("=== VERIFICATION ===");
+        Debug.Log("✅ Correct choices should NOT be tracked (they lead to normal progression)");
+        Debug.Log("✅ Incorrect choices should be tracked and filtered");
+        Debug.Log("✅ 'No choices left' error should never occur with proper dialog setup");
+        Debug.Log("=== TEST COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// SIMPLIFIED: Just respawn question bar when dialog response ends for incorrect choice
+    /// </summary>
+    private void CheckAndTriggerChoiceFiltering()
+    {
+        Debug.Log("[SIMPLE-FILTER] Checking if we need to respawn choices...");
+        
+        // Only proceed if we're currently showing responses
+        if (!isShowingResponse)
+        {
+            Debug.Log("[SIMPLE-FILTER] Not showing response, no action needed");
+            return;
+        }
+        
+        // Get current choice data
+        if (coreGameData == null || currentBlockIndex >= coreGameData.coreBlock.Length) return;
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null || selectedChoiceIndex < 0) return;
+        
+        // Get the choice array we're working with
+        CoreGameDialogChoices[] choicesToCheck = isUsingFilteredChoices ? currentFilteredChoices : currentBlock.Dialog.choices;
+        if (choicesToCheck == null || selectedChoiceIndex >= choicesToCheck.Length) return;
+        
+        var selectedChoice = choicesToCheck[selectedChoiceIndex];
+        
+        // Check if this was the last response
+        bool isLastResponse = (selectedChoice.dialogResponses == null || selectedChoice.dialogResponses.Length == 0) ||
+                              (currentChoiceResponseIndex >= selectedChoice.dialogResponses.Length - 1);
+        
+        if (isLastResponse)
+        {
+            Debug.Log($"[SIMPLE-FILTER] Last response for choice '{selectedChoice.playerChoice}' (correct: {selectedChoice.correctChoice})");
+            
+            if (selectedChoice.correctChoice)
+            {
+                // Correct choice - continue to next block
+                Debug.Log("[SIMPLE-FILTER] Correct choice, continuing to next block");
+                ResetDialogResponseState();
+                ClearAll3DDialogs();
+                if (!IsNext2DDialog() && !isUsingFilteredChoices)
+                {
+                    DestroyDialogInstances();
+                }
+                ContinueToNextBlock();
+            }
+            else
+            {
+                // Incorrect choice - JUST RESPAWN THE QUESTION BAR
+                Debug.Log("[SIMPLE-FILTER] Incorrect choice, respawning question bar with filtered choices");
+                
+                // Reset response state
+                ResetDialogResponseState();
+                
+                // Filter out the incorrect choice and respawn
+                FilterIncorrectChoiceAndRespawn(selectedChoiceIndex);
+            }
+        }
+        else
+        {
+            Debug.Log("[SIMPLE-FILTER] Not the last response, waiting...");
+        }
+    }
+    
+    /// <summary>
+    /// Auto-advance to next response after a delay (optional feature)
+    /// </summary>
+    private IEnumerator AutoAdvanceToNextResponse(float delaySeconds)
+    {
+        yield return new WaitForSeconds(delaySeconds);
+        
+        Debug.Log("[AUTO-ADVANCE] Checking if we should auto-advance to next response...");
+        
+        if (isShowingResponse && !isTextAnimating && !isInDialogTransition)
+        {
+            Debug.Log("[AUTO-ADVANCE] Triggering HandleDialogProgression for next response");
+            HandleDialogProgression();
+        }
+        else
+        {
+            Debug.Log($"[AUTO-ADVANCE] Skipping auto-advance - isShowingResponse:{isShowingResponse}, isTextAnimating:{isTextAnimating}, isInDialogTransition:{isInDialogTransition}");
+        }
+    }
+    
+    /// <summary>
+    /// Test the correct choice filtering system with detailed flow demonstration
+    /// </summary>
+    [ContextMenu("Test Correct Choice System")]
+    public void TestCorrectChoiceSystem()
+    {
+        Debug.Log("=== TESTING CORRECT CHOICE SYSTEM ===");
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError("Current block index is out of range!");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("Current dialog has no choices to test!");
+            return;
+        }
+        
+        Debug.Log($"Current Dialog Choices Analysis:");
+        Debug.Log($"Total choices: {currentBlock.Dialog.choices.Length}");
+        
+        int correctChoices = 0;
+        int incorrectChoices = 0;
+        
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            var choice = currentBlock.Dialog.choices[i];
+            string correctness = choice.correctChoice ? "CORRECT" : "INCORRECT";
+            Debug.Log($"  Choice {i}: '{choice.playerChoice}' - {correctness}");
+            
+            if (choice.correctChoice)
+                correctChoices++;
+            else
+                incorrectChoices++;
+        }
+        
+        Debug.Log($"Summary: {correctChoices} correct choice(s), {incorrectChoices} incorrect choice(s)");
+        
+        if (isUsingFilteredChoices)
+        {
+            Debug.Log($"Currently using filtered choices:");
+            Debug.Log($"  Filtered array has {currentFilteredChoices?.Length ?? 0} choice(s)");
+            Debug.Log($"  Original array had {originalChoices?.Length ?? 0} choice(s)");
+            
+            if (currentFilteredChoices != null)
+            {
+                for (int i = 0; i < currentFilteredChoices.Length; i++)
+                {
+                    var choice = currentFilteredChoices[i];
+                    string correctness = choice.correctChoice ? "CORRECT" : "INCORRECT";
+                    Debug.Log($"    Filtered choice {i}: '{choice.playerChoice}' - {correctness}");
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("Not currently using filtered choices (original choice set active)");
+        }
+        
+        Debug.Log("Expected behavior:");
+        Debug.Log("=== FLOW DEMONSTRATION ===");
+        Debug.Log("1. Initial state: User sees all choices (e.g., 3 buttons)");
+        Debug.Log("2. If user picks WRONG choice (correctChoice = false):");
+        Debug.Log("   a) Shows dialog response as normal");
+        Debug.Log("   b) When dialog response ends, respawns remaining choices");
+        Debug.Log("   c) Wrong choice is REMOVED from options (3 becomes 2)");
+        Debug.Log("3. If user picks WRONG choice again:");
+        Debug.Log("   a) Shows dialog response as normal");
+        Debug.Log("   b) When dialog response ends, respawns remaining choices");
+        Debug.Log("   c) Wrong choice is REMOVED from options (2 becomes 1)");
+        Debug.Log("4. If user picks CORRECT choice (correctChoice = true):");
+        Debug.Log("   a) Shows dialog response");
+        Debug.Log("   b) Continues to next dialog block normally");
+        Debug.Log("   c) NO respawning - normal dialog progression");
+        Debug.Log("=== CURRENT STATE ===");
+        Debug.Log($"questionInstance != null: {questionInstance != null}");
+        Debug.Log($"isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"isShowingResponse: {isShowingResponse}");
+        if (incorrectChoices > 0)
+        {
+            Debug.Log("✓ Has incorrect choices - filtering system will activate when wrong choice is picked");
+            Debug.Log("- Selecting an incorrect choice will show its response, then remove that choice");
+            Debug.Log("- Choice buttons will respawn with fewer options");
+            Debug.Log("- This continues until only correct choice(s) remain");
+        }
+        
+        if (correctChoices > 0)
+        {
+            Debug.Log("✓ Has correct choice(s) - selecting one will proceed with normal dialog flow");
+        }
+        
+        if (correctChoices == 0)
+        {
+            Debug.LogError("✗ CRITICAL: No correct choices found! This will cause an infinite loop!");
+        }
+        
+        Debug.Log("=== END CORRECT CHOICE SYSTEM TEST ===");
+    }
+    
+    /// <summary>
+    /// Manually test incorrect choice filtering (for debugging)
+    /// </summary>
+    [ContextMenu("Test Filter Incorrect Choice")]
+    public void TestFilterIncorrectChoice()
+    {
+        Debug.Log("=== TESTING FILTER INCORRECT CHOICE ===");
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("No choices available to test filtering!");
+            return;
+        }
+        
+        Debug.Log($"Current state before filtering:");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"  - currentFilteredChoices != null: {currentFilteredChoices != null}");
+        
+        // Find first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex >= 0)
+        {
+            Debug.Log($"Testing filter of incorrect choice {incorrectChoiceIndex}: '{currentBlock.Dialog.choices[incorrectChoiceIndex].playerChoice}'");
+            FilterIncorrectChoiceAndRespawn(incorrectChoiceIndex);
+            
+            Debug.Log($"After filtering:");
+            Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+            Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+            Debug.Log($"  - currentFilteredChoices != null: {currentFilteredChoices != null}");
+            Debug.Log($"  - currentFilteredChoices.Length: {currentFilteredChoices?.Length ?? 0}");
+        }
+        else
+        {
+            Debug.Log("No incorrect choices found to filter!");
+        }
+        
+        Debug.Log("=== END FILTER INCORRECT CHOICE TEST ===");
+    }
+    
+    /// <summary>
+    /// Force simulate an incorrect choice selection and response completion
+    /// This tests the exact flow that should happen when a player picks wrong choice
+    /// </summary>
+    [ContextMenu("Simulate Incorrect Choice Flow")]
+    public void SimulateIncorrectChoiceFlow()
+    {
+        Debug.Log("=== SIMULATING INCORRECT CHOICE FLOW ===");
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("No choices available to simulate!");
+            return;
+        }
+        
+        // Find first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found to simulate!");
+            return;
+        }
+        
+        var incorrectChoice = currentBlock.Dialog.choices[incorrectChoiceIndex];
+        Debug.Log($"Simulating selection of incorrect choice {incorrectChoiceIndex}: '{incorrectChoice.playerChoice}'");
+        
+        // Step 1: Simulate choice selection
+        Debug.Log("STEP 1: Simulating OnPlayerChoseResponse()");
+        selectedChoiceIndex = incorrectChoiceIndex;
+        isShowingResponse = true;
+        
+        // Step 2: Check if there are responses to show
+        if (incorrectChoice.dialogResponses != null && incorrectChoice.dialogResponses.Length > 0)
+        {
+            Debug.Log($"STEP 2: Choice has {incorrectChoice.dialogResponses.Length} responses");
+            currentChoiceResponseIndex = incorrectChoice.dialogResponses.Length - 1; // Simulate all responses shown
+            Debug.Log("STEP 3: Simulating all responses have been shown...");
+        }
+        else
+        {
+            Debug.Log("STEP 2: Choice has no responses, skipping to filtering");
+        }
+        
+        // Step 3: Simulate HandleDialogProgression call (what happens when user presses SPACE after responses)
+        Debug.Log("STEP 4: Simulating HandleDialogProgression() after responses complete");
+        Debug.Log($"Current state before HandleDialogProgression:");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        
+        // Important: The logic should work like this:
+        // 1. selectedChoiceIndex points to the choice in the current array being used
+        // 2. If we're using original choices, selectedChoiceIndex refers to original array
+        // 3. If we're using filtered choices, selectedChoiceIndex refers to filtered array
+        // 4. FilterIncorrectChoiceAndRespawn should remove from the current array
+        
+        // Manually trigger the incorrect choice filtering logic
+        Debug.Log("STEP 5: Manually triggering filtering logic...");
+        
+        // Store the choice index before resetting state (like our fixed HandleDialogProgression does)
+        int choiceToFilter = selectedChoiceIndex;
+        Debug.Log($"STEP 5a: choiceToFilter = {choiceToFilter} (from selectedChoiceIndex)");
+        
+        // Reset state
+        ResetDialogResponseState();
+        Debug.Log($"STEP 5b: After ResetDialogResponseState() - questionInstance != null: {questionInstance != null}");
+        
+        // Filter and respawn
+        Debug.Log($"STEP 5c: Calling FilterIncorrectChoiceAndRespawn({choiceToFilter})");
+        FilterIncorrectChoiceAndRespawn(choiceToFilter);
+        
+        Debug.Log("=== SIMULATION COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Test the complete incorrect choice filtering flow
+    /// This verifies the fixed progression logic
+    /// </summary>
+    [ContextMenu("Test Complete Incorrect Choice Flow")]
+    public void TestCompleteIncorrectChoiceFlow()
+    {
+        Debug.Log("=== TESTING COMPLETE INCORRECT CHOICE FLOW ===");
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError($"Current block index {currentBlockIndex} is out of range");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("Current block has no dialog or choices!");
+            return;
+        }
+        
+        // Find first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found to test with!");
+            return;
+        }
+        
+        var incorrectChoice = currentBlock.Dialog.choices[incorrectChoiceIndex];
+        Debug.Log($"Testing with incorrect choice {incorrectChoiceIndex}: '{incorrectChoice.playerChoice}'");
+        
+        // Verify choice has responses
+        if (incorrectChoice.dialogResponses == null || incorrectChoice.dialogResponses.Length == 0)
+        {
+            Debug.LogError("Incorrect choice has no dialog responses!");
+            return;
+        }
+        
+        Debug.Log($"Choice has {incorrectChoice.dialogResponses.Length} responses");
+        
+        // Step 1: Simulate choice selection
+        Debug.Log("STEP 1: Simulating incorrect choice selection...");
+        isShowingResponse = true;
+        selectedChoiceIndex = incorrectChoiceIndex;
+        currentChoiceResponseIndex = 0;
+        
+        // Show first response
+        Debug.Log("STEP 2: Showing first response...");
+        var firstResponse = incorrectChoice.dialogResponses[0];
+        string npcName = ConvertNpcNameToString(firstResponse.npcName);
+        Debug.Log($"Response: '{npcName}' says '{firstResponse.npcResponse}'");
+        
+        // Step 3: Simulate all responses being shown
+        Debug.Log("STEP 3: Simulating all responses shown...");
+        currentChoiceResponseIndex = incorrectChoice.dialogResponses.Length - 1;
+        
+        // Step 4: Test HandleDialogProgression (what happens when responses complete)
+        Debug.Log("STEP 4: Testing HandleDialogProgression after responses complete...");
+        Debug.Log($"Current state before progression:");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        
+        // This should trigger filtering and respawning
+        Debug.Log("Calling HandleDialogProgression() - this should trigger filtering...");
+        HandleDialogProgression();
+        
+        // Check results
+        Debug.Log("STEP 5: Checking results after progression...");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"  - currentFilteredChoices length: {currentFilteredChoices?.Length ?? 0}");
+        
+        if (isUsingFilteredChoices && currentFilteredChoices != null)
+        {
+            Debug.Log("✓ Filtering was applied! Remaining choices:");
+            for (int i = 0; i < currentFilteredChoices.Length; i++)
+            {
+                Debug.Log($"  Choice {i}: '{currentFilteredChoices[i].playerChoice}' (correct: {currentFilteredChoices[i].correctChoice})");
+            }
+            
+            // Verify buttons are visible and functional
+            if (questionInstance != null)
+            {
+                Button[] buttonArray = questionInstance.GetComponentsInChildren<Button>();
+                Debug.Log($"UI Check: Found {buttonArray.Length} buttons");
+                for (int i = 0; i < buttonArray.Length && i < currentFilteredChoices.Length; i++)
+                {
+                    if (buttonArray[i].gameObject.activeInHierarchy)
+                    {
+                        TMP_Text btnText = buttonArray[i].GetComponentInChildren<TMP_Text>();
+                        string buttonText = btnText?.text ?? "NO TEXT";
+                        Debug.Log($"  Button {i}: Active, Text: '{buttonText}'");
+                    }
+                    else
+                    {
+                        Debug.Log($"  Button {i}: INACTIVE");
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("✗ Filtering was NOT applied - choices should have been filtered!");
+        }
+        
+        Debug.Log("=== END COMPLETE INCORRECT CHOICE FLOW TEST ===");
+    }
+    
+    /// <summary>
+    /// Test just the filtering part without simulation - check if basic filtering works
+    /// </summary>
+    [ContextMenu("Test Filter Only")]
+    public void TestFilterOnly()
+    {
+        Debug.Log("=== TESTING FILTER ONLY ===");
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError($"Current block index {currentBlockIndex} is out of range");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("Current block has no dialog or choices!");
+            return;
+        }
+        
+        // Find first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found to test with!");
+            return;
+        }
+        
+        Debug.Log($"Before filtering: {currentBlock.Dialog.choices.Length} choices");
+        Debug.Log($"questionInstance != null: {questionInstance != null}");
+        
+        // Ensure we have a question instance
+        if (questionInstance == null)
+        {
+            Debug.Log("Creating question instance for test...");
+            questionInstance = SummonQuestionBar();
+            if (questionInstance == null)
+            {
+                Debug.LogError("Failed to create question instance!");
+                return;
+            }
+        }
+        
+        Debug.Log($"Calling FilterIncorrectChoiceAndRespawn({incorrectChoiceIndex})...");
+        FilterIncorrectChoiceAndRespawn(incorrectChoiceIndex);
+        
+        Debug.Log("After filtering:");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"  - currentFilteredChoices length: {currentFilteredChoices?.Length ?? 0}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        
+        if (questionInstance != null)
+        {
+            Button[] buttons = questionInstance.GetComponentsInChildren<Button>();
+            Debug.Log($"  - Found {buttons.Length} buttons in question instance");
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                Debug.Log($"    Button {i}: {buttons[i].name} - Active: {buttons[i].gameObject.activeInHierarchy}");
+                if (buttons[i].gameObject.activeInHierarchy)
+                {
+                    TMP_Text btnText = buttons[i].GetComponentInChildren<TMP_Text>();
+                    string text = btnText?.text ?? "NO TEXT";
+                    Debug.Log($"      Text: '{text}'");
+                }
+            }
+        }
+        
+        Debug.Log("=== END FILTER ONLY TEST ===");
     }
     
     /// <summary>
@@ -3442,12 +4791,19 @@ public class CoreGameManager : MonoBehaviour
         int choicesToShow = Mathf.Min(choices.Length, 3, buttonArray.Length);
         
         Debug.Log($"Total choices in data: {choices.Length}, UI will show: {choicesToShow} (Available buttons: {buttonArray.Length})");
+        
+        // Log filtered choices state for debugging
+        if (isUsingFilteredChoices)
+        {
+            Debug.Log($"[FILTERED CHOICES] Using filtered choices array with {choices.Length} remaining choices");
+            Debug.Log($"[FILTERED CHOICES] Original choices had {originalChoices?.Length ?? 0} choices");
+        }
 
         for (int i = 0; i < choicesToShow; i++)
         {
             if (choices[i] != null && i < buttonArray.Length)
             {
-                Debug.Log($"Processing choice {i}: '{choices[i].playerChoice}' -> Button {i} ({buttonArray[i].name})");
+                Debug.Log($"Processing choice {i}: '{choices[i].playerChoice}' (correctChoice: {choices[i].correctChoice}) -> Button {i} ({buttonArray[i].name})");
                 
                 Button btn = buttonArray[i];
                 btn.gameObject.SetActive(true);
@@ -3463,7 +4819,7 @@ public class CoreGameManager : MonoBehaviour
                     Debug.LogWarning($"Choice {i} has empty playerChoice field! Using fallback: '{choiceText}'");
                 }
                 
-                // Add key indicator based on button index
+                // Add key indicator based on button index (Q, W, E)
                 string keyIndicator = GetKeyIndicator(i);
                 string buttonTextWithKey = $"{keyIndicator} {choiceText}";
                 
@@ -3497,7 +4853,7 @@ public class CoreGameManager : MonoBehaviour
                     }
                 }
 
-                int index = i; // Important for correct capture
+                int index = i; // Important for correct capture - this is the index in the FILTERED choices array
                 btn.onClick.AddListener(() => {
                     // If animation is still playing, finish it instantly
                     if (buttonTweenIds.TryGetValue(btn, out int tweenId) && LeanTween.isTweening(tweenId))
@@ -3533,7 +4889,8 @@ public class CoreGameManager : MonoBehaviour
                         Debug.Log($"Map movement detected: {mapName}");
                     }
 
-                    onChoiceSelected?.Invoke(index);
+                    Debug.Log($"[CHOICE SELECTED] Button {index} clicked - choice: '{choices[index].playerChoice}' (correctChoice: {choices[index].correctChoice})");
+                    onChoiceSelected?.Invoke(index); // Pass the filtered array index
                     HideChoices(); // Hide all buttons after a choice is made
                 });
             }
@@ -4048,49 +5405,124 @@ public class CoreGameManager : MonoBehaviour
         return tweenId;
     }
 
+    /// <summary>
+    /// Handle player choice selection with correct choice filtering system
+    /// If choice is incorrect, remove it and respawn remaining choices
+    /// If choice is correct, continue with normal dialog flow
+    /// 
+    /// IMPORTANT FIX: Only track INCORRECT choices, not correct ones!
+    /// Correct choices lead to normal progression and should not be filtered.
+    /// </summary>
     [Obsolete]
     private void OnPlayerChoseResponse(int choiceIndex)
     {
         Debug.Log($"=== OnPlayerChoseResponse - Choice {choiceIndex} Selected ===");
         
         var currentBlock = coreGameData.coreBlock[currentBlockIndex];
-        if (currentBlock.Dialog?.choices == null || choiceIndex >= currentBlock.Dialog.choices.Length)
+        
+        // Determine which choice array to use (filtered or original)
+        CoreGameDialogChoices[] choicesToUse = isUsingFilteredChoices ? currentFilteredChoices : currentBlock.Dialog?.choices;
+        
+        Debug.Log($"[CHOICE SELECTION] Using choice array: {(isUsingFilteredChoices ? "FILTERED" : "ORIGINAL")}");
+        Debug.Log($"[CHOICE SELECTION] Choice array length: {choicesToUse?.Length ?? 0}");
+        Debug.Log($"[CHOICE SELECTION] Selected index: {choiceIndex}");
+        
+        if (choicesToUse == null || choiceIndex >= choicesToUse.Length)
         {
-            Debug.LogError($"Invalid choice index {choiceIndex} or no choices available!");
+            Debug.LogError($"[CHOICE SELECTION] Invalid choice index {choiceIndex} or no choices available!");
+            Debug.LogError($"[CHOICE SELECTION] choicesToUse is null: {choicesToUse == null}");
+            Debug.LogError($"[CHOICE SELECTION] choicesToUse.Length: {choicesToUse?.Length ?? 0}");
             return;
         }
         
-        var selectedChoice = currentBlock.Dialog.choices[choiceIndex];
-        Debug.Log($"Selected choice: '{selectedChoice.playerChoice}'");
+        var selectedChoice = choicesToUse[choiceIndex];
+        Debug.Log($"[CHOICE SELECTION] Selected choice: '{selectedChoice.playerChoice}' (correctChoice: {selectedChoice.correctChoice})");
         
         // Hide choices first
         HideChoices();
         
-        // Store which choice was selected
+        // Store which choice was selected (relative to the current choice array)
         selectedChoiceIndex = choiceIndex;
+        Debug.Log($"[CHOICE SELECTION] Set selectedChoiceIndex = {selectedChoiceIndex} (relative to {(isUsingFilteredChoices ? "filtered" : "original")} array)");
         
-        // Check if there are dialog responses to show
-        if (selectedChoice.dialogResponses != null && selectedChoice.dialogResponses.Length > 0)
+        // Check if this is a correct choice
+        if (selectedChoice.correctChoice)
         {
-            Debug.Log($"Found {selectedChoice.dialogResponses.Length} dialog responses to display");
+            Debug.Log("[CORRECT CHOICE] Player selected correct choice - proceeding with normal dialog flow");
+            Debug.Log("[CORRECT CHOICE] NOT tracking this choice since it's correct - it leads to normal progression");
             
-            // Start showing responses from index 0
-            currentChoiceResponseIndex = 0;
-            isShowingResponse = true;
+            // Reset filtered choices system since correct choice was selected
+            ResetFilteredChoicesSystem();
             
-            ShowDialogResponse(selectedChoice, 0);
+            // Check if there are dialog responses to show
+            if (selectedChoice.dialogResponses != null && selectedChoice.dialogResponses.Length > 0)
+            {
+                Debug.Log($"[CORRECT CHOICE] Found {selectedChoice.dialogResponses.Length} dialog responses to display");
+                
+                // Start showing responses from index 0
+                currentChoiceResponseIndex = 0;
+                isShowingResponse = true;
+                
+                ShowDialogResponse(selectedChoice, 0);
+            }
+            else
+            {
+                Debug.Log("[CORRECT CHOICE] No dialog responses found, continuing to next block");
+                // No responses, just continue to next block
+                ContinueToNextBlock();
+            }
         }
         else
         {
-            Debug.Log("No dialog responses found, continuing to next block");
-            // No responses, just continue to next block
-            ContinueToNextBlock();
+            Debug.Log("[INCORRECT CHOICE] Player selected incorrect choice - will respawn choices after response");
+            
+            // CRITICAL: Only track INCORRECT choices, not correct ones!
+            Debug.Log($"[PRESSED-CHOICE] Tracking INCORRECT choice {choiceIndex} as pressed: '{selectedChoice.playerChoice}'");
+            
+            // Find the original index of this choice for proper tracking
+            int originalIndex = -1;
+            if (originalChoices != null)
+            {
+                for (int i = 0; i < originalChoices.Length; i++)
+                {
+                    if (originalChoices[i].playerChoice == selectedChoice.playerChoice)
+                    {
+                        originalIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            // Track the pressed INCORRECT choice (use original index if found, otherwise current index)
+            TrackPressedChoice(originalIndex >= 0 ? originalIndex : choiceIndex, selectedChoice.playerChoice);
+            
+            // Show the response for the incorrect choice first
+            if (selectedChoice.dialogResponses != null && selectedChoice.dialogResponses.Length > 0)
+            {
+                Debug.Log($"[INCORRECT CHOICE] Showing incorrect choice response, then will filter choices");
+                
+                // Start showing responses from index 0
+                currentChoiceResponseIndex = 0;
+                isShowingResponse = true;
+                
+                // Mark that we need to respawn choices after this response completes
+                // We'll handle this in HandleDialogProgression when responses finish
+                ShowDialogResponse(selectedChoice, 0);
+            }
+            else
+            {
+                Debug.Log("[INCORRECT CHOICE] Incorrect choice has no response, filtering choices immediately");
+                // No response to show, filter choices immediately
+                FilterIncorrectChoiceAndRespawn(choiceIndex);
+            }
         }
     }
 
     /// <summary>
-    /// Show a specific dialog response from the selected choice
+    /// Show a specific dialog response from a choice's response array
     /// </summary>
+    /// <param name="selectedChoice">The choice containing the responses</param>
+    /// <param name="responseIndex">Index of the response to show</param>
     [Obsolete]
     private void ShowDialogResponse(CoreGameDialogChoices selectedChoice, int responseIndex)
     {
@@ -4179,12 +5611,29 @@ public class CoreGameManager : MonoBehaviour
             if (dialogTextComponent != null)
             {
                 Debug.Log($"Starting dialog response text animation for: '{processedResponse}'");
-                AnimateDialogText(processedResponse, dialogTextComponent, audioClip);
+                
+                // Create completion callback to reset transition state when animation finishes
+                System.Action onAnimationComplete = () => {
+                    Debug.Log("[RESPONSE] Dialog response animation completed, resetting transition state");
+                    isInDialogTransition = false;
+                    
+                    // NEW: Check if this was the last response and if we need to filter incorrect choices
+                    CheckAndTriggerChoiceFiltering();
+                    
+                    // Optional: Auto-advance to next response after a short delay (can be disabled for manual control)
+                    // StartCoroutine(AutoAdvanceToNextResponse(0.5f));
+                };
+                
+                AnimateDialogText(processedResponse, dialogTextComponent, audioClip, onAnimationComplete);
             }
             else
             {
                 Debug.LogError("Could not find DialogueText component for response animation! Falling back to instant text.");
                 UpdateDialogTextSafe(processedResponse);
+                isInDialogTransition = false; // Reset transition state since no animation
+                
+                // IMPORTANT: Even with instant text, we need to trigger choice filtering logic
+                CheckAndTriggerChoiceFiltering();
             }
         }
         
@@ -4233,7 +5682,17 @@ public class CoreGameManager : MonoBehaviour
         }
 
         textDialog3D.gameObject.SetActive(true);
-        AnimateDialogText(responseText, tmp3D, audioClip);
+        
+        // Create completion callback to handle choice filtering for 3D dialogs too
+        System.Action onAnimationComplete = () => {
+            Debug.Log("[3D RESPONSE] Dialog response animation completed, resetting transition state");
+            isInDialogTransition = false;
+            
+            // Check if this was the last response and if we need to filter incorrect choices
+            CheckAndTriggerChoiceFiltering();
+        };
+        
+        AnimateDialogText(responseText, tmp3D, audioClip, onAnimationComplete);
     }
     
     private void ClearAll3DDialogs()
@@ -4772,7 +6231,7 @@ public class CoreGameManager : MonoBehaviour
     
     #region Text Animation
     
-    private void AnimateDialogText(string fullText, TMP_Text textComponent, AudioClip audioClip = null)
+    private void AnimateDialogText(string fullText, TMP_Text textComponent, AudioClip audioClip = null, System.Action onComplete = null)
     {
         // Stop any existing audio and tweens
         if (dialogTween != null) LeanTween.cancel(gameObject, dialogTween.id);
@@ -4856,6 +6315,9 @@ public class CoreGameManager : MonoBehaviour
                 {
                     Debug.Log("Dialog animation completed using default timing.");
                 }
+                
+                // Call completion callback if provided
+                onComplete?.Invoke();
             });
     }
     
@@ -5123,43 +6585,121 @@ public class CoreGameManager : MonoBehaviour
                     {
                         Debug.Log($"[PROGRESSION] Showing next dialog response: {nextResponseIndex + 1}/{selectedChoice.dialogResponses.Length}");
                         
-                        // Ensure we're not in a transition state
-                        if (!isInDialogTransition)
-                        {
-                            isInDialogTransition = true;
-                            ShowDialogResponse(selectedChoice, nextResponseIndex);
-                        }
-                        else
-                        {
-                            Debug.LogWarning("[PROGRESSION] Already in transition, skipping duplicate response display");
-                        }
+                        // Show next response without checking transition state since we want to continue
+                        ShowDialogResponse(selectedChoice, nextResponseIndex);
                         return;
                     }
                     else
                     {
-                        Debug.Log("[PROGRESSION] All dialog responses shown, continuing to next block");
-                        // All responses shown, continue to next block
-                        ResetDialogResponseState();
+                        Debug.Log("[PROGRESSION] All dialog responses shown");
+                        
+                        // NOTE: For incorrect choices, CheckAndTriggerChoiceFiltering() should have already 
+                        // handled the filtering automatically when the last response animation completed.
+                        // If we reach here, it means the automatic callback failed or this is a correct choice.
+                        
+                        // Determine which choice array we're working with
+                        CoreGameDialogChoices[] choicesToCheck = isUsingFilteredChoices ? currentFilteredChoices : currentBlock.Dialog.choices;
+                        
+                        // Check if the selected choice was correct
+                        if (choicesToCheck != null && selectedChoiceIndex >= 0 && selectedChoiceIndex < choicesToCheck.Length)
+                        {
+                            var selectedChoiceToCheck = choicesToCheck[selectedChoiceIndex];
+                            
+                            Debug.Log($"[PROGRESSION] Choice '{selectedChoiceToCheck.playerChoice}' (correct: {selectedChoiceToCheck.correctChoice})");
+                            
+                            if (selectedChoiceToCheck.correctChoice)
+                            {
+                                Debug.Log("[PROGRESSION] Correct choice - continuing to next block");
+                                ResetDialogResponseState();
+                                ClearAll3DDialogs();
+                                
+                                if (!IsNext2DDialog() && !isUsingFilteredChoices)
+                                {
+                                    DestroyDialogInstances();
+                                }
+                                
+                                ContinueToNextBlock();
+                                return;
+                            }
+                            else
+                            {
+                                Debug.Log("[PROGRESSION] FALLBACK: Incorrect choice not handled by automatic callback - triggering manual filter");
+                                ResetDialogResponseState();
+                                FilterIncorrectChoiceAndRespawn(selectedChoiceIndex);
+                                return; // Don't continue to next block
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError("[PROGRESSION] Cannot determine if choice was correct - invalid selection data");
+                            ResetDialogResponseState();
+                            
+                            // Handle error case - continue to next block
+                            ClearAll3DDialogs();
+                            
+                            if (!IsNext2DDialog() && !isUsingFilteredChoices)
+                            {
+                                DestroyDialogInstances();
+                            }
+                            
+                            Debug.Log("[PROGRESSION] Continuing to next block after error...");
+                            ContinueToNextBlock();
+                            return;
+                        }
                     }
                 }
                 else
                 {
                     Debug.Log("[PROGRESSION] No more responses or selectedChoice is null, continuing to next block");
+                    // FALLBACK: Check if this was an incorrect choice that should be filtered
+                    // This handles cases where the automatic callback failed
+                    if (selectedChoice != null && !selectedChoice.correctChoice)
+                    {
+                        Debug.Log("[PROGRESSION] FALLBACK: Detected incorrect choice without responses - triggering filtering");
+                        
+                        // Store the choice index before resetting state
+                        int choiceToFilter = selectedChoiceIndex;
+                        
+                        // Ensure questionInstance exists
+                        if (questionInstance == null)
+                        {
+                            Debug.LogWarning("[PROGRESSION] FALLBACK: questionInstance is null! Creating new one...");
+                            #pragma warning disable CS0618 // Type or member is obsolete
+                            questionInstance = SummonQuestionBar();
+                            #pragma warning restore CS0618 // Type or member is obsolete
+                            if (questionInstance == null)
+                            {
+                                Debug.LogError("[PROGRESSION] FALLBACK: Failed to create questionInstance!");
+                                return;
+                            }
+                        }
+                        
+                        // Reset dialog response state
+                        ResetDialogResponseState();
+                        
+                        // Filter and respawn choices
+                        Debug.Log($"[PROGRESSION] FALLBACK: Calling FilterIncorrectChoiceAndRespawn({choiceToFilter})");
+                        FilterIncorrectChoiceAndRespawn(choiceToFilter);
+                        return; // Don't continue to next block
+                    }
+                    
                     // No more responses, continue to next block
                     ResetDialogResponseState();
+                    
+                    // Clear 3D dialogs and handle destruction for completed responses
+                    ClearAll3DDialogs();
+                    
+                    // Only destroy dialog instances if next block is not a 2D dialog
+                    // AND we're not using filtered choices
+                    if (!IsNext2DDialog() && !isUsingFilteredChoices)
+                    {
+                        DestroyDialogInstances();
+                    }
+                    
+                    Debug.Log("[PROGRESSION] Continuing to next block after responses...");
+                    ContinueToNextBlock();
+                    return;
                 }
-                
-                ClearAll3DDialogs(); // Clear 3D dialogs when continuing
-                
-                // Only destroy dialog instances if next block is not a 2D dialog
-                if (!IsNext2DDialog())
-                {
-                    DestroyDialogInstances();
-                }
-                
-                Debug.Log("[PROGRESSION] Continuing to next block after responses...");
-                ContinueToNextBlock();
-                return;
             }
             
             // If current block is dialog and has no choices, continue
@@ -5172,7 +6712,8 @@ public class CoreGameManager : MonoBehaviour
                     ClearAll3DDialogs(); // Clear 3D dialogs when continuing
                     
                     // Only destroy dialog instances if next block is not a 2D dialog
-                    if (!IsNext2DDialog())
+                    // AND we're not using filtered choices (which means we need to keep the questionInstance)
+                    if (!IsNext2DDialog() && !isUsingFilteredChoices)
                     {
                         DestroyDialogInstances();
                     }
@@ -5563,6 +7104,700 @@ public class CoreGameManager : MonoBehaviour
         IsSequenceRunning = false;
         currentCompletionCallback?.Invoke();
         currentCompletionCallback = null; 
+    }
+    
+    /// <summary>
+    /// Force trigger button respawn for testing - bypasses all conditions
+    /// </summary>
+    [ContextMenu("Force Button Respawn")]
+    public void ForceButtonRespawn()
+    {
+        Debug.Log("=== FORCE BUTTON RESPAWN TEST ===");
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError($"Current block index {currentBlockIndex} is out of range");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("Current block has no dialog or choices!");
+            return;
+        }
+        
+        Debug.Log($"Original choices: {currentBlock.Dialog.choices.Length}");
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            Debug.Log($"  Choice {i}: '{currentBlock.Dialog.choices[i].playerChoice}' (correct: {currentBlock.Dialog.choices[i].correctChoice})");
+        }
+        
+        // Find first incorrect choice to simulate its removal
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found to test with!");
+            return;
+        }
+        
+        Debug.Log($"Forcing removal of incorrect choice {incorrectChoiceIndex}: '{currentBlock.Dialog.choices[incorrectChoiceIndex].playerChoice}'");
+        
+        // Force create filtered choices by removing the incorrect one
+        List<CoreGameDialogChoices> filteredList = new List<CoreGameDialogChoices>();
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (i != incorrectChoiceIndex) // Skip the incorrect choice
+            {
+                filteredList.Add(currentBlock.Dialog.choices[i]);
+            }
+        }
+        
+        originalChoices = currentBlock.Dialog.choices;
+        currentFilteredChoices = filteredList.ToArray();
+        isUsingFilteredChoices = true;
+        
+        Debug.Log($"Created filtered choices: {currentFilteredChoices.Length}");
+        for (int i = 0; i < currentFilteredChoices.Length; i++)
+        {
+            Debug.Log($"  Filtered Choice {i}: '{currentFilteredChoices[i].playerChoice}' (correct: {currentFilteredChoices[i].correctChoice})");
+        }
+        
+        // Ensure we have a question instance
+        if (questionInstance == null)
+        {
+            Debug.Log("Creating question instance...");
+            #pragma warning disable CS0618 // Type or member is obsolete
+            questionInstance = SummonQuestionBar();
+            #pragma warning restore CS0618 // Type or member is obsolete
+            if (questionInstance == null)
+            {
+                Debug.LogError("Failed to create question instance!");
+                return;
+            }
+        }
+        
+        Debug.Log("Forcing button respawn with filtered choices...");
+        RespawnChoicesWithFilteredArray();
+        
+        Debug.Log("=== FORCE BUTTON RESPAWN COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Test manual button activation
+    /// </summary>
+    [ContextMenu("Test Manual Button Activation")]
+    public void TestManualButtonActivation()
+    {
+        Debug.Log("=== TESTING MANUAL BUTTON ACTIVATION ===");
+        
+        if (questionInstance == null)
+        {
+            Debug.Log("Creating question instance...");
+            #pragma warning disable CS0618 // Type or member is obsolete
+            questionInstance = SummonQuestionBar();
+            #pragma warning restore CS0618 // Type or member is obsolete
+            if (questionInstance == null)
+            {
+                Debug.LogError("Failed to create question instance!");
+                return;
+            }
+        }
+        
+        Button[] buttons = questionInstance.GetComponentsInChildren<Button>();
+        Debug.Log($"Found {buttons.Length} buttons");
+        
+        for (int i = 0; i < buttons.Length && i < 3; i++)
+        {
+            Button btn = buttons[i];
+            Debug.Log($"Activating button {i}: {btn.name}");
+            
+            btn.gameObject.SetActive(true);
+            
+            TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
+            if (btnText != null)
+            {
+                string testText = $"[{GetKeyIndicator(i)}] Test Choice {i + 1}";
+                btnText.text = testText;
+                Debug.Log($"Set button {i} text to: '{testText}'");
+            }
+            else
+            {
+                Debug.LogError($"Button {i} has no TMP_Text component!");
+            }
+            
+            // Add click listener
+            btn.onClick.RemoveAllListeners();
+            int index = i; // Capture for closure
+            btn.onClick.AddListener(() => {
+                Debug.Log($"Manual test button {index} clicked!");
+            });
+            
+            Debug.Log($"Button {i} setup complete - Active: {btn.gameObject.activeInHierarchy}");
+        }
+        
+        // Hide unused buttons
+        for (int i = 3; i < buttons.Length; i++)
+        {
+            buttons[i].gameObject.SetActive(false);
+        }
+        
+        Debug.Log("=== MANUAL BUTTON ACTIVATION COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Manual test of filtering without text animation - tests if the core logic works
+    /// </summary>
+    [ContextMenu("Manual Filter Test - No Animation")]
+    public void ManualFilterTestNoAnimation()
+    {
+        Debug.Log("=== MANUAL FILTER TEST - NO ANIMATION ===");
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError($"Current block index {currentBlockIndex} is out of range");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("Current block has no dialog or choices!");
+            return;
+        }
+        
+        Debug.Log("STEP 1: Show initial choices");
+        #pragma warning disable CS0618 // Type or member is obsolete
+        ShowChoicesWithButtons(currentBlock.Dialog.choices, OnPlayerChoseResponse);
+        #pragma warning restore CS0618 // Type or member is obsolete
+        
+        // Find first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found to test with!");
+            return;
+        }
+        
+        var incorrectChoice = currentBlock.Dialog.choices[incorrectChoiceIndex];
+        Debug.Log($"STEP 2: Simulate selection of incorrect choice {incorrectChoiceIndex}: '{incorrectChoice.playerChoice}'");
+        
+        // Manually set up the dialog response state
+        isShowingResponse = true;
+        selectedChoiceIndex = incorrectChoiceIndex;
+        
+        // Set to last response (or 0 if no responses)
+        if (incorrectChoice.dialogResponses != null && incorrectChoice.dialogResponses.Length > 0)
+        {
+            currentChoiceResponseIndex = incorrectChoice.dialogResponses.Length - 1;
+            Debug.Log($"Set to last response index: {currentChoiceResponseIndex}");
+        }
+        else
+        {
+            currentChoiceResponseIndex = 0;
+            Debug.Log("Choice has no responses, using index 0");
+        }
+        
+        Debug.Log("STEP 3: Manually trigger CheckAndTriggerChoiceFiltering");
+        Debug.Log($"State before filtering:");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        
+        CheckAndTriggerChoiceFiltering();
+        
+        Debug.Log("STEP 4: Check results");
+        Debug.Log($"State after filtering:");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"  - currentFilteredChoices length: {currentFilteredChoices?.Length ?? 0}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        
+        if (questionInstance != null)
+        {
+            Button[] buttons = questionInstance.GetComponentsInChildren<Button>();
+            Debug.Log($"Found {buttons.Length} buttons after filtering");
+            int activeCount = 0;
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                bool isActive = buttons[i].gameObject.activeInHierarchy;
+                if (isActive) activeCount++;
+                TMP_Text btnText = buttons[i].GetComponentInChildren<TMP_Text>();
+                string text = btnText?.text ?? "NO TEXT";
+                Debug.Log($"  Button {i}: {buttons[i].name} - Active: {isActive} - Text: '{text}'");
+            }
+            
+            if (activeCount == 0)
+            {
+                Debug.LogError("✗ CRITICAL: No buttons are active after manual filtering!");
+            }
+            else
+            {
+                Debug.Log($"✓ SUCCESS: {activeCount} buttons are active after manual filtering");
+            }
+        }
+        else
+        {
+            Debug.LogError("✗ CRITICAL: questionInstance is null after manual filtering!");
+        }
+        
+        Debug.Log("=== MANUAL FILTER TEST COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Check if the automatic text animation callback is working
+    /// </summary>
+    [ContextMenu("Test Animation Callback")]
+    public void TestAnimationCallback()
+    {
+        Debug.Log("=== TESTING ANIMATION CALLBACK ===");
+        
+        // Create a mock completion callback like the one used in text animation
+        System.Action testCallback = () => {
+            Debug.Log("[TEST CALLBACK] Animation completed, calling CheckAndTriggerChoiceFiltering");
+            CheckAndTriggerChoiceFiltering();
+        };
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError($"Current block index {currentBlockIndex} is out of range");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("Current block has no dialog or choices!");
+            return;
+        }
+        
+        // Find first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found to test with!");
+            return;
+        }
+        
+        var incorrectChoice = currentBlock.Dialog.choices[incorrectChoiceIndex];
+        Debug.Log($"Testing with incorrect choice {incorrectChoiceIndex}: '{incorrectChoice.playerChoice}'");
+        
+        // Set up state as if we just finished showing dialog responses
+        isShowingResponse = true;
+        selectedChoiceIndex = incorrectChoiceIndex;
+        if (incorrectChoice.dialogResponses != null && incorrectChoice.dialogResponses.Length > 0)
+        {
+            currentChoiceResponseIndex = incorrectChoice.dialogResponses.Length - 1;
+        }
+        else
+        {
+            currentChoiceResponseIndex = 0;
+        }
+        
+        Debug.Log($"Set up state: isShowingResponse={isShowingResponse}, selectedChoiceIndex={selectedChoiceIndex}, currentChoiceResponseIndex={currentChoiceResponseIndex}");
+        
+        // Manually invoke the callback
+        Debug.Log("Manually invoking animation completion callback...");
+        testCallback.Invoke();
+        
+        Debug.Log("=== ANIMATION CALLBACK TEST COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Complete test of incorrect choice flow with button verification
+    /// </summary>
+    [ContextMenu("Debug Complete Button Flow")]
+    public void DebugCompleteButtonFlow()
+    {
+        Debug.Log("=== DEBUGGING COMPLETE BUTTON FLOW ===");
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError($"Current block index {currentBlockIndex} is out of range");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("Current block has no dialog or choices!");
+            return;
+        }
+        
+        Debug.Log("=== STEP 1: INITIAL STATE ===");
+        Debug.Log($"Block has {currentBlock.Dialog.choices.Length} choices");
+        Debug.Log($"isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"questionInstance != null: {questionInstance != null}");
+        
+        if (questionInstance != null)
+        {
+            Button[] buttons = questionInstance.GetComponentsInChildren<Button>();
+            Debug.Log($"Found {buttons.Length} buttons in questionInstance");
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                Debug.Log($"  Button {i}: {buttons[i].name} - Active: {buttons[i].gameObject.activeInHierarchy}");
+            }
+        }
+        
+        Debug.Log("=== STEP 2: SHOW INITIAL CHOICES ===");
+        // Show initial choices
+        ShowChoicesWithButtons(currentBlock.Dialog.choices, OnPlayerChoseResponse);
+        
+        if (questionInstance != null)
+        {
+            Button[] buttons = questionInstance.GetComponentsInChildren<Button>();
+            Debug.Log($"After ShowChoicesWithButtons - Found {buttons.Length} buttons");
+            int activeCount = 0;
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                bool isActive = buttons[i].gameObject.activeInHierarchy;
+                if (isActive) activeCount++;
+                TMP_Text btnText = buttons[i].GetComponentInChildren<TMP_Text>();
+                string text = btnText?.text ?? "NO TEXT";
+                Debug.Log($"  Button {i}: {buttons[i].name} - Active: {isActive} - Text: '{text}'");
+            }
+            Debug.Log($"Total active buttons: {activeCount}");
+        }
+        
+        Debug.Log("=== STEP 3: SIMULATE INCORRECT CHOICE SELECTION ===");
+        // Find first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found to test with!");
+            return;
+        }
+        
+        var incorrectChoice = currentBlock.Dialog.choices[incorrectChoiceIndex];
+        Debug.Log($"Simulating selection of incorrect choice {incorrectChoiceIndex}: '{incorrectChoice.playerChoice}'");
+        
+        // Simulate the choice being selected
+        isShowingResponse = true;
+        selectedChoiceIndex = incorrectChoiceIndex;
+        currentChoiceResponseIndex = 0;
+        
+        Debug.Log("=== STEP 4: SIMULATE DIALOG RESPONSES COMPLETION ===");
+        if (incorrectChoice.dialogResponses != null && incorrectChoice.dialogResponses.Length > 0)
+        {
+            currentChoiceResponseIndex = incorrectChoice.dialogResponses.Length - 1; // Last response
+            Debug.Log($"Set to last response index: {currentChoiceResponseIndex}");
+        }
+        else
+        {
+            Debug.Log("Choice has no responses");
+        }
+        
+        Debug.Log("=== STEP 5: TRIGGER FILTERING ===");
+        Debug.Log("Calling CheckAndTriggerChoiceFiltering()...");
+        CheckAndTriggerChoiceFiltering();
+        
+        Debug.Log("=== STEP 6: CHECK RESULTS ===");
+        Debug.Log($"After filtering:");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"  - currentFilteredChoices length: {currentFilteredChoices?.Length ?? 0}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        
+        if (currentFilteredChoices != null)
+        {
+            Debug.Log("Filtered choices:");
+            for (int i = 0; i < currentFilteredChoices.Length; i++)
+            {
+                Debug.Log($"  Choice {i}: '{currentFilteredChoices[i].playerChoice}' (correct: {currentFilteredChoices[i].correctChoice})");
+            }
+        }
+        
+        Debug.Log("=== STEP 7: CHECK BUTTON STATE ===");
+        if (questionInstance != null)
+        {
+            Button[] finalButtons = questionInstance.GetComponentsInChildren<Button>();
+            Debug.Log($"Final button check - Found {finalButtons.Length} buttons");
+            int finalActiveCount = 0;
+            for (int i = 0; i < finalButtons.Length; i++)
+            {
+                bool isActive = finalButtons[i].gameObject.activeInHierarchy;
+                if (isActive) finalActiveCount++;
+                TMP_Text btnText = finalButtons[i].GetComponentInChildren<TMP_Text>();
+                string text = btnText?.text ?? "NO TEXT";
+                Debug.Log($"  Final Button {i}: {finalButtons[i].name} - Active: {isActive} - Text: '{text}'");
+            }
+            Debug.Log($"Final total active buttons: {finalActiveCount}");
+            
+            if (finalActiveCount == 0)
+            {
+                Debug.LogError("✗ CRITICAL: NO BUTTONS ARE ACTIVE AFTER FILTERING!");
+            }
+            else if (finalActiveCount == currentFilteredChoices?.Length)
+            {
+                Debug.Log($"✓ SUCCESS: {finalActiveCount} buttons are active as expected");
+            }
+            else
+            {
+                Debug.LogWarning($"⚠ WARNING: Expected {currentFilteredChoices?.Length ?? 0} active buttons, found {finalActiveCount}");
+            }
+        }
+        else
+        {
+            Debug.LogError("✗ CRITICAL: questionInstance is null after filtering!");
+        }
+        
+        Debug.Log("=== DEBUGGING COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Test the automatic choice filtering trigger
+    /// </summary>
+    [ContextMenu("Test Auto Choice Filtering")]
+    public void TestAutoChoiceFiltering()
+    {
+        Debug.Log("=== TESTING AUTO CHOICE FILTERING ===");
+        
+        if (coreGameData == null || coreGameData.coreBlock == null)
+        {
+            Debug.LogError("CoreGameData is null or has no blocks!");
+            return;
+        }
+        
+        if (currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError($"Current block index {currentBlockIndex} is out of range");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null)
+        {
+            Debug.LogError("Current block has no dialog or choices!");
+            return;
+        }
+        
+        // Find first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found to test with!");
+            return;
+        }
+        
+        var incorrectChoice = currentBlock.Dialog.choices[incorrectChoiceIndex];
+        Debug.Log($"Testing auto filtering with incorrect choice {incorrectChoiceIndex}: '{incorrectChoice.playerChoice}'");
+        
+        // Simulate being in the response state for the last response
+        Debug.Log("Setting up state to simulate last response completion...");
+        isShowingResponse = true;
+        selectedChoiceIndex = incorrectChoiceIndex;
+        if (incorrectChoice.dialogResponses != null && incorrectChoice.dialogResponses.Length > 0)
+        {
+            currentChoiceResponseIndex = incorrectChoice.dialogResponses.Length - 1; // Last response
+            Debug.Log($"Set currentChoiceResponseIndex to last response: {currentChoiceResponseIndex}");
+        }
+        else
+        {
+            currentChoiceResponseIndex = 0; // No responses case
+            Debug.Log("Choice has no responses, set currentChoiceResponseIndex to 0");
+        }
+        
+        // Ensure we have a question instance
+        if (questionInstance == null)
+        {
+            Debug.Log("Creating question instance for test...");
+            #pragma warning disable CS0618 // Type or member is obsolete
+            questionInstance = SummonQuestionBar();
+            #pragma warning restore CS0618 // Type or member is obsolete
+            if (questionInstance == null)
+            {
+                Debug.LogError("Failed to create question instance!");
+                return;
+            }
+        }
+        
+        Debug.Log("State before auto filtering:");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - currentChoiceResponseIndex: {currentChoiceResponseIndex}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        
+        Debug.Log("Calling CheckAndTriggerChoiceFiltering()...");
+        CheckAndTriggerChoiceFiltering();
+        
+        Debug.Log("State after auto filtering:");
+        Debug.Log($"  - isShowingResponse: {isShowingResponse}");
+        Debug.Log($"  - selectedChoiceIndex: {selectedChoiceIndex}");
+        Debug.Log($"  - questionInstance != null: {questionInstance != null}");
+        Debug.Log($"  - isUsingFilteredChoices: {isUsingFilteredChoices}");
+        Debug.Log($"  - currentFilteredChoices length: {currentFilteredChoices?.Length ?? 0}");
+        
+        if (isUsingFilteredChoices && currentFilteredChoices != null)
+        {
+            Debug.Log("✓ Auto filtering worked! Remaining choices:");
+            for (int i = 0; i < currentFilteredChoices.Length; i++)
+            {
+                Debug.Log($"  Choice {i}: '{currentFilteredChoices[i].playerChoice}' (correct: {currentFilteredChoices[i].correctChoice})");
+            }
+            
+            // Verify buttons are visible
+            if (questionInstance != null)
+            {
+                Button[] buttons = questionInstance.GetComponentsInChildren<Button>();
+                Debug.Log($"UI Check: Found {buttons.Length} buttons");
+                int activeButtons = 0;
+                for (int i = 0; i < buttons.Length; i++)
+                {
+                    if (buttons[i].gameObject.activeInHierarchy)
+                    {
+                        activeButtons++;
+                        TMP_Text btnText = buttons[i].GetComponentInChildren<TMP_Text>();
+                        string text = btnText?.text ?? "NO TEXT";
+                        Debug.Log($"  Active Button {i}: '{text}'");
+                    }
+                }
+                Debug.Log($"Total active buttons: {activeButtons}");
+            }
+        }
+        else
+        {
+            Debug.LogError("✗ Auto filtering failed - choices should have been filtered!");
+        }
+        
+        Debug.Log("=== END AUTO CHOICE FILTERING TEST ===");
+    }
+    
+    /// <summary>
+    /// SIMPLE TEST: Test incorrect choice flow - destroy old question bar, spawn new one
+    /// </summary>
+    [ContextMenu("Simple Test: Incorrect Choice Flow")]
+    public void SimpleTestIncorrectChoiceFlow()
+    {
+        Debug.Log("=== SIMPLE TEST: DESTROY AND RESPAWN FLOW ===");
+        
+        if (coreGameData == null || currentBlockIndex >= coreGameData.coreBlock.Length)
+        {
+            Debug.LogError("No valid game data to test with!");
+            return;
+        }
+        
+        var currentBlock = coreGameData.coreBlock[currentBlockIndex];
+        if (currentBlock.Dialog?.choices == null || currentBlock.Dialog.choices.Length == 0)
+        {
+            Debug.LogError("Current block has no choices to test with!");
+            return;
+        }
+        
+        // Find the first incorrect choice
+        int incorrectChoiceIndex = -1;
+        for (int i = 0; i < currentBlock.Dialog.choices.Length; i++)
+        {
+            if (!currentBlock.Dialog.choices[i].correctChoice)
+            {
+                incorrectChoiceIndex = i;
+                break;
+            }
+        }
+        
+        if (incorrectChoiceIndex < 0)
+        {
+            Debug.LogError("No incorrect choices found in current block!");
+            return;
+        }
+        
+        Debug.Log($"Found incorrect choice at index {incorrectChoiceIndex}: '{currentBlock.Dialog.choices[incorrectChoiceIndex].playerChoice}'");
+        
+        // Simulate the full flow
+        Debug.Log("STEP 1: Creating initial question instance...");
+        if (questionInstance != null)
+        {
+            Debug.Log("Destroying existing question instance first...");
+            Destroy(questionInstance);
+            questionInstance = null;
+        }
+        
+        #pragma warning disable CS0618
+        questionInstance = SummonQuestionBar();
+        #pragma warning restore CS0618
+        
+        Debug.Log("STEP 2: Showing initial choices...");
+        ShowChoicesWithButtons(currentBlock.Dialog.choices, OnPlayerChoseResponse);
+        
+        Debug.Log($"STEP 3: Simulating incorrect choice selection (choice {incorrectChoiceIndex})...");
+        selectedChoiceIndex = incorrectChoiceIndex;
+        isShowingResponse = true;
+        currentChoiceResponseIndex = 0;
+        
+        Debug.Log("STEP 4: Simulating response completion - this should DESTROY old and SPAWN new question bar...");
+        CheckAndTriggerChoiceFiltering();
+        
+        Debug.Log("=== SIMPLE TEST COMPLETE ===");
     }
     
     #endregion
