@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Rey, Tolong aja gak usah ngompol dan nangis gini
+      dialogEntry: '{+5stress} Rey, Tolong aja gak usah ngompol dan nangis gini'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,7 +44,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ganggu ibu kerja tau gak
+      dialogEntry: '{+5stress} Ganggu ibu kerja tau gak'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -56,7 +56,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Kenapa sih tiap sore selalu ngompol
+      dialogEntry: '{+5stress} Kenapa sih tiap sore selalu ngompol'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -104,7 +104,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Gak ada yang bantuin
+      dialogEntry: '{+5stress} Gak ada yang bantuin'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -116,7 +116,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ayah juga gak di rumah
+      dialogEntry: '{+5stress} Ayah juga gak di rumah'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

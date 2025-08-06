@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Apasih ibu lagi sibuk tau haduh berisik banget
+      dialogEntry: '{+5stress} Apasih ibu lagi sibuk tau haduh berisik banget'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -56,7 +56,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ibu jadi gila kalau kamu menangis terus terusa
+      dialogEntry: '{+5stress} Ibu jadi gila kalau kamu menangis terus terusan'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -116,7 +116,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: KAMU TAHU GAK SIH SEBERAPA SIBUKNYA IBU
+      dialogEntry: '{+20stress} KAMU TAHU GAK SIH SEBERAPA SIBUKNYA IBU'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -128,7 +128,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: "*Menangis*"
+      dialogEntry: '*Menangis*'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -140,7 +140,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ibu gak kuat nak ibu cape mengurus pekerjaan rumah, pekerjaan perusahaan, dan mengurus kamu
+      dialogEntry: '{+5stress} Ibu gak kuat nak ibu cape mengurus pekerjaan rumah,
+        pekerjaan perusahaan, dan mengurus kamu'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -164,7 +165,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: "*Menangis*"
+      dialogEntry: '*Menangis*'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -188,7 +189,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Sejak ngurus kamu dan kerja ini ibu jadi sering telat
+      dialogEntry: '{+5stress} Sejak ngurus kamu dan kerja ini ibu jadi sering telat'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -212,7 +213,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Selama punya kamu, aku sangat menderita banget
+      dialogEntry: '{+5stress} Selama punya kamu, aku sangat menderita banget'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -248,7 +249,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Cape ibu harus gonta ganti handuk
+      dialogEntry: '{+5stress} Cape ibu harus gonta ganti handuk'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -361,53 +362,3 @@ MonoBehaviour:
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
-  - npcName: 1
-    dialog: Ibu hari ini gak makan
-  - npcName: 1
-    dialog: Gak mandi
-  - npcName: 1
-    dialog: Mencuci
-  - npcName: 1
-    dialog: Memasak
-  - npcName: 1
-    dialog: KAMU TAHU GAK SIH SEBERAPA SIBUKNYA IBU
-  - npcName: 1
-    dialog: "*Menangis*"
-  - npcName: 1
-    dialog: Ibu gak kuat nak ibu cape mengurus pekerjaan rumah, pekerjaan perusahaan, dan mengurus kamu
-  - npcName: 1
-    dialog: Ibu cape banget tau gak
-  - npcName: 1
-    dialog: "*Menangis*"
-  - npcName: 0
-    dialog: Ibu kenapa menangis
-  - npcName: 1
-    dialog: Sejak ngurus kamu dan kerja ini ibu jadi sering telat
-  - npcName: 1
-    dialog: Tetap tersenyum tapi tubuh ini tidak kuat sekali
-  - npcName: 1
-    dialog: Selama punya kamu, aku sangat menderita banget
-  - npcName: 1
-    dialog: Selalu cuci handuk karena kamu ngompolnya sangat deras
-  - npcName: 1
-    dialog: Sudah dikasih popok tapi masih tetap tembus kehanduk
-  - npcName: 1
-    dialog: Cape ibu harus gonta ganti handuk
-  - npcName: 0
-    dialog: Ibu maaf Rey merepotkan Ibu
-  - npcName: 1
-    dialog: Sangat aneh ibu curhat ke Rey
-  - npcName: 1
-    dialog: Udah seperti orang gila aja
-  - npcName: 1
-    dialog: Sekarang kepalaku pusing banget
-  - npcName: 1
-    dialog: Kamu segera tidur
-  - npcName: 1
-    dialog: Ibu harus bekerja
-  - npcName: 1
-    dialog: Tapi ibu makin tidak minat untuk bekerja
-  - npcName: 1
-    dialog: Perasaan ibu semakin tidak karuan
-  - npcName: 0
-    dialog: Ibu

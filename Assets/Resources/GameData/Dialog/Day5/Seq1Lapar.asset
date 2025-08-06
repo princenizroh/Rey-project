@@ -75,7 +75,7 @@ MonoBehaviour:
         correctChoice: 1
         dialogResponses:
         - npcName: 0
-          npcResponse: '{+50Ibu... Aku Lapar'
+          npcResponse: Ibu... Aku Lapar
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

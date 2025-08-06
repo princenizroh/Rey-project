@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Udah diem
+      dialogEntry: '{+10stress} Udah diem'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Langsung tidur aja ibu banyak kerjaan
+      dialogEntry: '{+5stress} Langsung tidur aja ibu banyak kerjaan'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,7 +44,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Aduh... mana meeting bentar lagi
+      dialogEntry: '{+5stress} Aduh... mana meeting bentar lagi'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -56,7 +56,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Belum siap-siap. Aku juga belum mandi
+      dialogEntry: '{+5stress} Belum siap-siap. Aku juga belum mandi'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -68,7 +68,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Gimana ini... gak bisa konsentrasi
+      dialogEntry: '{+5stress} Gimana ini... gak bisa konsentrasi'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -80,7 +80,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Klien pasti marah kalau meeting berantakan lagi
+      dialogEntry: '{+10stress} Klien pasti marah kalau meeting berantakan lagi'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -92,7 +92,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Tanganku gemetar sekali
+      dialogEntry: '{+10stress} Tanganku gemetar sekali'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

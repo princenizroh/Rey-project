@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Capek...
+      dialogEntry: '{+10stress} Capek...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +32,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Baru hari pertama kerja dah dikasih kerjaan yang seabrek
+      dialogEntry: '{+10stress} Baru hari pertama kerja dah dikasih kerjaan yang
+        seabrek'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -101,7 +102,7 @@ MonoBehaviour:
         - npcName: 0
           npcResponse: Ibu... Aku lapar
         - npcName: 1
-          npcResponse: '{+50stress} Kenapa sih Rey'
+          npcResponse: '{+10stress} Kenapa sih Rey'
         audioDialogResponse: {fileID: 0}
       - playerChoice: '*Oek* (Menangis)'
         correctChoice: 1
@@ -109,7 +110,7 @@ MonoBehaviour:
         - npcName: 0
           npcResponse: Ibu... Aku sungguh lapar
         - npcName: 1
-          npcResponse: '{+50stress} Haduh malah nangis'
+          npcResponse: '{+10stress} Haduh malah nangis'
         audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
@@ -120,7 +121,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Arghh cape
+      dialogEntry: '{+10stress} Arghh cape'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -132,7 +133,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Sakit kuping begini
+      dialogEntry: '{+10stress} Sakit kuping begini'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

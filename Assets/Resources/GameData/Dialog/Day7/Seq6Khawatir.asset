@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Kenapa rey lapar ya
+      dialogEntry: '{+10stress} Kenapa rey lapar ya'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +32,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Tapi gak usah nangis kenceng juga ibu lagi banyak kerjaan ini
+      dialogEntry: '{+10stress} Tapi gak usah nangis kenceng juga ibu lagi banyak
+        kerjaan ini'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,7 +45,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ibu cape hari ini gara-gara kerjaan dari manager tiba-tiba berikan banyak kerjaan segunung
+      dialogEntry: '{+10tress} Ibu cape hari ini gara-gara kerjaan dari manager tiba-tiba
+        berikan banyak kerjaan segunung'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -56,7 +58,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ibu sampe lembur ini malam-malam bukannya istirahat malah kerja
+      dialogEntry: '{+10stress} Ibu sampe lembur ini malam-malam bukannya istirahat
+        malah kerja'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -104,7 +107,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Capeee
+      dialogEntry: '{+10stress} Capeee'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -140,7 +143,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Dadaku selalu sakit nengurus kamu dan kerjaan ini
+      dialogEntry: '{+10stress} Dadaku selalu sakit nengurus kamu dan kerjaan ini'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -164,7 +167,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Aku mau cerita ke ayah tapi dia setiap pulang langsung tidur
+      dialogEntry: '{+15stress} Aku mau cerita ke ayah tapi dia setiap pulang langsung
+        tidur'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -176,7 +180,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Emangnya ayah gak punya selera ke istrinya apa
+      dialogEntry: '{+15stress} Emangnya ayah gak punya selera ke istrinya apa'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -188,7 +192,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Katanya mau membantu menghidupi sama-sama tapi malah sibuk dengan kerjaannya
+      dialogEntry: '{+10stress} Katanya mau membantu menghidupi sama-sama tapi malah
+        sibuk dengan kerjaannya'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

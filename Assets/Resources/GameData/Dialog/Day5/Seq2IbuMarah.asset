@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: REY! IBU BILANG JANGAN GANGGU! IBU LAGI KERJA
+      dialogEntry: '{+25stress} REY! IBU BILANG JANGAN GANGGU! IBU LAGI KERJA'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: KAMU KENAPA SIH HADUH
+      dialogEntry: '{+25stress} KAMU KENAPA SIH HADUH'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -60,13 +60,13 @@ MonoBehaviour:
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: '*Oek* (Menangis)'
-        correctChoice: 0
+        correctChoice: 1
         dialogResponses:
         - npcName: 0
           npcResponse: 'Ibu aku hanya lapar... '
         audioDialogResponse: {fileID: 0}
       - playerChoice: '*Oeekk* (Menangis Keras)'
-        correctChoice: 0
+        correctChoice: 1
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu... Aku takut

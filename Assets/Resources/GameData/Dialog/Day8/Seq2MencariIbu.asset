@@ -32,18 +32,6 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Rey ditinggal ya Ibu
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
       dialogEntry: Ibu...
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -58,18 +46,12 @@ MonoBehaviour:
       npcName: 0
       dialogEntry: Rey Lapar
       audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu dimana...
-      audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Oeeeekkkkk*  (Menangis makin keras)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu dimana... Ibu...
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

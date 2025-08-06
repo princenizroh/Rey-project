@@ -63,7 +63,7 @@ MonoBehaviour:
         correctChoice: 1
         dialogResponses:
         - npcName: 0
-          npcResponse: '{+100stress} IBU! ADA YANG ANEH!'
+          npcResponse: IBU! ADA YANG ANEH!
         audioDialogResponse: {fileID: 0}
       - playerChoice: (Diam Takut)
         correctChoice: 0
@@ -80,8 +80,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Rey... mama udah gak bisa tidur kamu malah nangis gini kenapa
-        sih
+      dialogEntry: '{+15stress} Rey... mama udah gak bisa tidur kamu malah nangis
+        gini kenapa sih'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -93,7 +93,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Sekarang kamu nangis keras banget
+      dialogEntry: '{+15stress} Sekarang kamu nangis keras banget'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -105,7 +105,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Berisik kedengeran tetangga tau gak
+      dialogEntry: '{+10stress} Berisik kedengeran tetangga tau gak'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -129,7 +129,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: ya sabar ini mau disusuin
+      dialogEntry: '{+10stress} ya sabar ini mau disusuin'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

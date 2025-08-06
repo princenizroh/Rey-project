@@ -69,7 +69,7 @@ MonoBehaviour:
         correctChoice: 1
         dialogResponses:
         - npcName: 0
-          npcResponse: '{+30stress} Ibu! Aku butuh ibu!'
+          npcResponse: Ibu! Aku butuh ibu!
         - npcName: 0
           npcResponse: Gak nyaman banget
         audioDialogResponse: {fileID: 0}

@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Kok gak ada suara dari Rey
+      dialogEntry: '{+50stress} Kok gak ada suara dari Rey'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,7 +44,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Padahal aku dapat telpon dari tetangga kalau ada bayi menangis terus terusan
+      dialogEntry: Padahal aku dapat telpon dari tetangga kalau ada bayi menangis
+        terus terusan
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -56,7 +57,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Agak kesal sekali baru ditinggal sebentar ke perusahaan sudah menangis aja
+      dialogEntry: Agak kesal sekali baru ditinggal sebentar ke perusahaan sudah
+        menangis aja
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -104,7 +106,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Mana jaraknya juga jauh banget dan butuh waktu perjalanan untuk pulang
+      dialogEntry: Mana jaraknya juga jauh banget dan butuh waktu perjalanan untuk
+        pulang
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -140,7 +143,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Gara-gara manager aku harus keperusahaan buat ngambil dokumen dokumen untuk dimasukkan ke dalam database
+      dialogEntry: Gara-gara manager aku harus keperusahaan buat ngambil dokumen
+        dokumen untuk dimasukkan ke dalam database
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

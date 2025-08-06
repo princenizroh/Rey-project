@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Iya iya berisik banget dah
+      dialogEntry: '{+4stress} Iya iya berisik banget dah'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Mama lagi kerja gak usah nangis terus
+      dialogEntry: '{+5stress} Mama lagi kerja gak usah nangis terus'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,7 +44,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Kenapa sih gak tidur seharian aja
+      dialogEntry: '{+5stress} Kenapa sih gak tidur seharian aja'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
