@@ -156,6 +156,10 @@ public class CoreGameManager : MonoBehaviour
     // Pressed choices tracking - keep track of all choices that have been pressed
     private System.Collections.Generic.HashSet<string> pressedChoiceTexts = new System.Collections.Generic.HashSet<string>(); // Track by choice text
     private System.Collections.Generic.List<int> pressedChoiceIndices = new System.Collections.Generic.List<int>(); // Track by original indices
+    
+    // Choice set tracking - to determine if we're dealing with the same choice set
+    private CoreGameDialogChoices[] lastProcessedChoices = null; // Last choice set we processed
+    private int lastProcessedBlockIndex = -1; // Track which dialog block we last processed choices for
 
     private System.Action currentCompletionCallback;
     public bool IsSequenceRunning { get; private set; }
@@ -245,6 +249,10 @@ public class CoreGameManager : MonoBehaviour
         }
         
         currentBlockIndex = 0;
+        
+        // Reset choice tracking when starting a new conversation
+        ResetFilteredChoicesSystem();
+        
         ProcessCurrentBlock();
     }
     
@@ -277,6 +285,9 @@ public class CoreGameManager : MonoBehaviour
         currentBlockIndex = 0;
         currentCompletionCallback = onComplete;
         IsSequenceRunning = true;
+        
+        // Reset choice tracking when starting a new conversation
+        ResetFilteredChoicesSystem();
         
         Debug.Log($"Starting CoreGame sequence from: {resourcePath}");
         ProcessCurrentBlock();
@@ -1762,6 +1773,84 @@ public class CoreGameManager : MonoBehaviour
         
         // Also reset pressed choices tracking when starting a new dialog block
         ClearPressedChoicesTracking();
+        
+        // Clear last processed choices
+        lastProcessedChoices = null;
+    }
+    
+    /// <summary>
+    /// Smart reset that only resets if we're dealing with a completely different choice set
+    /// </summary>
+    /// <param name="newChoices">The new choice set to compare against</param>
+    private void SmartResetFilteredChoicesSystem(CoreGameDialogChoices[] newChoices, int blockIndex)
+    {
+        Debug.Log($"[SMART RESET] Checking choice set for block {blockIndex}...");
+        
+        // Log current state for debugging
+        Debug.Log($"[SMART RESET] Current pressed choices count: {pressedChoiceTexts.Count}");
+        Debug.Log($"[SMART RESET] New choices count: {newChoices?.Length ?? 0}");
+        Debug.Log($"[SMART RESET] Last processed choices count: {lastProcessedChoices?.Length ?? 0}");
+        Debug.Log($"[SMART RESET] Last processed block: {lastProcessedBlockIndex}, Current block: {blockIndex}");
+        
+        // First check: are we in a different dialog block?
+        if (blockIndex != lastProcessedBlockIndex)
+        {
+            Debug.Log($"[SMART RESET] Different dialog block detected (was {lastProcessedBlockIndex}, now {blockIndex}) - resetting system");
+            ResetFilteredChoicesSystem();
+            lastProcessedChoices = newChoices;
+            lastProcessedBlockIndex = blockIndex;
+            return;
+        }
+        
+        // Second check: if same block, are the choices different?
+        if (lastProcessedChoices != null && AreChoicesetsEquivalent(lastProcessedChoices, newChoices))
+        {
+            Debug.Log($"[SMART RESET] Same block ({blockIndex}) and same choice set detected - preserving tracking and filtering");
+            return;
+        }
+        
+        Debug.Log($"[SMART RESET] Same block ({blockIndex}) but different choice set detected - resetting system");
+        
+        // Debug what choices we're resetting from
+        if (pressedChoiceTexts.Count > 0)
+        {
+            Debug.Log($"[SMART RESET] Clearing {pressedChoiceTexts.Count} pressed choices:");
+            foreach (string choice in pressedChoiceTexts)
+            {
+                Debug.Log($"[SMART RESET]   - '{choice}'");
+            }
+        }
+        
+        ResetFilteredChoicesSystem();
+        lastProcessedChoices = newChoices;
+        lastProcessedBlockIndex = blockIndex;
+    }
+    
+    /// <summary>
+    /// Compare two choice arrays to see if they represent the same choice set
+    /// </summary>
+    /// <param name="choices1">First choice array</param>
+    /// <param name="choices2">Second choice array</param>
+    /// <returns>True if the choice sets are equivalent</returns>
+    private bool AreChoicesetsEquivalent(CoreGameDialogChoices[] choices1, CoreGameDialogChoices[] choices2)
+    {
+        if (choices1 == null || choices2 == null)
+            return false;
+            
+        if (choices1.Length != choices2.Length)
+            return false;
+            
+        // Check if all choice texts and correctness flags match
+        for (int i = 0; i < choices1.Length; i++)
+        {
+            if (choices1[i].playerChoice != choices2[i].playerChoice ||
+                choices1[i].correctChoice != choices2[i].correctChoice)
+            {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     /// <summary>
@@ -4726,6 +4815,9 @@ public class CoreGameManager : MonoBehaviour
 
     private void ShowChoices(CoreGameDialogChoices[] choices)
     {
+        // Use smart reset to preserve choice tracking when appropriate
+        SmartResetFilteredChoicesSystem(choices, currentBlockIndex);
+        
         GameObject questionBar = SummonQuestionBar();
         
         // If prefab failed, try creating a fallback question bar
@@ -4747,6 +4839,7 @@ public class CoreGameManager : MonoBehaviour
     /// <summary>
     /// Integrated choice display system from PlayerAnswerManager
     /// UPDATED: Use button array approach for direct modification
+    /// ENHANCED: Automatically filter out previously pressed incorrect choices
     /// </summary>
     private void ShowChoicesWithButtons(CoreGameDialogChoices[] choices, System.Action<int> callback)
     {
@@ -4761,8 +4854,45 @@ public class CoreGameManager : MonoBehaviour
             return;
         }
         
+        // ENHANCED: Auto-filter choices if we have pressed choices tracking
+        CoreGameDialogChoices[] choicesToDisplay = choices;
+        if (pressedChoiceTexts.Count > 0 && !isUsingFilteredChoices)
+        {
+            Debug.Log($"[AUTO-FILTER] Found {pressedChoiceTexts.Count} pressed choices, applying automatic filtering...");
+            
+            // Create filtered array excluding pressed choices
+            var filteredList = new System.Collections.Generic.List<CoreGameDialogChoices>();
+            for (int i = 0; i < choices.Length; i++)
+            {
+                if (!IsChoiceAlreadyPressed(choices[i].playerChoice))
+                {
+                    filteredList.Add(choices[i]);
+                    Debug.Log($"[AUTO-FILTER] Keeping choice: '{choices[i].playerChoice}'");
+                }
+                else
+                {
+                    Debug.Log($"[AUTO-FILTER] Filtering out pressed choice: '{choices[i].playerChoice}'");
+                }
+            }
+            
+            if (filteredList.Count < choices.Length)
+            {
+                choicesToDisplay = filteredList.ToArray();
+                currentFilteredChoices = choicesToDisplay;
+                originalChoices = choices;
+                isUsingFilteredChoices = true;
+                Debug.Log($"[AUTO-FILTER] Filtered {choices.Length} -> {choicesToDisplay.Length} choices");
+            }
+        }
+        else if (isUsingFilteredChoices && currentFilteredChoices != null)
+        {
+            // Use existing filtered choices
+            choicesToDisplay = currentFilteredChoices;
+            Debug.Log($"[AUTO-FILTER] Using existing filtered choices: {choicesToDisplay.Length} choices");
+        }
+        
         // Debug the choices data
-        ValidateChoices(choices);
+        ValidateChoices(choicesToDisplay);
         
         // Validate the question UI structure
         ValidateQuestionUI();
@@ -4788,29 +4918,29 @@ public class CoreGameManager : MonoBehaviour
         }
 
         // Show up to 3 choices on screen (or all choices if less than 3), limited by available buttons
-        int choicesToShow = Mathf.Min(choices.Length, 3, buttonArray.Length);
+        int choicesToShow = Mathf.Min(choicesToDisplay.Length, 3, buttonArray.Length);
         
-        Debug.Log($"Total choices in data: {choices.Length}, UI will show: {choicesToShow} (Available buttons: {buttonArray.Length})");
+        Debug.Log($"Total choices in data: {choicesToDisplay.Length}, UI will show: {choicesToShow} (Available buttons: {buttonArray.Length})");
         
         // Log filtered choices state for debugging
         if (isUsingFilteredChoices)
         {
-            Debug.Log($"[FILTERED CHOICES] Using filtered choices array with {choices.Length} remaining choices");
+            Debug.Log($"[FILTERED CHOICES] Using filtered choices array with {choicesToDisplay.Length} remaining choices");
             Debug.Log($"[FILTERED CHOICES] Original choices had {originalChoices?.Length ?? 0} choices");
         }
 
         for (int i = 0; i < choicesToShow; i++)
         {
-            if (choices[i] != null && i < buttonArray.Length)
+            if (choicesToDisplay[i] != null && i < buttonArray.Length)
             {
-                Debug.Log($"Processing choice {i}: '{choices[i].playerChoice}' (correctChoice: {choices[i].correctChoice}) -> Button {i} ({buttonArray[i].name})");
+                Debug.Log($"Processing choice {i}: '{choicesToDisplay[i].playerChoice}' (correctChoice: {choicesToDisplay[i].correctChoice}) -> Button {i} ({buttonArray[i].name})");
                 
                 Button btn = buttonArray[i];
                 btn.gameObject.SetActive(true);
                 btn.onClick.RemoveAllListeners();
 
-                // CRITICAL: Use choices[i].playerChoice directly from CoreGameDialogChoices data structure
-                string choiceText = choices[i].playerChoice;
+                // CRITICAL: Use choicesToDisplay[i].playerChoice directly from CoreGameDialogChoices data structure
+                string choiceText = choicesToDisplay[i].playerChoice;
                 
                 // Handle empty playerChoice
                 if (string.IsNullOrEmpty(choiceText))
@@ -4862,7 +4992,7 @@ public class CoreGameManager : MonoBehaviour
                         if (btnText2 != null)
                         {
                             string keyIndicator = GetKeyIndicator(index);
-                            string choiceTextFinal = !string.IsNullOrEmpty(choices[index].playerChoice) ? choices[index].playerChoice : $"Choice {index + 1}";
+                            string choiceTextFinal = !string.IsNullOrEmpty(choicesToDisplay[index].playerChoice) ? choicesToDisplay[index].playerChoice : $"Choice {index + 1}";
                             btnText2.text = $"{keyIndicator} {choiceTextFinal}";
                         }
                         LeanTween.cancel(tweenId);
@@ -4872,7 +5002,7 @@ public class CoreGameManager : MonoBehaviour
 
                     // Custom logic: Only detect "mapname:scene_name" pattern
                     const string moveMapPrefix = "mapname:";
-                    string npcResponse = GetNpcResponseFromChoice(choices[index]);
+                    string npcResponse = GetNpcResponseFromChoice(choicesToDisplay[index]);
                     Debug.Log(npcResponse);
                     int prefixIndex = npcResponse.IndexOf(moveMapPrefix);
                     if (prefixIndex != -1)
@@ -4909,15 +5039,17 @@ public class CoreGameManager : MonoBehaviour
     
     /// <summary>
     /// Hide choices and clean up buttons using button array approach
+    /// ENHANCED: Destroy the question prefab completely after choice selection
     /// </summary>
     private void HideChoices()
     {
-        Debug.Log("Hiding choices using button array approach...");
+        Debug.Log("Hiding choices and destroying question prefab...");
         
         if (questionInstance != null)
         {
+            // Clean up button listeners before destroying
             Button[] buttonArray = questionInstance.GetComponentsInChildren<Button>();
-            Debug.Log($"Found {buttonArray.Length} buttons to hide in question instance");
+            Debug.Log($"Found {buttonArray.Length} buttons to clean up in question instance");
             
             for (int i = 0; i < buttonArray.Length; i++)
             {
@@ -4925,33 +5057,44 @@ public class CoreGameManager : MonoBehaviour
                 if (btn != null)
                 {
                     btn.onClick.RemoveAllListeners();
-                    TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
-                    if (btnText != null)
-                    {
-                        Debug.Log($"Clearing button {i} ({btn.name}) text: was '{btnText.text}'");
-                        btnText.text = "";
-                    }
-                    btn.gameObject.SetActive(false);
-                    Debug.Log($"Hidden button {i}: {btn.name}");
+                    Debug.Log($"Cleaned up button {i}: {btn.name}");
                 }
             }
+            
+            // Stop any active tweens on the question instance
+            if (buttonTweenIds.Count > 0)
+            {
+                Debug.Log($"Cancelling {buttonTweenIds.Count} active button tweens");
+                foreach (var kvp in buttonTweenIds)
+                {
+                    if (LeanTween.isTweening(kvp.Value))
+                    {
+                        LeanTween.cancel(kvp.Value);
+                    }
+                }
+                buttonTweenIds.Clear();
+            }
+            
+            // Destroy the entire question prefab
+            Debug.Log($"Destroying question prefab: {questionInstance.name}");
+            Destroy(questionInstance);
+            questionInstance = null;
+        }
+        else
+        {
+            Debug.LogWarning("Question instance is null, nothing to destroy");
         }
         
-        // Also hide any buttons from the answerButtons array (fallback)
+        // Also clean up any buttons from the answerButtons array (fallback) if they exist independently
         if (answerButtons != null)
         {
-            Debug.Log($"Also hiding {answerButtons.Length} buttons from answerButtons fallback array");
+            Debug.Log($"Cleaning up {answerButtons.Length} buttons from answerButtons fallback array");
             for (int i = 0; i < answerButtons.Length; i++)
             {
                 Button btn = answerButtons[i];
-                if (btn != null)
+                if (btn != null && btn.gameObject != null)
                 {
                     btn.onClick.RemoveAllListeners();
-                    TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
-                    if (btnText != null)
-                    {
-                        btnText.text = "";
-                    }
                     btn.gameObject.SetActive(false);
                 }
             }
@@ -4959,9 +5102,8 @@ public class CoreGameManager : MonoBehaviour
         
         // Clear choice selection state
         onChoiceSelected = null;
-        buttonTweenIds.Clear();
         
-        Debug.Log("All buttons hidden and cleared");
+        Debug.Log("Question prefab destroyed and all choice state cleared");
     }
     
     /// <summary>
@@ -5451,8 +5593,9 @@ public class CoreGameManager : MonoBehaviour
             Debug.Log("[CORRECT CHOICE] Player selected correct choice - proceeding with normal dialog flow");
             Debug.Log("[CORRECT CHOICE] NOT tracking this choice since it's correct - it leads to normal progression");
             
-            // Reset filtered choices system since correct choice was selected
-            ResetFilteredChoicesSystem();
+            // Don't reset filtered choices system when correct choice is selected
+            // This allows the system to remember incorrect choices for future similar choice sets
+            Debug.Log("[CORRECT CHOICE] Preserving choice tracking for future use");
             
             // Check if there are dialog responses to show
             if (selectedChoice.dialogResponses != null && selectedChoice.dialogResponses.Length > 0)
@@ -7798,6 +7941,135 @@ public class CoreGameManager : MonoBehaviour
         CheckAndTriggerChoiceFiltering();
         
         Debug.Log("=== SIMPLE TEST COMPLETE ===");
+    }
+    
+    #endregion
+    
+    #region Debug and Testing Methods
+    
+    /// <summary>
+    /// Get a summary of pressed choices for debugging
+    /// </summary>
+    private string GetPressedChoicesSummary()
+    {
+        if (pressedChoiceTexts.Count == 0 && pressedChoiceIndices.Count == 0)
+        {
+            return "No pressed choices tracked";
+        }
+        
+        string summary = $"Pressed Choices Summary:\n";
+        summary += $"- {pressedChoiceTexts.Count} choices tracked by text\n";
+        summary += $"- {pressedChoiceIndices.Count} choices tracked by index\n";
+        
+        if (pressedChoiceTexts.Count > 0)
+        {
+            summary += "Texts: " + string.Join(", ", pressedChoiceTexts) + "\n";
+        }
+        
+        if (pressedChoiceIndices.Count > 0)
+        {
+            summary += "Indices: " + string.Join(", ", pressedChoiceIndices) + "\n";
+        }
+        
+        summary += $"Using filtered choices: {isUsingFilteredChoices}\n";
+        summary += $"Current filtered count: {currentFilteredChoices?.Length ?? 0}\n";
+        summary += $"Original choices count: {originalChoices?.Length ?? 0}";
+        
+        return summary;
+    }
+    
+    /// <summary>
+    /// Debug method to print current filtering system state
+    /// Call this to debug choice filtering issues
+    /// </summary>
+    [ContextMenu("Debug Choice Filtering State")]
+    public void DebugChoiceFilteringState()
+    {
+        Debug.Log("=== CHOICE FILTERING DEBUG STATE ===");
+        Debug.Log(GetPressedChoicesSummary());
+        
+        if (lastProcessedChoices != null)
+        {
+            Debug.Log($"Last processed choices: {lastProcessedChoices.Length} choices");
+            for (int i = 0; i < lastProcessedChoices.Length; i++)
+            {
+                Debug.Log($"  Choice {i}: '{lastProcessedChoices[i].playerChoice}' (correct: {lastProcessedChoices[i].correctChoice})");
+            }
+        }
+        else
+        {
+            Debug.Log("No last processed choices stored");
+        }
+        
+        // Debug question instance state
+        if (questionInstance != null)
+        {
+            Debug.Log($"Question instance exists: {questionInstance.name}");
+        }
+        else
+        {
+            Debug.Log("Question instance is null (destroyed after choice selection)");
+        }
+        
+        Debug.Log("=== END DEBUG STATE ===");
+    }
+    
+    /// <summary>
+    /// Test method to verify prefab destruction after choice selection
+    /// </summary>
+    [ContextMenu("Test Prefab Destruction")]
+    public void TestPrefabDestruction()
+    {
+        Debug.Log("=== TESTING PREFAB DESTRUCTION ===");
+        
+        if (questionInstance != null)
+        {
+            Debug.Log($"Question instance exists: {questionInstance.name}");
+            Debug.Log("Calling HideChoices() to test destruction...");
+            HideChoices();
+            
+            if (questionInstance == null)
+            {
+                Debug.Log("✓ SUCCESS: Question instance destroyed correctly");
+            }
+            else
+            {
+                Debug.LogError("✗ FAILED: Question instance still exists after HideChoices()");
+            }
+        }
+        else
+        {
+            Debug.Log("No question instance exists to test destruction");
+            
+            // Try creating one for testing
+            if (coreGameData?.coreBlock?[currentBlockIndex]?.Dialog?.choices != null)
+            {
+                Debug.Log("Creating question instance for testing...");
+                ShowChoices(coreGameData.coreBlock[currentBlockIndex].Dialog.choices);
+                
+                if (questionInstance != null)
+                {
+                    Debug.Log($"✓ Question instance created: {questionInstance.name}");
+                    Debug.Log("Now testing destruction...");
+                    HideChoices();
+                    
+                    if (questionInstance == null)
+                    {
+                        Debug.Log("✓ SUCCESS: Question instance destroyed correctly after creation");
+                    }
+                    else
+                    {
+                        Debug.LogError("✗ FAILED: Question instance still exists after HideChoices()");
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No valid choices available for testing");
+            }
+        }
+        
+        Debug.Log("=== END PREFAB DESTRUCTION TEST ===");
     }
     
     #endregion
