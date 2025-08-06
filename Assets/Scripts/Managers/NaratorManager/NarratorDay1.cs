@@ -4,21 +4,7 @@ using System.Collections;
 public class NarratorDay1 : NarratorBase
 {
     [System.Obsolete]
-    public override IEnumerator Narrate()
-    {
-        ResetUIState();
-
-        switch (NarratorManager.Instance.currentTime)
-        {
-            case TimeOfDay.Night:
-                yield return StartCoroutine(PlayNightSequence());
-                break;
-        }
-    }
-
-
-    [System.Obsolete]
-    private IEnumerator PlayNightSequence()
+    protected override IEnumerator PlayNightSequence()
     {
         TimeManager.instance.TimeOfDay = 1.0f;
         // AppearObjects();

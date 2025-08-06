@@ -8,28 +8,7 @@ public class NarratorDay2 : NarratorBase
     private Quaternion[] lastSpawnRotations;
 
     [System.Obsolete]
-    public override IEnumerator Narrate()
-    {
-        ResetUIState();
-        switch (NarratorManager.Instance.currentTime)
-        {
-            case TimeOfDay.Morning:
-                yield return StartCoroutine(PlayMorningSequence());
-                break;
-            case TimeOfDay.Afternoon:
-                yield return StartCoroutine(PlayAfternoonSequence());
-                break;
-            case TimeOfDay.Evening:
-                yield return StartCoroutine(PlayEveningSequence());
-                break;
-            case TimeOfDay.Night:
-                yield return StartCoroutine(PlayNightSequence());
-                break;
-        }
-    }
-    
-    [System.Obsolete]
-    private IEnumerator PlayMorningSequence()
+    protected override IEnumerator PlayMorningSequence()
     {    
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
         PlayCharacterAnimation(CharacterType.Father, "Sit");
@@ -42,7 +21,7 @@ public class NarratorDay2 : NarratorBase
     }
     
     [System.Obsolete]
-    private IEnumerator PlayAfternoonSequence()
+    protected override IEnumerator PlayAfternoonSequence()
     {
         TimeManager.instance.TimeOfDay = 13.0f;
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
@@ -50,7 +29,7 @@ public class NarratorDay2 : NarratorBase
         yield return null;
     }
     
-    private IEnumerator PlayEveningSequence()
+    protected override IEnumerator PlayEveningSequence()
     {
         TimeManager.instance.TimeOfDay = 19.0f;
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
@@ -59,7 +38,7 @@ public class NarratorDay2 : NarratorBase
     }
     
     [System.Obsolete]
-    private IEnumerator PlayNightSequence()
+    protected override IEnumerator PlayNightSequence()
     {
         TimeManager.instance.TimeOfDay = 1.0f;
         PlayCharacterAnimation(CharacterType.Mother, "Sit");

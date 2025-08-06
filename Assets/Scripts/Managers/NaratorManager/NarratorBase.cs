@@ -12,7 +12,7 @@ public enum NarratorDay
 
 public enum TimeOfDay
 {
-    Morning, Afternoon, Evening, Night, Midnight
+    Morning, Afternoon, Evening, Night
 }
 
 public enum CharacterType
@@ -152,7 +152,53 @@ public abstract class NarratorBase : MonoBehaviour
 #endregion
 #region Abstract Methods
     [System.Obsolete]
-    public abstract IEnumerator Narrate();
+    public IEnumerator StartNarration()
+    {
+        yield return StartCoroutine(Narrate());
+    }
+    
+    [System.Obsolete]
+    protected virtual IEnumerator Narrate()
+    {
+        ResetUIState();
+        switch (NarratorManager.Instance.currentTime)
+        {
+            case TimeOfDay.Morning:
+                yield return StartCoroutine(PlayMorningSequence());
+                break;
+            case TimeOfDay.Afternoon:
+                yield return StartCoroutine(PlayAfternoonSequence());
+                break;
+            case TimeOfDay.Evening:
+                yield return StartCoroutine(PlayEveningSequence());
+                break;
+            case TimeOfDay.Night:
+                yield return StartCoroutine(PlayNightSequence());
+                break;
+        }
+    }
+    [System.Obsolete]
+    protected virtual IEnumerator PlayMorningSequence()
+    {
+        yield return null;
+    }
+    
+    [System.Obsolete]
+    protected virtual IEnumerator PlayAfternoonSequence()
+    {
+        yield return null;
+    }
+    
+    protected virtual IEnumerator PlayEveningSequence()
+    {
+        yield return null;
+    }
+    
+    [System.Obsolete]
+    protected virtual IEnumerator PlayNightSequence()
+    {
+        yield return null;
+    }
 #endregion
 
 #region UI Management

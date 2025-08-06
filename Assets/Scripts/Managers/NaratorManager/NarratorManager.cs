@@ -52,7 +52,7 @@ public class NarratorManager : MonoBehaviour
 
         if (narratorDict.TryGetValue(day, out NarratorBase narrator))
         {
-            StartCoroutine(narrator.Narrate());
+            StartCoroutine(narrator.StartNarration());
         }
         else
         {
