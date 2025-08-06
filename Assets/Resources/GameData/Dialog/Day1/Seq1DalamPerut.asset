@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Dunia yang gelap ini.. aku selalu merasakan kehangatan
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Aku selalu mendengar suara detak jantung yang selalu menenangkanku
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -43,7 +43,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Suara asing dari seseorang yang tidak aku kenal...
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -55,7 +55,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Dan itu adalah ibuku
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -67,7 +67,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Suara Ibuku teredam, seperti musik dari kejauhan
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -79,7 +79,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Aku mengambang, tubuhku ringan, dan semua kebutuhanku terpenuhi
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -91,7 +91,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 
+      npcName: 0
       dialogEntry: Sampai suatu ketika duniaku yang nyaman mulai mendorongku
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -103,7 +103,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Rasa ini yang tidak aku kenal
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -115,7 +115,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Dingin.. Sakit.. Terang.. Sesak..
       audioDialogEntry: {fileID: 0}
       choices: []

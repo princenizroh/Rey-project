@@ -8,7 +8,6 @@ public class NarratorDay1 : NarratorBase
     {
         TimeManager.instance.TimeOfDay = 1.0f;
         AppearObjects();
-        // yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
         SetCharacterSpawn(CharacterType.Mother, 0);  
         SetCharacterSpawn(CharacterType.Father, 0);    
         SetCharacterSpawn(CharacterType.Bidan, 0);   
@@ -62,8 +61,6 @@ public class NarratorDay1 : NarratorBase
         Debug.Log("Opening eyes");
         FadeOpenEyes();
 
-        // Instantiate(Resources.Load("ChargeMeter"));
-
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq5MembukaMata", 
             () => { seq5Complete = true; });
@@ -99,6 +96,11 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitForSeconds(1f);
 
         Debug.Log("Sequence 7 complete, closing narration.");
+        
+        // Auto progression ke Day 2 Morning
+        yield return new WaitForSeconds(2f);
+        Debug.Log("Day 1 Night finished! Moving to Day 2 Morning...");
+        GoToNextDay();
     }
 
 }

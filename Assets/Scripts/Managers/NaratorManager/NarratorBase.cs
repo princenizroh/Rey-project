@@ -562,5 +562,33 @@ public abstract class NarratorBase : MonoBehaviour
         
         return null;
     }
+
+    // Auto progression system
+    protected void GoToNextTimeOfDay()
+    {
+        if (NarratorManager.Instance != null)
+        {
+            Debug.Log($"Current: {NarratorManager.Instance.currentDay} {NarratorManager.Instance.currentTime}");
+            NarratorManager.Instance.NextTimeOfDay();
+        }
+    }
+
+    protected void GoToNextDay()
+    {
+        if (NarratorManager.Instance != null)
+        {
+            Debug.Log($"Finishing {NarratorManager.Instance.currentDay}, going to next day...");
+            NarratorManager.Instance.NextDay();
+        }
+    }
+
+    protected void GoToSpecificNarrator(NarratorDay day, TimeOfDay time)
+    {
+        if (NarratorManager.Instance != null)
+        {
+            Debug.Log($"Going to {day} {time}");
+            NarratorManager.Instance.ChangeNarrator(day, time);
+        }
+    }
 #endregion
 }
