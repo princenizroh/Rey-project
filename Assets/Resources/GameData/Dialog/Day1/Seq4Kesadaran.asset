@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Suara ini..
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -31,11 +31,12 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Rasa ini begitu hangat
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: (Membuka mata)
+        correctChoice: 1
         dialogResponses: []
         audioDialogResponse: {fileID: 0}
     Animation:

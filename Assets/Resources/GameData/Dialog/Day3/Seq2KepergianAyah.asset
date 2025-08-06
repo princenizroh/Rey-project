@@ -9,33 +9,99 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc95e7fb1be8ad24795b8b55a4b44a68, type: 3}
+  m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
   m_Name: Seq2KepergianAyah
   m_EditorClassIdentifier: 
-  sequences:
-  - npcName: 1
-    dialog: Ada yang ketinggalan gak?
-  - npcName: 2
-    dialog: Gak ada sepertinya
-  - npcName: 1
-    dialog: Yaudah cepet pulang
-  - npcName: 2
-    dialog: Iya sayang
-  - npcName: 2
-    dialog: Ayah berangkat dulu ya nak
-  - npcName: 5
-    dialog: '[Choice A: Heh (Merespon)]'
-  - npcName: 2
-    dialog: Iya ayah pergi kerja dulu
-  - npcName: 2
-    dialog: Jangan merepotkan mama ya nak
-  - npcName: 2
-    dialog: Aku pergi dulu ya
-  - npcName: 1
-    dialog: Iya hati-hati
-  - npcName: 1
-    dialog: Hari ini gak usah mandi ya
-  - npcName: 1
-    dialog: Ibu cape mau langsung tidur
-  - npcName: 1
-    dialog: Kamu juga tidur juga
+  coreBlock:
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Ada yang ketinggalan gak?
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 2
+      dialogEntry: Gak ada sepertinya
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Yaudah cepet pulang
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 2
+      dialogEntry: Iya sayang
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 2
+      dialogEntry: Ayah berangkat dulu ya nak
+      audioDialogEntry: {fileID: 0}
+      choices:
+      - playerChoice: '*Nghh* (Merespon)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 2
+          npcResponse: Iya ayah pergi kerja dulu
+        - npcName: 2
+          npcResponse: Jangan merepotkan mama ya nak
+        audioDialogResponse: {fileID: 0}
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 2
+      dialogEntry: Aku pergi dulu ya
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Iya hati-hati
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}

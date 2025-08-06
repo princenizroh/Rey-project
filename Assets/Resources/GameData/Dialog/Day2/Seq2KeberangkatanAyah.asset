@@ -72,6 +72,7 @@ MonoBehaviour:
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: '*Nghh* (Merespon)'
+        correctChoice: 1
         dialogResponses:
         - npcName: 2
           npcResponse: Ih dia merespon... lucunya

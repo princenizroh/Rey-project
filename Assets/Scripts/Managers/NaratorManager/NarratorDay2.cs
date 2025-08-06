@@ -82,6 +82,14 @@ public class NarratorDay2 : NarratorBase
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
         
+        yield return new WaitForSeconds(1f);
+        
+        // Seq6 Rewel
+        bool seq6Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq6Rewel", 
+            () => { seq6Complete = true; });
+        yield return new WaitUntil(() => seq6Complete);
+        
         FadeCloseEyes(); // Baby sleeps again
         yield return new WaitForSeconds(2f);
         
@@ -101,11 +109,19 @@ public class NarratorDay2 : NarratorBase
         FadeOpenEyes(); // Baby wakes up
         yield return new WaitForSeconds(1f);
         
-        // Seq6 Mengompol
-        bool seq6Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq6Mengompol", 
-            () => { seq6Complete = true; });
-        yield return new WaitUntil(() => seq6Complete);
+        // Seq7 Mengompol
+        bool seq7Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq7Mengompol", 
+            () => { seq7Complete = true; });
+        yield return new WaitUntil(() => seq7Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq8 Kesal
+        bool seq8Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq8Kesal", 
+            () => { seq8Complete = true; });
+        yield return new WaitUntil(() => seq8Complete);
         
         yield return new WaitForSeconds(1f);
         
@@ -113,22 +129,22 @@ public class NarratorDay2 : NarratorBase
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Baby, 1));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 1));
         
-        // Seq7 AyahPulang
-        bool seq7Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq7AyahPulang", 
-            () => { seq7Complete = true; });
-        yield return new WaitUntil(() => seq7Complete);
+        // Seq9 AyahPulang
+        bool seq9Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq9AyahPulang", 
+            () => { seq9Complete = true; });
+        yield return new WaitUntil(() => seq9Complete);
         
         yield return new WaitForSeconds(1f);
         
         // Mother approaches
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
         
-        // Seq8 MenyambutAyah
-        bool seq8Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq8MenyambutAyah", 
-            () => { seq8Complete = true; });
-        yield return new WaitUntil(() => seq8Complete);
+        // Seq10 MenyambutAyah
+        bool seq10Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq10MenyambutAyah", 
+            () => { seq10Complete = true; });
+        yield return new WaitUntil(() => seq10Complete);
         
         FadeCloseEyes(); // Scene transition
         yield return new WaitForSeconds(2f);
@@ -150,19 +166,27 @@ public class NarratorDay2 : NarratorBase
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 2));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 2));
         
-        // Seq9 Memasak
-        bool seq9Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq9Memasak", 
-            () => { seq9Complete = true; });
-        yield return new WaitUntil(() => seq9Complete);
+        // Seq11 Memasak
+        bool seq11Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
+            () => { seq11Complete = true; });
+        yield return new WaitUntil(() => seq11Complete);
         
         yield return new WaitForSeconds(1f);
         
-        // Seq10 BuatinSusu
-        bool seq10Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq10BuatinSusu", 
-            () => { seq10Complete = true; });
-        yield return new WaitUntil(() => seq10Complete);
+        // Seq12 BuatinSusu
+        bool seq12Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12BuatinSusu", 
+            () => { seq12Complete = true; });
+        yield return new WaitUntil(() => seq12Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq13 SusuBotol
+        bool seq13Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq13SusuBotol", 
+            () => { seq13Complete = true; });
+        yield return new WaitUntil(() => seq13Complete);
         
         FadeCloseEyes(); // Baby sleeps
         yield return new WaitForSeconds(2f);
@@ -185,11 +209,11 @@ public class NarratorDay2 : NarratorBase
         FadeOpenEyes(); // Baby wakes up
         yield return new WaitForSeconds(1f);
         
-        // Seq11 Terbangun
-        bool seq11Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Terbangun", 
-            () => { seq11Complete = true; });
-        yield return new WaitUntil(() => seq11Complete);
+        // Seq14 Terbangun
+        bool seq14Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq14Terbangun", 
+            () => { seq14Complete = true; });
+        yield return new WaitUntil(() => seq14Complete);
         
         FadeCloseEyes(); // Baby sleeps
         yield return new WaitForSeconds(2f);

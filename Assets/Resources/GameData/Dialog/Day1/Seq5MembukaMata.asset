@@ -96,11 +96,13 @@ MonoBehaviour:
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: '*Neh* (Lapar)'
+        correctChoice: 1
         dialogResponses:
         - npcName: 0
           npcResponse: Dia mengeluarkan suara, apa yang dia butuhkan
         audioDialogResponse: {fileID: 8300000, guid: 34fc5efa1b0dcce4c8ec06157917fae7, type: 3}
       - playerChoice: '*Oek* (Menangis)'
+        correctChoice: 1
         dialogResponses:
         - npcName: 1
           npcResponse: Kenapa anak ini menangis? Berisik sekali

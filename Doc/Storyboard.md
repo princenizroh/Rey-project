@@ -1,12 +1,3 @@
----
-category:
-  - "[[GameDevelopment]]"
-tags:
-  - 2025-W31
-  - 2025-07-30
-  - game_development
-created: 2025-07-30 19:42
----
 # Day 1
 
 ---
@@ -89,7 +80,7 @@ Keadaan: Sang anak membuka matanya. Keadaan dari gelap menjadi terang
 
 Interaksi Pilihan:
 
-Choice A : Membuka mata
+Choice A : (Membuka mata)
 ### Seq5 Membuka Mata
 
 Ayah: "Lihat dia membuka matanya"
@@ -116,7 +107,7 @@ Choice B : Menangis pelan
 
 Jika berdasarkan pilihan
 
-Choice A
+Choice A: *Neh* (Lapar)
 ```
 	Ayah: "Dia mengeluarkan suara, apa yang dia butuhkan"
 	
@@ -130,7 +121,7 @@ Choice A
 ```
 
 
-Choice B
+Choice B *Oek* (Menangis)
 ```
 	Ibu: "Kenapa anak ini menangis? Berisik sekali..."
 	
@@ -253,11 +244,12 @@ Ayah: "Iya sayang"
 Ayah: "Ayah berangkat kerja dulu ya nak"
 
 Interaksi Pilihan: 
-Choice A: Eh.. (Merespon)
+Choice A: Mengeluarkan suara "Nghh" untuk merespon
+
 
 Jika berdasarkan pilihan
 
-Choice A 
+Choice A: *Nghh* (Merespon)
 	Ayah: "Ih dia merespon... lucunya" 
 Ayah: "Yaudah aku pergi dulu ya" 
 Ibu: "Iya hati-hati" 
@@ -269,13 +261,14 @@ Ibu: "Iya hati-hati"
 Ibu: "Habis ini mandi dulu habis itu ganti popok"
 
 Ibu: "Habis itu langsung tidurin Rey lagi. Ibu masih mau istirahat"
+Ibu: "Ibu juga mau nonton drakor"
 **Keadaan:** Proses mandi berlangsung cepat
 
-### Seq3 SelesaiMandi
+### Seq4 SelesaiMandi
 
 **Lokasi:** Kamar Ortu
 **Keadaan: Rey diletakkan di kasur** 
-Ibu: "Nah. udah bersih dan wangi" 
+Ibu: "Nah... udah bersih dan wangi" 
 Anak: "Hangat" 
 Anak: "Lapar..." 
 Interaksi Pilihan:
@@ -286,18 +279,16 @@ Choice B : Menangis Pelan
 
 Jika berdasarkan pilihan
 
-Choice A: Neh (Lapar)
+Choice A: *Neh* (Lapar)
 
 ```
 Ibu: "Iya iya bentar"
 ```
 
-Choice B: Menangis Pelan
+Choice B: *Oek* (Menangis)
 
 ```
 Ibu: _agak kesal_ "Iya iya sabar dulu malah nangis"
-
-Anak: "Ibu"
 ```
 
 **Keadaan:** Rey diletakkan di pangkuan ibu
@@ -307,7 +298,7 @@ Anak: "Ibu"
 
 ## Siang Hari
 
-### Seq4 Lapar
+### Seq5 Lapar
 
 **Lokasi:** Kamar Ortu 
 **Set Waktu:** Siang
@@ -325,18 +316,19 @@ Choice B : Menangis Pelan
 
 Jika berdasarkan pilihan
 
-Choice A: Neh (Lapar)
+Choice A: *Neh* (Lapar)
 
 ```
 Anak: "Ibu lapar.."
 Keadaan: Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
-Choice B: Menangis Pelan Anak: "Ibu lapar.."
+Choice B: *Oek* (Menangis)
+	Anak: "Ibu lapar.."
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan**: Ibu datang dan mencapai depan keranjang bayi rey
-
+### Seq6 Rewel
 Ibu: _agak kesal_ "Udah Bangun aja. Mending tidur lagi aja. Aku masih sibuk masak" 
 Anak: "Lapar.." 
 **Keadaan:** Ibu mengangkat rey dan berada di depan dada sambil menggendong dan menyusui 
@@ -346,14 +338,16 @@ Anak: "Lapar.."
 
 ## Sore Hari
 
-**Lokasi:** Kamar Ortu **Set Waktu:** Sore hari
+**Lokasi:** Kamar Ortu
+**Set Waktu:** Sore hari
 
-### Seq5 Mengompol
+### Seq7 Mengompol
 
 **Keadaan: Rey terbangun karena popoknya udah penuh** 
 Anak: "Bagian bawahku tidak nyaman" 
 
-Anak: "Ibu dimana" Anak: "Ibu..."
+Anak: "Ibu dimana" 
+Anak: "Ibu..."
 
 Interaksi Pilihan:
 
@@ -363,18 +357,18 @@ Choice B : Menangis Pelan
 
 Jika berdasarkan pilihan
 
-Choice A: Heh (Tidak nyaman)
+Choice A: *Heh* (Tidak nyaman)
 
 ```
 Anak: "Ibu"
 Keadaan: Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
-Choice B: Menangis Pelan 
+Choice B: *Oek* (Menangis) 
 	Anak: "Ibu... Aku tidak nyaman"
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan**: Ibu datang dan mencapai depan keranjang bayi rey
-
+### Seq8 Kesal
 Ibu: "Kenapa lagi. Minta susu?" 
 Ibu: "Mengendus" 
 Ibu: "Yah ngompol"
@@ -382,7 +376,7 @@ Ibu: "Yaudah sekalian mandi"
 
 **Keadaan: Rey - layar gelap**
 
-### Seq6 AyahPulang
+### Seq9 AyahPulang
 
 **Lokasi:** Ruang Keluarga
 **Keadaan: Rey berada di ruang keluarga** 
@@ -393,17 +387,18 @@ Ayah: "Nungguin ayah pulang ya"
 Anak: "Ayah"
 Ayah: "Rey gak nakal kan"
 
-Interaksi Pilihan: Choice A: Heh (Merespon)
+Interaksi Pilihan: 
+Choice A: Mengeluarkan suara "Nghh" untuk merespon
 
 Jika berdasarkan pilihan
 
-Choice A 
+Choice A *Nghh* (Merespon)
 ```
 	Ayah: "Anak pintar gak nakal ya" 
 	Ayah: "Anakku memang hebat" 
 	Ayah: "Jangan ngerepotin ibu ya nak"
 ```
-### Seq7 IbuMenghampiriAyah
+### Seq10 MenyambutAyah
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan
 **Keadaan**: Ibu dari dapur menghampiri ayah
@@ -429,7 +424,7 @@ Ayah: "Ayah mau mandi dulu ya nak habis itu kita bantu masak ibumu"
 
 ## Malam Hari
 
-### Seq8 Memasak
+### Seq11 Memasak
 
 **Lokasi:** Di dapur 
 **Set Waktu:** Malam hari 
@@ -456,23 +451,22 @@ Ibu: "Aku masih masakin ini"
 Ibu: "Sekalian tidurin Rey kalau bisa terus bawa ke kamar"
 Ayah: "Siap cantik"
 
-### Seq9 BuatinSusu
+### Seq12 BuatinSusu
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan:** Ayah berjalan kesamping untuk membuat dot
-
+Anak : "Lapar"
 Interaksi Pilihan: 
-Choice A: Ungh (Arah ke ayah)
-Choice B: Ungh (Arah ke Ibu)
-
+Choice A: Mengeluarkan suara "Unghh" untuk berinteraksi dengan Ayah
+Choice B: Mengeluarkan suara "Unghh" untuk berinteraksi dengan Ibu
 Jika berdasarkan pilihan
 
-Choice A
+Choice A *Unghh* (Interaksi Ayah)
 ```
 Ayah: "Iya sebentar ya sayang"
 Lalu kembali ke linear 
 ```
-Choice B
+Choice B *Unghh* (Interaksi Ibu)
 ```
 Ibu: "Minta susu ke ayah saja" 
 Akan berulang jika tidak memilih Choice A
@@ -480,7 +474,7 @@ Akan berulang jika tidak memilih Choice A
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan:** Ayah mendatangi rey dan memberikan botol susu
-
+### Seq13 SusuBotol
 Ayah: "Ini sayang susunya tapi di botol" 
 Anak: "Susu.. Di botol"
 
@@ -488,7 +482,7 @@ Choice A: Mengeluarkan suara "Heh" Yang menandakan Tidak nyaman
 
 Jika berdasarkan pilihan
 
-Choice A 
+Choice A *Heh* (Gak Nyaman)
 	Ayah: "Eh kenapa sayang ini gak papa. Ini susu formula enak juga kok seperti punya ibu tapi rasanya agak berbeda"
 
 Ayah: "Diminum ya sayang"
@@ -501,7 +495,7 @@ Anak: "Enak punya ibu"
 
 ## Tengah Malam
 
-### Seq10 Terbangun
+### Seq14 Terbangun
 
 **Lokasi:** Kamar Ortu
 
@@ -519,20 +513,20 @@ Choice B : Menangis Pelan
 
 Jika berdasarkan pilihan
 
-Choice A: Neh (Lapar)
+Choice A: *Neh* (Lapar)
 
 ```
 Anak: "Ibu lapar.."
-Ayah: "Hnghh.. Sepertinya Rey terbangun"
+Ayah: "Sepertinya Rey terbangun"
 Ayah: "Sayang Rey terbangun, bisa kasih makan bentar gak"
 Ibu: "Iya sayang"
 
 ```
-Choice B: Menangis Pelan
+Choice B: *Oek* (Menangis)
 ```
-Anak: "Ibu lapar.." 
-Ibu: "_terbangun_ " 
-Ibu: "Haduh ini jam tengah malam" 
+Anak: "Ibu dimana... Lapar..." 
+Ibu: "*Hngghh*" 
+Ibu: "Haduh apasih ini jam tengah malam" 
 Ibu: "Berisik banget sih" 
 Ayah: "Sudah.. kasih makan aja adek daripada nangis terus" 
 ```
@@ -590,11 +584,11 @@ Ayah: "Iya sayang"
 Ayah: "Ayah berangkat dulu ya nak"
 
 Interaksi Pilihan: 
-Choice A: Heh (Merespon)
+Choice A: Mengeluarkan suara "Nghh" untuk merespon
 
 Jika berdasarkan pilihan
 
-Choice A 
+Choice A *Nghh* (Merespon)
 	Ayah: "Iya ayah pergi kerja dulu"
 	Ayah: "Jangan merepotkan mama ya nak"
 Ayah: "Aku pergi dulu ya" 
@@ -602,7 +596,7 @@ Ibu: _singkat_ "Iya hati-hati"
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan:** Ayah pergi menuju keluar
 **Keadaan:** Ibu menuju kearah bayi
-
+### Seq3 Mandi
 Ibu: _agak malas_ "Hari ini gak usah mandi ya"
 Ibu: _agak malas_ "Ibu cape mau langsung tidur"
 Ibu: _agak malas_ "Kamu juga tidur juga"
@@ -612,7 +606,7 @@ Ibu: _agak malas_ "Kamu juga tidur juga"
 
 ## Siang Hari
 
-### Seq3 Rewel
+### Seq4 Lapar
 
 **Lokasi:** Kamar Ortu 
 **Set Waktu:** Siang 
@@ -632,19 +626,20 @@ Choice C : Menangis Keras
 
 Jika berdasarkan pilihan
 
-Choice A: Neh (Lapar)
+Choice A: *Neh* (Lapar)
 
 ```
 Anak: "Ibu..."
 **Keadaan: ** Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
-Choice B: Menangis Pelan
+Choice B: *Oek* (Menangis)
 	Anak: "Lapar..."
 
-Choice C : Menangis Keras
+Choice C : *Oeekk* (Menangis Keras)
 	Anak: "Ibu dimana..."
 
+### Seq5 Rewel
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan**: Ibu datang dengan terburu-buru dan  dan mencapai depan keranjang bayi rey
 
 Ibu:  *agak kesel* "Seperti biasa udah rewel aja"
@@ -660,7 +655,7 @@ Anak: "Ibu.. Aku lapar"
 
 **Lokasi:** Kamar Ortu **Set Waktu:** Sore hari
 
-### Seq5 Mengompol
+### Seq6 Mengompol
 
 **Keadaan: Rey terbangun karena popoknya udah penuh** 
 Anak: "Tidak nyaman" 
@@ -672,32 +667,30 @@ Interaksi Pilihan:
 Choice A : Mengeluarkan suara "Heh" Yang menandakan tidak nyaman
 
 Choice B : Menangis Pelan
-
 Choice C : Menangis Keras
 
 Jika berdasarkan pilihan
 
-Choice A: Heh (Tidak nyaman)
+Choice A: *Heh* (Tidak nyaman)
 
 ```
 Anak: "Ibu"
 **Keadaan: ** Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
-Choice B: Menangis Pelan 
+Choice B: *Oek* (Menangis)
 
 ```
 Anak: "Gak nyaman"
 **Keadaan: ** Ibu tidak datang lanjut ke sisa pilihan Choice C
 ```
-Choice C : Menangis Keras
+Choice C : *Oeekk* (Menangis Keras)
 ```
 Anak: "Ibu.. Basah"
-**Keadaan: ** Ibu tidak datang lanjut ke sisa pilihan Choice C
 ```
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan**: Ibu datang dengan wajah kesal
-
+### Seq7 Kesal
 Ibu: _sangat kesal_ "Lagi-lagi ngompol" 
 bu: "*Mengendus*" 
 Ibu: "Haduh baunya" 
@@ -705,7 +698,7 @@ Ibu: "Capek banget jadi ibu"
 
 **Keadaan: Rey - layar gelap**
 
-### Seq6 AyahPulang
+### Seq8 AyahPulang
 
 **Lokasi:** Ruang Keluarga
 **Keadaan: Rey berada di ruang keluarga**
@@ -715,11 +708,12 @@ Ayah: "Sore sore gini sudah menunggu ayah pulang saja"
 Anak: "Ayah" 
 Ayah: "Rey baik-baik aja kan hari ini"
 
-Interaksi Pilihan: Choice A: Heh (Merespon)
+Interaksi Pilihan:
+Choice A: Mengeluarkan suara "Nghh" untuk merespon
 
 Jika berdasarkan pilihan
 
-Choice A 
+Choice A *Nghh* (Merespon)
 ```
 	Ayah: "Iya anak baik" 
 	Ayah: "Ayah bangga sama Rey" 
@@ -727,7 +721,7 @@ Choice A
 ```
 
 
-### Seq7 IbuMenghampiriAyah
+### Seq9 MenyambutAyah
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan**: Ibu dari dapur menghampiri ayah 
@@ -752,7 +746,7 @@ Ayah: "Ayah mandi dulu ya nak"
 
 ## Malam Hari
 
-### Seq8 PersiapanBesok
+### Seq10 MakanMalam
 
 **Lokasi:** Di Ruang Keluarga
 **Set Waktu:** Malam hari 
@@ -779,22 +773,23 @@ Ayah: "Iya sih... ya udah terserah kamu"
 Ayah: "Karena berhubungan dengan kesibukan kerja kamu, berarti kayaknya besok bakal pulang lambat" 
 Ibu: "Hmm.. iya...  Yang penting langsung pulang" 
 
-### Seq9 BuatinSusu
+### Seq11 ButuhSusu
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan:** Ayah berjalan ke arah Rey untuk memberikan susu
 Interaksi Pilihan: 
-Choice A: Ungh (Arah ke ayah)
-Choice B: Ungh (Arah ke Ibu)
+Choice A: Mengeluarkan suara "Unghh" untuk berinteraksi dengan Ayah
+Choice B: Mengeluarkan suara "Unghh" untuk berinteraksi dengan Ibu
 
 Jika berdasarkan pilihan
 
-Choice A 
+Choice A *Unghh* (Interaksi)
 	Ayah: "Iya sayang mau susu" Lalu kembali ke linear
-Choice B
+Choice B *Unghh* (Interaksi)
 	Ibu: _lelah_ "Sayang, Rey butuh susu" Akan berulang jika tidak memilih Choice A
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan:** Ayah mendatangi rey dan memberikan botol susu
 
+### Seq12 SusuBotol
 Ayah: "Ini susunya sayang" 
 Anak: "Susu"
 
@@ -804,7 +799,7 @@ Anak: "Susu"
 
 ## Tengah Malam
 
-### Seq10 TerbangunTerakhir
+### Seq13 Terbangun
 
 **Lokasi:** Kamar Ortu
 
@@ -823,7 +818,7 @@ Choice C : Menangis Keras
 
 Jika berdasarkan pilihan
 
-Choice A: Neh (Lapar)
+Choice A: *Neh* (Lapar)
 
 ```
 Anak: "Ibu..."
@@ -832,7 +827,7 @@ Ayah: _lelah_ "Sayang Rey minta susu"
 Ibu: "Iya sayang"
 ```
 
-Choice B: Menangis Pelan 
+Choice B: *Oek* (Menangis)
 ```
 Anak: "Lapar..." 
 Ibu: _bangun dengan kesal_ 
@@ -840,7 +835,7 @@ Ibu: "Kenapa sih Rey"
 Ibu: "Besok mama kerja tau" 
 Ayah: "Udah kasih makan aja" 
 ```
-Choice C: Menangis Keras
+Choice C: *Oeekk* (Menangis Keras)
 ```
 Anak: "Lapar Banget..." 
 Ayah: "Rey kenceng banget nangisnya"
@@ -886,14 +881,10 @@ Choice A : Mengeluarkan suara "Neh" Yang menandakan lapar
 Choice B : Menangis pelan
 Choice C : Menangis keras
 Choice D : Menangis makin keras
-Jika berdasarkan pilihan
-
-Choice A: Neh (Lapar)
-
 
 Jika berdasarkan pilihan
 
-Choice A: Neh (Lapar)
+Choice A: *Neh* (Lapar)
 
 ```
 Anak: "Ibu... lapar"
@@ -901,7 +892,7 @@ Anak: "Ibu... lapar"
 ```
 
 
-Choice B:  Enggh(Menangis pelan)
+Choice B:  *Oek* (Menangis)
 
 ```
 Anak: "Ibu... Aku lapar"
@@ -909,7 +900,7 @@ Anak: "Ibu... Aku lapar"
 ```
 
 
-Choice C: Anghh (Menangis Keras)
+Choice C: *Oeekk* (Menangis Keras)
 
 ```
 Anak: "Ibu.. Dimana.. Aku lapar"
@@ -917,7 +908,7 @@ Anak: "Ibu.. Dimana.. Aku lapar"
 ```
 
 
-Choice D: Oekkk (Menangis makin keras)
+Choice D: *Oeeeekkkkk*  (Menangis makin keras)
 
 ```
 Anak: "Ibu.. Sakit.. Lapar"
@@ -943,7 +934,7 @@ Ibu: _kesal_ "Aku harus angkat dulu"
 Ibu: _kesal_ "Bener kata ayah apa lebih baik berhenti aja dulu ya." 
 Ibu : "Ah yasudahlah. Nasi sudah menjadi bubur"
 **Keadaan**: Ibu meletakkan rey dan rey belum tertidur
-### Seq4 ReyDiletakkanKembali
+### Seq4 Telephone
 Keadaan: Rey diletakkan kembali di ranjang dan belum tertidur pulas
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan**: Ibu kembali ke kamar ortu dan mengangkat telpon
 Ibu: "Halo"
@@ -957,7 +948,7 @@ Choice A : Menangis keras
 Choice B : Tidur
 
 Jika berdasarkan pilihan 
-Choice A:  Enggh(Menangis Keras)
+Choice A:  *Oeekk* (Menangis Keras)
 
 ```
 Anak: "Ibu... Ibu kemana.."
@@ -967,14 +958,14 @@ Penelpon: "Oh yasudah, bisa diselesaikan hari ini kan"
 Ibu: "Iya pak bisa"
 ```
 
-Choice B: Tidur 
+Choice B: (Tidur) 
 ```
 Anak: "Aku langsung tidur saja"
 **Keadaan:** Ibu tidak datang, lanjut ke Choice B
 ```
 
 --- 
-### Seq5 Overwhelmed
+### Seq5 Kerja
 
 **Keadaan: Ibu sedang bekerja**
 
@@ -983,7 +974,6 @@ Ibu: "Data yang diberikan ternyata makin banyak"
 Ibu: "Capek banget... Baru hari pertama bekerja kembali gak dikasih napas"
 Ibu: _baca sekilas_ "Teman-teman ngajak hang out"
 Ibu: _menutup HP_ " Tapi aku gak bisa... belum bisa keluar rumah"
-Anak: "Ibu.. ibu kenapa" 
 **Keadaan: Baby Blues Symptom - Crying Spells**
 
 **Keadaan: Anxiety dan Overwhelmed memuncak**
@@ -993,7 +983,7 @@ Anak: "Ibu.. ibu kenapa"
 
 ## Sore Hari
 
-### Seq6 Deadline Pressure
+### Seq6 Lapar
 
 **Lokasi:** Kamar Rey
 **Set Waktu:** Sore
@@ -1013,19 +1003,19 @@ Choice B : Menangis Keras
 
 Jika berdasarkan pilihan
 
-Choice A: Heh (Tidak nyaman)
+Choice A: *Heh* (Tidak nyaman)
 
 ```
 Anak: "Ibu...Aku tidak nyaman"
 **Keadaan:** Ibu tidak datang, lanjut ke Choice B
 ```
 
-Choice B: Menangis Keras
+Choice B: *Oeekk* (Menangis Keras)
 	Anak: "Ibu! Aku butuh ibu!"
 	Anak: "Gak nyaman banget"
 
 **Sound: Suara gebrakan meja, kursi bergeser kasar**
-
+### Seq7 IbuMarahLagi
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan**: Ibu datang dengan mata merah, terlihat sangat stress
 Keadaan: Pintu terbuka 
 
@@ -1042,7 +1032,7 @@ Ibu: "Ganti popok aja dulu lah"
 
 ---
 
-### Seq7 Menyerah Sementara
+### Seq8 Stres
 
 **Keadaan: Ibu duduk di kasur sambil menggendong Rey**
 Lokasi: Kamar Ortu
@@ -1059,13 +1049,13 @@ Ibu: "Tapi aku masih usahain sore ini kelar dulu"
 Ibu: "Rey tidur ya... Ibu capek banget" 
 Ibu: "Makannya nanti aja" 
 
-Choice A : Mengeluarkan suara "Neh" Yang menandakan tidak nyaman
+Choice A : Mengeluarkan suara "Neh" Yang menandakan lapar
 
 Choice B : Menangis Pelan
 
 Jika berdasarkan pilihan
 
-Choice A: Heh (Tidak nyaman)
+Choice A: *Neh* (Lapar)
 
 ```
 Anak: "Anak: "Ibu.. Aku lapar""
@@ -1073,8 +1063,9 @@ Ibu: "Kenapa sih Rey"
 Keadaan: Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
-Choice B: Menangis Pelan 
+Choice B:  *Oek* (Menangis)
 	Anak: "Ibu... Aku sungguh lapar"
+	
 Ibu: "Haduh malah nangis" 
 Ibu: "Arghh cape" 
 Ibu: "Sakit kuping begini" 
@@ -1086,7 +1077,7 @@ Ibu: "Sakit kuping begini"
 
 ## Malam Hari
 
-### Seq6 Gangguan Setan Ringan
+### Seq9 Gangguan Setan Ringan
 
 **Lokasi:** Kamar Rey
 **Set Waktu:** Malam
@@ -1110,11 +1101,17 @@ Interaksi Pilihan:
 
 Choice A : Menangis Pelan
 
+Jika berdasarkan pilihan
+
+Choice A: *Oek* (Menangis)
+
 ```
 Anak: "Ibu Dimana.."
 ```
 Ayah: "Itu si rey nangis coba samperin dulu"
 Ibu: "Iya" 
+
+### Seq10 Maaf
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan**: Ibu datang dan mencapai depan pintu
 Keadaan: Membuka pintu 
@@ -1150,7 +1147,7 @@ Ibu: "Tidurlah nak"
 
 ## Siang Hari
 
-### Seq1 IbuMarah
+### Seq1 Lapar
 
 **Lokasi:** Kamar Rey
 **Set Waktu:** Siang
@@ -1167,7 +1164,7 @@ Anak: "Ibu sedang apa"
 
 Interaksi Pilihan:
 
-Choice A : Mengeluarkan suara "Neh" pelan
+Choice A : Mengeluarkan suara "Neh" Yang menandakan lapar
 
 Choice B : Menangis pelan
 
@@ -1175,22 +1172,25 @@ Choice C : Menangis keras
 
 Jika berdasarkan pilihan
 
-Choice A: Neh (Lapar - pelan)
+Choice A: *Neh* (Lapar)
 
 ```
 Anak: "Ibu.."
 **Keadaan:** Ibu tidak mendengar, lanjut ke Choice B
 ```
 
-Choice B: Menangis Pelan
-	Anak: "Ibu... Lapar"
+Choice B: *Oek* (Menangis)
+```
+Anak: "Ibu... Lapar"
+**Keadaan:** Ibu tidak mendengar, lanjut ke Choice C
+```
 
-Choice C : Menangis Keras
+Choice C : *Oeekk* (Menangis Keras)
 	Anak: "Ibu... Aku Lapar"
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan
 **Keadaan**: Ibu datang dengan MARAH LUAR BIASA
-
+### Seq2 IbuMarah
 Ibu: _berteriak mengamuk_ "REY! IBU BILANG JANGAN GANGGU! IBU LAGI KERJA" 
 Ibu: _anger outburst_ "KAMU KENAPA SIH HADUH"
 Anak: "Ibu sangat menakutkan" 
@@ -1204,12 +1204,13 @@ Choice B : Menangis keras
 
 Jika berdasarkan pilihan
 
-Choice A: Menangis Pelan
+Choice A:  *Oek* (Menangis)
 	Anak: "Ibu aku hanya lapar... "
 
-Choice B : Menangis Keras
+Choice B : *Oeekk* (Menangis Keras)
 	Anak: "Ibu... Aku takut"
 
+### Seq3 Stres
 **Keadaan:** Ibu mengangkat rey dan berada di depan dada sambil menggendong
 Ibu: _anger outburst_ "Udah diem"
 Ibu: "Langsung tidur aja ibu banyak kerjaan"
@@ -1221,7 +1222,7 @@ Ibu: _gemetar_ "Tanganku gemetar sekali"
 Anak: "Ibu napasnya aneh" 
 **Keadaan: Rey tidur lagi - layar gelap**
 ## Sore Hari
-### Seq2 Penyesalan
+### Seq4 Penyesalan
 
 **Keadaan: Setelah marah, ibu tiba-tiba merasa bersalah**
 **Gejala: Guilt & Self-Blame**
@@ -1254,16 +1255,15 @@ Choice A : Membuka mata
 
 Jika berdasarkan pilihan
 
-Choice A: Membuka mata
+Choice A: (Membuka mata)
 	Anak: "Ibu..."
 
 Anak: "Ibu tampak gembira"
 Ibu: "Ayo Rey kita mandi dulu, sekalian makan"
 **Keadaan: Mandi berlangsung layar gelap**
 
----
-
-### Seq3 GangguanSetanHujan
+## Malam Hari
+### Seq5 GangguanSetanHujan
 
 **Lokasi:** Kamar Rey **Set Waktu:** Malam
 
@@ -1290,13 +1290,13 @@ Choice B : Diam ketakutan
 
 Jika berdasarkan pilihan
 
-Choice A: Menangis keras 
+Choice A: *Oeekk* (Menangis Keras)
 	Anak: "IBU! ADA YANG ANEH!"
 
-Choice B: Diam ketakutan
+Choice B: (Diam Takut)
 	Anak: "Takut... tapi takut ibu marah juga"
 	 **Keadaan:**  lanjut ke Choice A
-
+### Seq6 Muak
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan**: Ibu datang dengan wajah sangat lelah dan kesal
 
 Ibu: _sangat capek_ "Rey... mama udah gak bisa tidur kamu malah nangis gini kenapa sih" 
@@ -1366,6 +1366,7 @@ Ibu: "Gak papa lah, aku masih ada kerjaan banyak buat hari ini jadi bisa fokus"
 **Keadaan: Rey terbangun, ruangan terasa dingin**
 Anak: "Suara apa itu"
 Anak: "Tadi aku mendengar suara tertawa"
+Keadaan: Ada sesuatu yang lewat
 ### Seq4 Sosok
 Anak: "Apa itu"
 Anak: "Ada yang berbeda" 
@@ -1375,6 +1376,7 @@ Anak: "Ada... sesuatu di pojok"
 Anak: "Menakutkan..."
 **Keadaan: Sosok perlahan bergerak mendekati box bayi**
 
+### Seq5 Mendekat
 Anak: "Mendekat..." 
 Anak: "Takut sekali..." 
 Anak: "IBU! AYAH!"
@@ -1387,10 +1389,10 @@ Choice B : Diam ketakutan
 
 Jika berdasarkan pilihan
 
-Choice A: Menangis keras 
+Choice A: *Oeekk* (Menangis Keras)
 	Anak: "IBU! ADA YANG ANEH DI KAMAR!"
 
-Choice B: Diam ketakutan 
+Choice B: (Diam Takut)
 	Anak: "Takut... tapi takut ganggu ibu lagi"
 	 lanjut ke Choice A
 
@@ -1399,7 +1401,7 @@ Choice B: Diam ketakutan
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan**: Ibu datang terburu-buru dan menangkat rey
 **Keadaan**: Pintu terbuka
-
+### Seq6 Khawatir
 Ibu: _khawatir_ "Iya sayang ibu disini" 
 Ibu: "Lapar ya.. dari siang gak ada minum susu" 
 Ibu: "Ibu gak ada marah marah hari ini karena kamu gak rewel"
@@ -1436,17 +1438,17 @@ Choice B : Menangis Keras
 
 Jika berdasarkan pilihan
 
-Choice A:  Menangis pelan
+Choice A:  *Oek* (Menangis)
 
 ```
 Anak: "Ibu... Lapr"
 **Keadaan: ** Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
-Choice B : Menangis Keras
+Choice B : *Oeeeekkkkk*  (Menangis makin keras)
 	Anak: "Ibu dimana..."
 
-### Seq2 KemanaIbu
+### Seq2 Sendirian
 Anak: "Ibu dimana"
 Anak: "Ibu kenapa gak datang"
 Choice A : Menangis Makin Keras
@@ -1517,10 +1519,10 @@ Choice B : Diam ketakutan
 
 Jika berdasarkan pilihan
 
-Choice A: Menangis keras memanggil ibu 
+Choice A: *Oeekk* (Menangis Keras)
 	Anak: "AYAH! IBU! TOLONG!" 
 	
-Choice B: Diam ketakutan 
+Choice B: (Diam Takut) 
 	Anak: "Takut... tapi takut ganggu ibu"
 	Kembali sisa pilihan A
 
@@ -1528,6 +1530,7 @@ Choice B: Diam ketakutan
 **Keadaan**: Ibu datang terburu-buru dan mengangkat rey 
 **Keadaan**: Pintu terbuka
 
+### Seq6 Khawatir
 Ibu: _khawatir_ "Kenapa rey lapar ya" 
 Ibu: "Tapi gak usah nangis kenceng juga ibu lagi banyak kerjaan ini" 
 Ibu: "Ibu cape hari ini gara-gara kerjaan dari manager tiba-tiba berikan banyak kerjaan segunung"
@@ -1575,24 +1578,24 @@ Choice B : Menangis Keras
 
 Jika berdasarkan pilihan
 
-Choice A:  Menangis pelan
+Choice A:   *Oek* (Menangis)
 
 ```
 Anak: "Ibu... Lapr"
 **Keadaan: ** Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
-Choice B : Menangis Keras
+Choice B : *Oeekk* (Menangis Keras)
 	Anak: "Ibu.. Aku lapar..."
 
-### Seq2 KemanaIbu
+### Seq2 MencariIbu
 Anak: "Ibu kok gak datang lagi"
 Anak: "Rey ditinggal ya Ibu"
 Anak: "Ibu..."
 Anak: "Rey Lapar"
 Choice A : Menangis Makin Keras
 	Anak: "Ibu dimana..."
-### Seq3 IbuMarahBesar
+### Seq3 MarahBesar
 Keadaan: Ibu mendobrak pintu sambil marah marah
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan**: Ibu datang dan mencapai depan pintu
@@ -1660,16 +1663,16 @@ Anak: "Gak akan"
 Anak: "AYAH! IBU!"
 Interaksi Pilihan:
 
-Choice A : Menangis keras memanggil ibu
+Choice A : Menangis makin keras memanggil ibu
 Jika berdasarka pilihan
 
-Choice A: Menangis keras memanggil ibu 
+Choice A: *Oeeeekkkkk*  (Menangis makin keras)
 	Anak: "AYAH! IBU! TOLONG!" 
 	
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan**: Ibu datang terburu-buru dan mengangkat rey 
 **Keadaan**: Pintu terbuka
-
+### Seq5 MarahSangatBesar
 Ibu: "REY BERISIK TAU GAK"
 Ibu: "IBU CAPE"
 Ibu: "BERHENTI LAH MENANGIS"
@@ -1710,7 +1713,7 @@ Anak: "Ibu aku kesakitan"
 
 ## Siang Hari
 
-### Seq1 LaparSiang
+### Seq1 Lapar
 
 **Lokasi:** Kamar Ortu
 **Set Waktu:** Siang
@@ -1721,20 +1724,20 @@ Anak: "Ternyata aku ada di kamar ibu"
 Anak: "Ibu aku lapar"
 Interaksi Pilihan:
 
-Choice A : Mengeluarkan suara "Neh" pelan
+Choice A : Mengeluarkan suara "Neh" Yang menandakan lapar
 
 Choice B : Menangis pelan
 
 
 Jika berdasarkan pilihan
 
-Choice A: Menangis pelan 
+Choice A: *Neh* (Lapar)
 	Anak: "Ibu..." 
 	**Keadaan:** Tidak ada respons, lanjut ke Choice B
 
-Choice B: Menangis Pelan 
+Choice B: *Oek* (Menangis)
 	Anak: "Ibu.. Lapar.. " 
-
+### Seq2 Diam
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan
 **Keadaan:** Ibu mengangkat rey dan berada di depan dada sambil menggendong serta tidak mengatakan apa apa dan langsung
 Anak: "Ibu kenapa  diam saja"
@@ -1751,7 +1754,7 @@ Sound: Suara getar dari hp
 
 ## Malam Hari
 
-### Seq2 PelampiasanEmosi
+### Seq3 PelampiasanEmosi
 
 **Lokasi:** Ruang Santai
 **Set Waktu:** Malam
@@ -1788,7 +1791,7 @@ Ibu: "Ayah bisa cari istri yang lebih baik..."
 
 ## Siang Hari
 
-### Seq1 POV ANAK - KeanehanIbu
+### Seq1  - Lapar
 
 **Lokasi:** Kamar Ortu
 **Set Waktu:** Siang
@@ -1808,9 +1811,9 @@ Choice A : Menangis Pelan
 
 Jika berdasarkan pilihan
 
-Choice A: Menangis pelan 
+Choice A: *Oek* (Menangis)
 	Anak: "Ibu... lapar..." 
-
+### Seq2  - Keanehan
 Ibu: "Terbangun ya"
 Ibu: "Ibu lagi gak enak perasaan ini"
 Anak: "Ibu kembali seperti biasa"
@@ -1821,7 +1824,7 @@ Anak: "Sepertinya ibu tidak kenapa napa"
 
 ## Malam Hari
 
-### Seq2 Curhatan
+### Seq3 Curhatan
 
 **Lokasi:** Kamar Ortu
 **Set Waktu:** Malam
@@ -1917,13 +1920,14 @@ Choice A : Menangis Keras
 
 Jika berdasarkan pilihan
 
-Choice A: Menangis Keras
+Choice A: *Oeekk* (Menangis Keras)
 	Anak: "Ibu..." 
 
 Anak : "Ibu gak merespon"
 Interaksi Pilihan:
 
 Choice A : Menangis Kencang Keras
+### Seq2 Selamat
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 Keadaan: Ibu mendatangi rey dengan wajah pucat dan menggendong rey
 Ibu: "Kenapa sih kamu menangis terus"
@@ -1946,7 +1950,7 @@ Anak: "Ibu"
 **Set Waktu:** Malam 
 **POV:** Multiple (Ibu & Anak bergantian)
 
-**Keadaan: Rey lapar, **
+**Keadaan: Rey lapar**
 
 Suara : Dering telepon
 Anak: "Aku lapar"
