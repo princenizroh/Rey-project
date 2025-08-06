@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: "*Mengendus*"
+      dialogEntry: '*Mengendus*'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

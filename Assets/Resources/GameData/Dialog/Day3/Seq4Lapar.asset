@@ -60,7 +60,7 @@ MonoBehaviour:
           npcResponse: Lapar...
         audioDialogResponse: {fileID: 0}
       - playerChoice: '*Oeekk* (Menangis Keras)'
-        correctChoice: 0
+        correctChoice: 1
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu dimana...

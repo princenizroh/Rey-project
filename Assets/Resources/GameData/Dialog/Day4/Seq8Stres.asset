@@ -94,55 +94,23 @@ MonoBehaviour:
       npcName: 1
       dialogEntry: Makannya nanti aja
       audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu.. Aku lapar
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Kenapa sih Rey
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu... Aku sungguh lapar
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Haduh malah nangis
-      audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Neh* (Lapar)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu... Aku lapar
+        - npcName: 1
+          npcResponse: '{+50stress} Kenapa sih Rey'
+        audioDialogResponse: {fileID: 0}
+      - playerChoice: '*Oek* (Menangis)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu... Aku sungguh lapar
+        - npcName: 1
+          npcResponse: '{+50stress} Haduh malah nangis'
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0

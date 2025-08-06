@@ -17,29 +17,29 @@ public class StressBarIndicatorIbu : MonoBehaviour
     [SerializeField] private float stressRate;
     
     [Header("Base Stress Colors (Day 1-12 - Brighter)")]
-    [SerializeField] private Color lowStressColor = new Color(0f, 1f, 0f, 1f);         // 0-25 stress (Green)
-    [SerializeField] private Color mediumLowStressColor = new Color(1f, 0.5f, 0f, 1f); // 25-200 stress (Orange)
-    [SerializeField] private Color mediumStressColor = new Color(1f, 0f, 0f, 1f);      // 200-600 stress (Red)
+    [SerializeField] private Color lowStressColor = new Color(0f, 1f, 0f, 1f);         // 0-5 stress (Green)
+    [SerializeField] private Color mediumLowStressColor = new Color(1f, 1f, 0f, 1f);   // 5-250 stress (Yellow)
+    [SerializeField] private Color mediumStressColor = new Color(1f, 0.5f, 0f, 1f);    // 250-500 stress (Orange)
     [SerializeField] private Color mediumHighStressColor = new Color(0.8f, 0f, 0f, 1f); // Not used in new logic
-    [SerializeField] private Color highStressColor = new Color(0.6f, 0f, 0f, 1f);      // 600-1000 stress (Dark Red)
-    [SerializeField] private Color maxStressColor = new Color(0.4f, 0f, 0f, 1f);       // 1000+ stress (Very Dark Red)
+    [SerializeField] private Color highStressColor = new Color(1f, 0f, 0f, 1f);        // 500-1000 stress (Red)
+    [SerializeField] private Color maxStressColor = new Color(0.4f, 0f, 0f, 1f);       // 1000+ stress (Dark Red)
     
     [Header("Dark Stress Colors (Day 13+ - Darker)")]
-    [SerializeField] private Color darkLowStressColor = new Color(0f, 0.7f, 0f, 1f);         // 0-25 stress (Dark Green)
-    [SerializeField] private Color darkMediumLowStressColor = new Color(0.8f, 0.4f, 0f, 1f); // 25-200 stress (Dark Orange)
-    [SerializeField] private Color darkMediumStressColor = new Color(0.7f, 0f, 0f, 1f);      // 200-600 stress (Dark Red)
+    [SerializeField] private Color darkLowStressColor = new Color(0f, 0.7f, 0f, 1f);         // 0-5 stress (Dark Green)
+    [SerializeField] private Color darkMediumLowStressColor = new Color(0.8f, 0.8f, 0f, 1f); // 5-250 stress (Dark Yellow)
+    [SerializeField] private Color darkMediumStressColor = new Color(0.8f, 0.4f, 0f, 1f);    // 250-500 stress (Dark Orange)
     [SerializeField] private Color darkMediumHighStressColor = new Color(0.5f, 0f, 0f, 1f);  // Not used in new logic
-    [SerializeField] private Color darkHighStressColor = new Color(0.4f, 0f, 0f, 1f);        // 600-1000 stress (Very Dark Red)
-    [SerializeField] private Color darkMaxStressColor = new Color(0.3f, 0f, 0f, 1f);         // 1000+ stress (Extremely Dark Red)
+    [SerializeField] private Color darkHighStressColor = new Color(0.7f, 0f, 0f, 1f);        // 500-1000 stress (Dark Red)
+    [SerializeField] private Color darkMaxStressColor = new Color(0.3f, 0f, 0f, 1f);         // 1000+ stress (Very Dark Red)
     
     [Header("Day-based Settings")]
     [SerializeField] private int darkDayThreshold = 13; // Day 13+ uses darker colors
     
     [Header("Outline Colors")]
-    [SerializeField] private Color lowStressOutline = new Color(0f, 1f, 0f, 0.3f);     // 0-25: Green outline
-    [SerializeField] private Color mediumStressOutline = new Color(1f, 0.5f, 0f, 0.5f);  // 25-200: Orange outline
-    [SerializeField] private Color highStressOutline = new Color(1f, 0f, 0f, 0.7f);     // 200-600: Red outline
-    [SerializeField] private Color maxStressOutline = new Color(0.6f, 0f, 0f, 0.9f);    // 600+: Dark Red outline
+    [SerializeField] private Color lowStressOutline = new Color(0f, 1f, 0f, 0.3f);     // 0-5: Green outline
+    [SerializeField] private Color mediumStressOutline = new Color(1f, 1f, 0f, 0.5f);  // 5-250: Yellow outline
+    [SerializeField] private Color highStressOutline = new Color(1f, 0.5f, 0f, 0.7f);  // 250-500: Orange outline
+    [SerializeField] private Color maxStressOutline = new Color(1f, 0f, 0f, 0.9f);     // 500+: Red outline
     
     [Header("Outline Settings")]
     [SerializeField] private float outlineThickness = 2f;
@@ -60,7 +60,7 @@ public class StressBarIndicatorIbu : MonoBehaviour
     [SerializeField] private bool enableStressChangeAnimation = true;
     
     [Header("Debug")]
-    [SerializeField] private bool enableDebugLogs = false; // Changed default to false
+    [SerializeField] private bool enableDebugLogs = true; // Temporarily enabled for debugging
 
     void Start()
     {
@@ -284,6 +284,8 @@ public class StressBarIndicatorIbu : MonoBehaviour
         int currentStress = saveData.mother_stress_level;
         bool useDarkPalette = currentDay >= darkDayThreshold;
         
+        if (enableDebugLogs) Debug.Log($"[StressBar] UpdateColors called - Day: {currentDay}, Stress: {currentStress}, UseDarkPalette: {useDarkPalette}");
+        
         // Update fill color based on day and stress
         UpdateDayAndStressBasedFillColor(currentStress, useDarkPalette);
         
@@ -300,6 +302,8 @@ public class StressBarIndicatorIbu : MonoBehaviour
         if (indicatorStressImage == null)
             return;
             
+        if (enableDebugLogs) Debug.Log($"[StressBar] UpdateFillColor called with stressLevel={stressLevel}, useDarkPalette={useDarkPalette}");
+            
         Color fillColor;
         
         // Select color palette based on day
@@ -310,39 +314,58 @@ public class StressBarIndicatorIbu : MonoBehaviour
         Color highColor = useDarkPalette ? darkHighStressColor : highStressColor;
         Color maxColor = useDarkPalette ? darkMaxStressColor : maxStressColor;
         
+        if (enableDebugLogs) Debug.Log($"[StressBar] Selected colors - lowColor={lowColor}, mediumLowColor={mediumLowColor}");
+        
         // Determine color based on stress level with new thresholds
-        // <= 25: Green, <= 200: Orange, <= 600: Red, <= 1000: Dark Red
-        if (stressLevel <= 25)
+        // <= 5: Green, <= 50: Yellow, <= 250: Yellow-Orange, <= 500: Orange, <= 1000: Red, 1000+: Dark Red
+        if (stressLevel <= 4)
         {
-            // 0-25: Green
+            // 0-5: Green
             fillColor = lowColor;
+            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Green");
         }
-        else if (stressLevel <= 200)
+        else if (stressLevel <= 5)
         {
-            // 25-200: Orange (interpolate from green to orange)
-            float t = (stressLevel - 25f) / 175f;
-            fillColor = Color.Lerp(lowColor, mediumLowColor, t);
+            // 5-50: Pure Yellow
+            fillColor = mediumLowColor;
+            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Pure Yellow {mediumLowColor}");
+            
+            // FORCE TEST: Set to bright red to see if this actually works
+            if (stressLevel == 50) {
+                fillColor = Color.red;
+                if (enableDebugLogs) Debug.Log($"[StressBar] FORCE TEST: Setting stress 50 to RED for testing");
+            }
         }
-        else if (stressLevel <= 600)
+        else if (stressLevel <= 6)
         {
-            // 200-600: Red (interpolate from orange to red)
-            float t = (stressLevel - 200f) / 400f;
-            fillColor = Color.Lerp(mediumLowColor, mediumColor, t);
+            // 50-250: Yellow to Orange transition
+            float t = (stressLevel - 50f) / 200f;
+            fillColor = Color.Lerp(mediumLowColor, mediumStressColor, t);
+            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Yellow-Orange interpolation (t={t:F2})");
+        }
+        else if (stressLevel <= 500)
+        {
+            // 250-500: Orange
+            fillColor = mediumStressColor;
+            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Orange");
         }
         else if (stressLevel <= 1000)
         {
-            // 600-1000: Dark Red (interpolate from red to dark red)
-            float t = (stressLevel - 600f) / 400f;
-            fillColor = Color.Lerp(mediumColor, highColor, t);
+            // 500-1000: Red (interpolate from orange to red)
+            float t = (stressLevel - 500f) / 500f;
+            fillColor = Color.Lerp(mediumStressColor, highColor, t);
+            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Red interpolation (t={t:F2})");
         }
         else
         {
-            // 1000+: Maximum dark red
+            // 1000+: Dark Red
             fillColor = maxColor;
+            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Dark Red");
         }
         
         // Apply fill color
         indicatorStressImage.color = fillColor;
+        if (enableDebugLogs) Debug.Log($"[StressBar] Final applied color: {fillColor} to {indicatorStressImage.name}");
     }
     
     /// <summary>
@@ -355,24 +378,24 @@ public class StressBarIndicatorIbu : MonoBehaviour
             
         Color outlineColor;
         
-        if (stressLevel <= 25)
+        if (stressLevel <= 5)
         {
-            // 0-25: Green outline
+            // 0-5: Green outline
             outlineColor = lowStressOutline;
         }
-        else if (stressLevel <= 200)
+        else if (stressLevel <= 500)
         {
-            // 25-200: Orange outline
+            // 5-50: Yellow outline
             outlineColor = mediumStressOutline;
         }
-        else if (stressLevel <= 600)
+        else if (stressLevel <= 750)
         {
-            // 200-600: Red outline
+            // 50-500: Orange outline
             outlineColor = highStressOutline;
         }
         else
         {
-            // 600+: Dark Red outline
+            // 500+: Red outline
             outlineColor = maxStressOutline;
         }
         
@@ -555,6 +578,21 @@ public class StressBarIndicatorIbu : MonoBehaviour
         foreach (int stress in criticalLevels)
         {
             SetStressLevel(stress);
+        }
+    }
+    
+    /// <summary>
+    /// Test method to verify stress level 50 behavior
+    /// </summary>
+    [ContextMenu("Test Stress 50 Debug")]
+    public void TestStress50Debug()
+    {
+        if (saveData != null)
+        {
+            SetStressLevel(50);
+            Debug.Log($"[StressBar] Manual test - set stress to 50. Current stress: {saveData.mother_stress_level}");
+            Debug.Log($"[StressBar] IndicatorStress GameObject: {(indicatorStressImage != null ? indicatorStressImage.name : "NULL")}");
+            Debug.Log($"[StressBar] Current color: {(indicatorStressImage != null ? indicatorStressImage.color : Color.clear)}");
         }
     }
     

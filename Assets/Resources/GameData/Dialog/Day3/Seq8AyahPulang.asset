@@ -58,42 +58,16 @@ MonoBehaviour:
       npcName: 2
       dialogEntry: Rey baik-baik aja kan hari ini
       audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 2
-      dialogEntry: Iya anak baik
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 2
-      dialogEntry: Ayah bangga sama Rey
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 2
-      dialogEntry: Besok ayah harus kerja lebih keras lagi
-      audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Nghh* (Merespon)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Iya anak baik
+        - npcName: 0
+          npcResponse: Ayah bangga sama Rey
+        - npcName: 0
+          npcResponse: Besok ayah harus kerja lebih keras lagi
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

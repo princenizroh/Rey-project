@@ -212,7 +212,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Padahal setelah Ibu menikah dengan ayahmu, Ibu masih ingin bersenang-senang dulu bersama ayahmu
+      dialogEntry: Padahal setelah Ibu menikah dengan ayahmu, Ibu masih ingin bersenang-senang
+        dulu bersama ayahmu
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -225,18 +226,6 @@ MonoBehaviour:
       camChoice: 0
       npcName: 1
       dialogEntry: Momen ini gak pernah diduga dengan kelahiranmu
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Ibu masih berharap
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -261,30 +250,6 @@ MonoBehaviour:
       camChoice: 0
       npcName: 1
       dialogEntry: Bangun, kita mandi dulu
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu...
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu tampak gembira
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

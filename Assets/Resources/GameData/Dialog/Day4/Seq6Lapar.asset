@@ -58,42 +58,20 @@ MonoBehaviour:
       npcName: 0
       dialogEntry: Bagian bawahku mulai basah
       audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu...Aku tidak nyaman
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu! Aku butuh ibu!
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Gak nyaman banget
-      audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Heh* (Tidak nyaman)'
+        correctChoice: 0
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu...Aku tidak nyaman
+        audioDialogResponse: {fileID: 0}
+      - playerChoice: '*Oeekk* (Menangis Keras)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: '{+30stress} Ibu! Aku butuh ibu!'
+        - npcName: 0
+          npcResponse: Gak nyaman banget
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

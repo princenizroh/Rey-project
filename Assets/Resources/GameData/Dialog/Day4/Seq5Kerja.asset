@@ -44,7 +44,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Capek banget... Baru hari pertama bekerja kembali gak dikasih napas
+      dialogEntry: Capek banget... Baru hari pertama bekerja kembali gak dikasih
+        napas
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -73,5 +74,3 @@ MonoBehaviour:
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
-  - npcName: 0
-    dialog: Ibu.. ibu kenapa

@@ -20,20 +20,20 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Iya sayang mau susu
+      dialogEntry: Lapar
       audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Sayang, Rey butuh susu
-      audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Unghh* (Interaksi Ayah)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Iya sayang mau susu ya
+        audioDialogResponse: {fileID: 0}
+      - playerChoice: '*Unghh* (Interaksi Ibu)'
+        correctChoice: 0
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Sayang, Rey butuh susu
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

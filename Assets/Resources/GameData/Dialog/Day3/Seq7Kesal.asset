@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Lagi-lagi ngompol
+      dialogEntry: '{+1stress} Lagi-lagi ngompol'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: "*Mengendus*"
+      dialogEntry: '*Mengendus*'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,7 +44,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: "Haduh baunya"
+      dialogEntry: Haduh baunya
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -56,7 +56,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: "Capek banget jadi ibu"
+      dialogEntry: Capek banget jadi ibu
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

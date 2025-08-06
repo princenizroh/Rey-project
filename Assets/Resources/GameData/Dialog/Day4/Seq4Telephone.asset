@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 5
+      npcName: 6
       dialogEntry: Halo, Linda data dari peneliti sudah di kumpulkan semua
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -55,8 +55,9 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 5
-      dialogEntry: Hari ini tolong semuanya diselesaikan ya. Ini ada data terbaru yang baru ditemukan.
+      npcName: 6
+      dialogEntry: Hari ini tolong semuanya diselesaikan ya. Ini ada data terbaru
+        yang baru ditemukan.
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -68,70 +69,28 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Ibu kemana
+      dialogEntry: Ibu kemana..
       audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Oeekk* (Menangis Keras)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu... Ibu kemana..
+        - npcName: 6
+          npcResponse: Suara apa itu?
+        - npcName: 1
+          npcResponse: Eh gak papa itu anak saya lagi rewel
+        - npcName: 6
+          npcResponse: Oh yasudah, bisa diselesaikan hari ini kan
+        - npcName: 1
+          npcResponse: Iya pak bisa
+        audioDialogResponse: {fileID: 0}
+      - playerChoice: '*Oeekk* (Menangis Keras)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Aku langsung tidur saja
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu... Ibu kemana..
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 5
-      dialogEntry: Suara apa itu?
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Eh gak papa itu anak saya lagi rewel
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 5
-      dialogEntry: Oh yasudah, bisa diselesaikan hari ini kan
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Iya pak bisa
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - npcName: 0
-    dialog: Aku langsung tidur saja

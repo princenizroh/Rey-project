@@ -58,7 +58,19 @@ MonoBehaviour:
       npcName: 0
       dialogEntry: IBU! AYAH!
       audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Oeekk* (Menangis Keras)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: '{+100stress} IBU! ADA YANG ANEH!'
+        audioDialogResponse: {fileID: 0}
+      - playerChoice: (Diam Takut)
+        correctChoice: 0
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Takut... tapi takut ibu marah juga
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
@@ -68,7 +80,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Kenapa rey lapar ya
+      dialogEntry: Rey... mama udah gak bisa tidur kamu malah nangis gini kenapa
+        sih
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -80,7 +93,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Tapi gak usah nangis kenceng juga ibu lagi banyak kerjaan ini
+      dialogEntry: Sekarang kamu nangis keras banget
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -92,7 +105,19 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ibu sampe lembur ini malam-malam bukannya istirahat malah kerja
+      dialogEntry: Berisik kedengeran tetangga tau gak
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 2
+      dialogEntry: Kenapa sayang, tenangin Rey udah malam
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -104,79 +129,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Udah gitu harus hari ini selesai
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Besok mau dipake
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Arghh... cape banget
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Capeee
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Kesal
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Gak kuat
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Iya sabar ini mau disusuin
+      dialogEntry: ya sabar ini mau disusuin
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

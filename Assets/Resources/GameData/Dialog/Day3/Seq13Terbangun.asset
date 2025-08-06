@@ -32,80 +32,48 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Lapar..
+      dialogEntry: Lapar...
       audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu...
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 2
-      dialogEntry: Rey bangun lagi
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 2
-      dialogEntry: Sayang Rey minta susu
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Iya sayang
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Mulai besok Rey jangan dibangunin, karena aku besok mau langsung kerja
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 2
-      dialogEntry: Iya sayang gak kubangunin kok
-      audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Neh* (Lapar)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu...
+        - npcName: 2
+          npcResponse: Rey bangun lagi
+        - npcName: 2
+          npcResponse: Sayang Rey minta susu
+        - npcName: 1
+          npcResponse: '{+2stress} Iya sayang'
+        audioDialogResponse: {fileID: 0}
+      - playerChoice: '*Oek* (Menangis)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Lapar...
+        - npcName: 1
+          npcResponse: '*Hnghh*'
+        - npcName: 1
+          npcResponse: '{+2stress} Kenapa sih Rey'
+        - npcName: 1
+          npcResponse: Besok mama kerja tau
+        - npcName: 2
+          npcResponse: Udah kasih makan aja
+        audioDialogResponse: {fileID: 0}
+      - playerChoice: '*Oek* (Menangis)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Lapar Banget...
+        - npcName: 2
+          npcResponse: Rey kenceng banget nangisnya
+        - npcName: 2
+          npcResponse: Lapar banget kayaknya
+        - npcName: 1
+          npcResponse: '{+2stress} Mau meledak rasanya denger tangisannya'
+        - npcName: 1
+          npcResponse: Udah kasih makan Besok aku dah kerja begadang yang ada hih
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

@@ -94,6 +94,36 @@ MonoBehaviour:
       npcName: 0
       dialogEntry: Aku mau bersama ibu...
       audioDialogEntry: {fileID: 0}
+      choices:
+      - playerChoice: '*Oek* (Menangis)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu Dimana...
+        audioDialogResponse: {fileID: 0}
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 2
+      dialogEntry: Itu si rey nangis coba samperin dulu
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Iya
+      audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
