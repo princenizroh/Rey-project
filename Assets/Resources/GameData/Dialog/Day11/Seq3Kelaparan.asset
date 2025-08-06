@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 5
-      dialogEntry: '[Sound: Dering telepon]'
+      dialogEntry: '*Tulalit'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Kenapa sih kamu menangis terus
+      dialogEntry: '{+10stress} Kenapa sih kamu menangis terus'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -68,7 +68,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Aku meminum susu Ibu. tapi keluarnya sangat sedikit
+      dialogEntry: Aku meminum susu Ibu, tapi keluarnya sangat sedikit
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

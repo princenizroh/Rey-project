@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+5stress} Apasih ibu lagi sibuk tau haduh berisik banget'
+      dialogEntry: '{+10stress} Apasih ibu lagi sibuk tau haduh berisik banget'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -56,7 +56,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+5stress} Ibu jadi gila kalau kamu menangis terus terusan'
+      dialogEntry: '{+10stress} Ibu jadi gila kalau kamu menangis terus terusan'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -68,7 +68,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ibu hari ini gak makan
+      dialogEntry: '{+10stress} Ibu hari ini gak makan'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -140,7 +140,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+5stress} Ibu gak kuat nak ibu cape mengurus pekerjaan rumah,
+      dialogEntry: '{+15stress}  Ibu gak kuat nak ibu cape mengurus pekerjaan rumah,
         pekerjaan perusahaan, dan mengurus kamu'
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -153,7 +153,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ibu cape banget tau gak
+      dialogEntry: '{+5stress} Ibu cape banget tau gak'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -189,7 +189,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+5stress} Sejak ngurus kamu dan kerja ini ibu jadi sering telat'
+      dialogEntry: '{+10stress} Sejak ngurus kamu dan kerja ini ibu jadi sering telat'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -225,7 +225,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Selalu cuci handuk karena kamu ngompolnya sangat deras
+      dialogEntry: '{+5stress} Selalu cuci handuk karena kamu ngompolnya sangat deras'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -237,7 +237,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Sudah dikasih popok tapi masih tetap tembus kehanduk
+      dialogEntry: '{+5stress} Sudah dikasih popok tapi masih tetap tembus kehanduk'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

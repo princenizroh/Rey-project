@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 5
-      dialogEntry: SFX KUNCI PINTU, LANGKAH KAKI
+      dialogEntry: '{+10stress} *Ckrk'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Aneh... rumah gelap semua
+      dialogEntry: '*DugDug'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -64,18 +64,6 @@ MonoBehaviour:
   - Type: 0
     Dialog:
       cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 5
-      dialogEntry: SFX HENING TOTAL
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
       dialogType: 0
       dialog3DLocation: 0
       camChoice: 0
@@ -92,7 +80,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Katanya sih sakit, tapi gak ada konfirmasi lagi kalau masuk kerjanya kapan
+      dialogEntry: Katanya sih sakit, tapi gak ada konfirmasi lagi kalau masuk kerjanya
+        kapan
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

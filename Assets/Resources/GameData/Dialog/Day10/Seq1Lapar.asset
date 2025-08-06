@@ -19,6 +19,42 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 5
+      dialogEntry: '{+10stress} *Duggg*'
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 5
+      dialogEntry: '{+20stress} *Debugg'
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 5
+      dialogEntry: '{+20stress} *Prankk'
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
       npcName: 0
       dialogEntry: Ada suara..
       audioDialogEntry: {fileID: 0}
@@ -44,42 +80,20 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Ibu dimana ya?
+      dialogEntry: Ibu dimana ya...
       audioDialogEntry: {fileID: 0}
-      choices: []
+      choices:
+      - playerChoice: '*Oek* (Menangis)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu... lapar...
+        audioDialogResponse: {fileID: 0}
+      - playerChoice: '*Oeekk* (Menangis Keras)'
+        correctChoice: 1
+        dialogResponses:
+        - npcName: 0
+          npcResponse: Ibu... Aku lapar...
+        audioDialogResponse: {fileID: 0}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu... lapar...
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Terbangun ya
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - npcName: 1
-    dialog: Terbangun ya
-  - npcName: 1
-    dialog: Ibu lagi gak enak perasaan ini
-  - npcName: 0
-    dialog: Ibu kembali seperti biasa
-  - npcName: 0
-    dialog: Tapi kok ada yang aneh
-  - npcName: 0
-    dialog: Sepertinya ibu tidak kenapa napa

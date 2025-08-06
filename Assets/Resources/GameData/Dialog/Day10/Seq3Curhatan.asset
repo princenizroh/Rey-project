@@ -20,6 +20,102 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
+      dialogEntry: Gelap...
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Sepi banget...
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: '{+5stres} Kenapa hidupku jadi kayak gini...'
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: '{+20stres} AKU CAPEK TAU GAK! AKU CAPEK!'
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: '{+10stres} Semua berantakan!'
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: '{+10stres} Hidupku berantakan!'
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Mengurus semuanya sendirian
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: '{+20stress} SEMUANYA BERANTAKAN!'
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
       dialogEntry: Aku gak kuat lagi...
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -44,7 +140,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: AAAHHHHH!
+      dialogEntry: '{+20stress} AAAHHHHH!'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -68,7 +164,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ada yang melihatku...
+      dialogEntry: '{+5stress} Ada yang melihatku...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -92,7 +188,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Mereka bilang aku ibu gak becus...
+      dialogEntry: '{+10stress} Mereka bilang aku ibu gak becus...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -104,7 +200,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Mereka bilang Rey lebih baik tanpa ku...
+      dialogEntry: '{+5stress} Mereka bilang Rey lebih baik tanpa ku...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -128,7 +224,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Tetangga pasti tau aku jelek...
+      dialogEntry: '{+5stress} Tetangga pasti tau aku jelek...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -140,7 +236,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Mereka pasti pada ngegosip...
+      dialogEntry: '{+5stress} Mereka pasti pada ngegosip...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -152,7 +248,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Bilang aku gak bisa ngurus anak...
+      dialogEntry: '{+5stress} Bilang aku gak bisa ngurus anak...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -176,7 +272,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Gak papa, aku gak papa kok hahahaha
+      dialogEntry: '{+10stress} Gak papa, aku gak papa kok hahahaha'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

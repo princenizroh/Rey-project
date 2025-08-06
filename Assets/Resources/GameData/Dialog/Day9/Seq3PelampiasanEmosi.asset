@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Rumah sepi...
+      dialogEntry: '{+10stress} Rumah sepi...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,7 +44,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Hidup mama kosong...
+      dialogEntry: '{+10stress} Hidup mama kosong...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -68,7 +68,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Tapi gak ada siapa-siapa...
+      dialogEntry: '{+10stress} Tapi gak ada siapa-siapa...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -80,7 +80,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Sendiri...
+      dialogEntry: '{+10stress} Sendiri...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -104,7 +104,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Kalau aku gak ada...
+      dialogEntry: '{+10stress} Kalau aku gak ada...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -116,7 +116,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Semua orang bakal lebih bahagia kali ya...
+      dialogEntry: '{+10stress} Semua orang bakal lebih bahagia kali ya...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -128,7 +128,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Rey bisa diasuh yang lebih baik...
+      dialogEntry: '{+5stress} Rey bisa diasuh yang lebih baik...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -140,7 +140,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ayah bisa cari istri yang lebih baik...
+      dialogEntry: '{+15stress} Ayah bisa cari istri yang lebih baik...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
