@@ -105,10 +105,10 @@ public class DialogPrefabController : MonoBehaviour
     /// </summary>
     private void InitializeComponents()
     {
-        // Set default dialog text if components exist
+        // Set default dialog text if components exist (but leave NPC name blank)
         if (dialogueName != null && string.IsNullOrEmpty(dialogueName.text))
         {
-            dialogueName.text = "NPC Name";
+            dialogueName.text = ""; // Start with empty name - will be set by dialog system
         }
         
         if (dialogueText != null && string.IsNullOrEmpty(dialogueText.text))
