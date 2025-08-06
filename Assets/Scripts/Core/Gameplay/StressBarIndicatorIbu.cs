@@ -17,29 +17,29 @@ public class StressBarIndicatorIbu : MonoBehaviour
     [SerializeField] private float stressRate;
     
     [Header("Base Stress Colors (Day 1-12 - Brighter)")]
-    [SerializeField] private Color lowStressColor = new Color(0f, 1f, 0f, 1f);         // 0-200 stress (Green)
-    [SerializeField] private Color mediumLowStressColor = new Color(0.5f, 1f, 0f, 1f); // 200-400 stress (Yellow-Green)
-    [SerializeField] private Color mediumStressColor = new Color(1f, 1f, 0f, 1f);      // 400-600 stress (Yellow)
-    [SerializeField] private Color mediumHighStressColor = new Color(1f, 0.5f, 0f, 1f); // 600-800 stress (Orange)
-    [SerializeField] private Color highStressColor = new Color(1f, 0f, 0f, 1f);        // 800-1000 stress (Red)
-    [SerializeField] private Color maxStressColor = new Color(0.6f, 0f, 0f, 1f);       // 1000+ stress (Dark Red)
+    [SerializeField] private Color lowStressColor = new Color(0f, 1f, 0f, 1f);         // 0-25 stress (Green)
+    [SerializeField] private Color mediumLowStressColor = new Color(1f, 0.5f, 0f, 1f); // 25-200 stress (Orange)
+    [SerializeField] private Color mediumStressColor = new Color(1f, 0f, 0f, 1f);      // 200-600 stress (Red)
+    [SerializeField] private Color mediumHighStressColor = new Color(0.8f, 0f, 0f, 1f); // Not used in new logic
+    [SerializeField] private Color highStressColor = new Color(0.6f, 0f, 0f, 1f);      // 600-1000 stress (Dark Red)
+    [SerializeField] private Color maxStressColor = new Color(0.4f, 0f, 0f, 1f);       // 1000+ stress (Very Dark Red)
     
     [Header("Dark Stress Colors (Day 13+ - Darker)")]
-    [SerializeField] private Color darkLowStressColor = new Color(0f, 0.7f, 0f, 1f);         // 0-200 stress (Dark Green)
-    [SerializeField] private Color darkMediumLowStressColor = new Color(0.3f, 0.7f, 0f, 1f); // 200-400 stress (Dark Yellow-Green)
-    [SerializeField] private Color darkMediumStressColor = new Color(0.7f, 0.7f, 0f, 1f);    // 400-600 stress (Dark Yellow)
-    [SerializeField] private Color darkMediumHighStressColor = new Color(0.7f, 0.3f, 0f, 1f); // 600-800 stress (Dark Orange)
-    [SerializeField] private Color darkHighStressColor = new Color(0.7f, 0f, 0f, 1f);        // 800-1000 stress (Dark Red)
-    [SerializeField] private Color darkMaxStressColor = new Color(0.4f, 0f, 0f, 1f);         // 1000+ stress (Very Dark Red)
+    [SerializeField] private Color darkLowStressColor = new Color(0f, 0.7f, 0f, 1f);         // 0-25 stress (Dark Green)
+    [SerializeField] private Color darkMediumLowStressColor = new Color(0.8f, 0.4f, 0f, 1f); // 25-200 stress (Dark Orange)
+    [SerializeField] private Color darkMediumStressColor = new Color(0.7f, 0f, 0f, 1f);      // 200-600 stress (Dark Red)
+    [SerializeField] private Color darkMediumHighStressColor = new Color(0.5f, 0f, 0f, 1f);  // Not used in new logic
+    [SerializeField] private Color darkHighStressColor = new Color(0.4f, 0f, 0f, 1f);        // 600-1000 stress (Very Dark Red)
+    [SerializeField] private Color darkMaxStressColor = new Color(0.3f, 0f, 0f, 1f);         // 1000+ stress (Extremely Dark Red)
     
     [Header("Day-based Settings")]
     [SerializeField] private int darkDayThreshold = 13; // Day 13+ uses darker colors
     
     [Header("Outline Colors")]
-    [SerializeField] private Color lowStressOutline = new Color(0f, 1f, 0f, 0.3f);     // Low stress outline
-    [SerializeField] private Color mediumStressOutline = new Color(1f, 1f, 0f, 0.5f);  // Medium stress outline
-    [SerializeField] private Color highStressOutline = new Color(1f, 0.5f, 0f, 0.7f);  // High stress outline
-    [SerializeField] private Color maxStressOutline = new Color(0.8f, 0f, 0f, 0.9f);   // Max stress outline
+    [SerializeField] private Color lowStressOutline = new Color(0f, 1f, 0f, 0.3f);     // 0-25: Green outline
+    [SerializeField] private Color mediumStressOutline = new Color(1f, 0.5f, 0f, 0.5f);  // 25-200: Orange outline
+    [SerializeField] private Color highStressOutline = new Color(1f, 0f, 0f, 0.7f);     // 200-600: Red outline
+    [SerializeField] private Color maxStressOutline = new Color(0.6f, 0f, 0f, 0.9f);    // 600+: Dark Red outline
     
     [Header("Outline Settings")]
     [SerializeField] private float outlineThickness = 2f;
@@ -47,8 +47,20 @@ public class StressBarIndicatorIbu : MonoBehaviour
     // Component references
     private Outline outlineComponent;
     
+    // Animation tracking
+    private float currentFillAmount = 0f;
+    private float targetFillAmount = 0f;
+    private int previousStressLevel = 0;
+    private bool isAnimating = false;
+    private LTDescr fillAnimationTween;
+    
+    [Header("Animation Settings")]
+    [SerializeField] private float animationDuration = 0.5f;
+    [SerializeField] private LeanTweenType animationEase = LeanTweenType.easeOutQuad;
+    [SerializeField] private bool enableStressChangeAnimation = true;
+    
     [Header("Debug")]
-    [SerializeField] private bool enableDebugLogs = true;
+    [SerializeField] private bool enableDebugLogs = false; // Changed default to false
 
     void Start()
     {
@@ -65,7 +77,7 @@ public class StressBarIndicatorIbu : MonoBehaviour
         stressBarFillImage = GameObject.Find("Background").GetComponent<Image>();
         if (stressBarFillImage == null)
         {
-            LogError("Background GameObject not found in the scene or doesn't have an Image component.");
+            Debug.LogError("[StressBarIbu] Background GameObject not found in the scene or doesn't have an Image component.");
         }
         else
         {
@@ -74,7 +86,6 @@ public class StressBarIndicatorIbu : MonoBehaviour
             if (outlineComponent == null)
             {
                 outlineComponent = stressBarFillImage.gameObject.AddComponent<Outline>();
-                LogDebug("Added Outline component to Background");
             }
             
             // Initialize outline settings
@@ -89,16 +100,17 @@ public class StressBarIndicatorIbu : MonoBehaviour
             indicatorStressImage = indicatorStressGO.GetComponent<Image>();
             if (indicatorStressImage == null)
             {
-                LogError("IndicatorStress GameObject found but doesn't have an Image component.");
+                Debug.LogError("[StressBarIbu] IndicatorStress GameObject found but doesn't have an Image component.");
             }
             else
             {
-                LogDebug("Found IndicatorStress Image component");
+                // Initialize current fill amount
+                currentFillAmount = indicatorStressImage.fillAmount;
             }
         }
         else
         {
-            LogError("IndicatorStress GameObject not found in the scene.");
+            Debug.LogError("[StressBarIbu] IndicatorStress GameObject not found in the scene.");
         }
     }
     
@@ -113,21 +125,35 @@ public class StressBarIndicatorIbu : MonoBehaviour
             saveData = Resources.Load<CoreGameSaves>(saveDataPath);
             if (saveData == null)
             {
-                LogError($"CoreGameSaves not found at Resources/{saveDataPath}");
-                LogError("Please assign CoreGameSaves ScriptableObject in inspector or place it in Resources folder");
+                Debug.LogError("[StressBarIbu] CoreGameSaves not found at Resources/" + saveDataPath);
+                Debug.LogError("[StressBarIbu] Please assign CoreGameSaves ScriptableObject in inspector or place it in Resources folder");
                 return;
             }
             else
             {
-                LogDebug($"Loaded CoreGameSaves from Resources: {saveDataPath}");
+                // Store the initial stress level for animation tracking
+                if (saveData != null)
+                {
+                    previousStressLevel = saveData.mother_stress_level;
+                    targetFillAmount = Mathf.Clamp01(saveData.mother_stress_level / 1000f);
+                    currentFillAmount = targetFillAmount;
+                }
             }
         }
         
-        LogDebug($"Save data loaded - Day: {saveData.day}, Mother Stress: {saveData.mother_stress_level}");
-        
-        // Initial update
-        UpdateStressBar();
+        // Initial update without animation
+        UpdateStressBarImmediate();
         UpdateDayAndStressBasedColors();
+    }
+
+    void OnDestroy()
+    {
+        // Clean up any running animations
+        if (fillAnimationTween != null)
+        {
+            LeanTween.cancel(fillAnimationTween.id);
+            fillAnimationTween = null;
+        }
     }
 
     void Update()
@@ -139,28 +165,65 @@ public class StressBarIndicatorIbu : MonoBehaviour
         if (enableAutoStressIncrease)
         {
             saveData.mother_stress_level += (int)(stressRate * Time.deltaTime);
-            // Don't clamp here - allow stress to go above 1000 for testing
-            // The UI will handle clamping the fill amount to 1.0
         }
         
-        // Update UI
-        UpdateStressBar();
+        // Check if stress level has changed
+        if (saveData.mother_stress_level != previousStressLevel)
+        {
+            // Stress has changed - trigger animation
+            AnimateStressChange(saveData.mother_stress_level);
+            previousStressLevel = saveData.mother_stress_level;
+        }
+        
+        // Always update colors (in case day changed)
         UpdateDayAndStressBasedColors();
     }
     
     /// <summary>
-    /// Update the stress bar fill amount based on save data
-    /// Scaling: 0.1 fill = 100 stress, 1.0 fill = 1000 stress
+    /// Animate stress change from current level to new level
     /// </summary>
-    private void UpdateStressBar()
+    /// <param name="newStressLevel">The new stress level to animate to</param>
+    private void AnimateStressChange(int newStressLevel)
     {
-        if (saveData == null)
+        if (!enableStressChangeAnimation)
+        {
+            UpdateStressBarImmediate();
             return;
-            
-        // Calculate fill amount - 100 stress = 0.1 fill, 1000 stress = 1.0 fill
-        // Formula: fillAmount = stress / 1000
-        float fillAmount = Mathf.Clamp01(saveData.mother_stress_level / 1000f);
+        }
         
+        // Calculate new target fill amount
+        float newTargetFill = Mathf.Clamp01(newStressLevel / 1000f);
+        
+        // If already animating, cancel the previous animation
+        if (fillAnimationTween != null)
+        {
+            LeanTween.cancel(fillAnimationTween.id);
+        }
+        
+        // Start from current fill amount and animate to new target
+        targetFillAmount = newTargetFill;
+        isAnimating = true;
+        
+        // Animate the fill amount
+        fillAnimationTween = LeanTween.value(gameObject, currentFillAmount, targetFillAmount, animationDuration)
+            .setEase(animationEase)
+            .setOnUpdate((float value) => {
+                currentFillAmount = value;
+                UpdateFillDisplay(value);
+            })
+            .setOnComplete(() => {
+                isAnimating = false;
+                currentFillAmount = targetFillAmount;
+                fillAnimationTween = null;
+            });
+    }
+    
+    /// <summary>
+    /// Update the visual fill display with the given fill amount
+    /// </summary>
+    /// <param name="fillAmount">Fill amount between 0 and 1</param>
+    private void UpdateFillDisplay(float fillAmount)
+    {
         // Update IndicatorStress fill amount (primary stress display)
         if (indicatorStressImage != null)
         {
@@ -172,9 +235,39 @@ public class StressBarIndicatorIbu : MonoBehaviour
         {
             stressBarFillImage.fillAmount = fillAmount;
         }
+    }
+    
+    /// <summary>
+    /// Update the stress bar fill amount immediately without animation
+    /// </summary>
+    private void UpdateStressBarImmediate()
+    {
+        if (saveData == null)
+            return;
+            
+        // Calculate fill amount - 100 stress = 0.1 fill, 1000 stress = 1.0 fill
+        float fillAmount = Mathf.Clamp01(saveData.mother_stress_level / 1000f);
         
-        // Debug log to show fill calculation
-        LogDebug($"Stress: {saveData.mother_stress_level} = Fill: {fillAmount:F3} ({fillAmount * 100:F1}%) [Scale: stress/1000]");
+        currentFillAmount = fillAmount;
+        targetFillAmount = fillAmount;
+        
+        UpdateFillDisplay(fillAmount);
+    }
+    
+    /// <summary>
+    /// Update the stress bar fill amount based on save data (with animation if enabled)
+    /// </summary>
+    private void UpdateStressBar()
+    {
+        if (saveData == null)
+            return;
+            
+        // Check if stress level changed
+        if (saveData.mother_stress_level != previousStressLevel)
+        {
+            AnimateStressChange(saveData.mother_stress_level);
+            previousStressLevel = saveData.mother_stress_level;
+        }
     }
     
     /// <summary>
@@ -196,8 +289,6 @@ public class StressBarIndicatorIbu : MonoBehaviour
         
         // Update outline color based on stress
         UpdateStressBasedOutlineColor(currentStress);
-        
-        LogDebug($"Day {currentDay}, Stress {currentStress} - Using {(useDarkPalette ? "DARK" : "BRIGHT")} color palette");
     }
     
     /// <summary>
@@ -210,7 +301,6 @@ public class StressBarIndicatorIbu : MonoBehaviour
             return;
             
         Color fillColor;
-        string colorInfo;
         
         // Select color palette based on day
         Color lowColor = useDarkPalette ? darkLowStressColor : lowStressColor;
@@ -220,48 +310,39 @@ public class StressBarIndicatorIbu : MonoBehaviour
         Color highColor = useDarkPalette ? darkHighStressColor : highStressColor;
         Color maxColor = useDarkPalette ? darkMaxStressColor : maxStressColor;
         
-        string paletteType = useDarkPalette ? "DARK" : "BRIGHT";
-        
-        // Determine color based on stress level (same ranges, different palettes)
-        if (stressLevel <= 200)
+        // Determine color based on stress level with new thresholds
+        // <= 25: Green, <= 200: Orange, <= 600: Red, <= 1000: Dark Red
+        if (stressLevel <= 25)
         {
+            // 0-25: Green
             fillColor = lowColor;
-            colorInfo = $"{paletteType} Green (0-200 stress)";
         }
-        else if (stressLevel <= 400)
+        else if (stressLevel <= 200)
         {
-            float t = (stressLevel - 200f) / 200f;
+            // 25-200: Orange (interpolate from green to orange)
+            float t = (stressLevel - 25f) / 175f;
             fillColor = Color.Lerp(lowColor, mediumLowColor, t);
-            colorInfo = $"{paletteType} Yellow-Green (200-400 stress)";
         }
         else if (stressLevel <= 600)
         {
-            float t = (stressLevel - 400f) / 200f;
+            // 200-600: Red (interpolate from orange to red)
+            float t = (stressLevel - 200f) / 400f;
             fillColor = Color.Lerp(mediumLowColor, mediumColor, t);
-            colorInfo = $"{paletteType} Yellow (400-600 stress)";
         }
-        else if (stressLevel <= 800)
+        else if (stressLevel <= 1000)
         {
-            float t = (stressLevel - 600f) / 200f;
-            fillColor = Color.Lerp(mediumColor, mediumHighColor, t);
-            colorInfo = $"{paletteType} Orange (600-800 stress)";
-        }
-        else if (stressLevel < 1000)
-        {
-            float t = (stressLevel - 800f) / 200f;
-            fillColor = Color.Lerp(mediumHighColor, highColor, t);
-            colorInfo = $"{paletteType} Red (800-999 stress)";
+            // 600-1000: Dark Red (interpolate from red to dark red)
+            float t = (stressLevel - 600f) / 400f;
+            fillColor = Color.Lerp(mediumColor, highColor, t);
         }
         else
         {
+            // 1000+: Maximum dark red
             fillColor = maxColor;
-            colorInfo = $"{paletteType} Dark Red (1000+ stress)";
         }
         
         // Apply fill color
         indicatorStressImage.color = fillColor;
-        
-        LogDebug($"Applied {colorInfo}");
     }
     
     /// <summary>
@@ -273,38 +354,31 @@ public class StressBarIndicatorIbu : MonoBehaviour
             return;
             
         Color outlineColor;
-        string stressRange;
         
-        if (stressLevel <= 300)
+        if (stressLevel <= 25)
         {
-            // 0-300: Green outline
+            // 0-25: Green outline
             outlineColor = lowStressOutline;
-            stressRange = "0-300 (Green Outline)";
+        }
+        else if (stressLevel <= 200)
+        {
+            // 25-200: Orange outline
+            outlineColor = mediumStressOutline;
         }
         else if (stressLevel <= 600)
         {
-            // 300-600: Yellow outline
-            outlineColor = mediumStressOutline;
-            stressRange = "300-600 (Yellow Outline)";
-        }
-        else if (stressLevel < 1000)
-        {
-            // 600-999: Orange outline
+            // 200-600: Red outline
             outlineColor = highStressOutline;
-            stressRange = "600-999 (Orange Outline)";
         }
         else
         {
-            // 1000+: Dark Red outline
+            // 600+: Dark Red outline
             outlineColor = maxStressOutline;
-            stressRange = "1000+ (Dark Red Outline)";
         }
         
         // Apply outline color
         outlineComponent.effectColor = outlineColor;
         outlineComponent.enabled = true;
-        
-        LogDebug($"Stress {stressLevel} - Applied outline color for range {stressRange}");
     }
     
     /// <summary>
@@ -315,13 +389,8 @@ public class StressBarIndicatorIbu : MonoBehaviour
     {
         if (saveData != null)
         {
-            UpdateStressBar();
+            UpdateStressBarImmediate();
             UpdateDayAndStressBasedColors();
-            LogDebug($"Stress bar refreshed - Day: {saveData.day}, Stress: {saveData.mother_stress_level}");
-        }
-        else
-        {
-            LogError("Cannot refresh - save data is null");
         }
     }
     
@@ -333,10 +402,17 @@ public class StressBarIndicatorIbu : MonoBehaviour
     {
         if (saveData != null)
         {
+            int oldStress = saveData.mother_stress_level;
             saveData.mother_stress_level = Mathf.Max(0, newStressLevel); // Only ensure it's not negative
-            UpdateStressBar();
+            
+            // Trigger animation if stress changed
+            if (oldStress != saveData.mother_stress_level)
+            {
+                AnimateStressChange(saveData.mother_stress_level);
+                previousStressLevel = saveData.mother_stress_level;
+            }
+            
             UpdateDayAndStressBasedColors();
-            LogDebug($"Stress level set to: {saveData.mother_stress_level}");
         }
     }
     
@@ -349,7 +425,6 @@ public class StressBarIndicatorIbu : MonoBehaviour
         {
             saveData.day = Mathf.Max(1, newDay);
             UpdateDayAndStressBasedColors(); // Colors are now day AND stress-based
-            LogDebug($"Day set to: {saveData.day}");
         }
     }
     
@@ -370,25 +445,35 @@ public class StressBarIndicatorIbu : MonoBehaviour
     }
     
     /// <summary>
+    /// Enable or disable stress change animations
+    /// </summary>
+    public void SetAnimationEnabled(bool enabled)
+    {
+        enableStressChangeAnimation = enabled;
+    }
+    
+    /// <summary>
+    /// Get whether animations are currently enabled
+    /// </summary>
+    public bool IsAnimationEnabled()
+    {
+        return enableStressChangeAnimation;
+    }
+    
+    /// <summary>
     /// Test method to cycle through different stress levels and days to see color changes
     /// </summary>
     [ContextMenu("Test Day and Stress Color Cycle")]
     public void TestDayAndStressColorCycle()
     {
         if (saveData == null)
-        {
-            LogError("Cannot test - save data is null");
             return;
-        }
         
         int[] testDays = { 1, 5, 12, 13, 15, 20 };
-        int[] testStressLevels = { 0, 200, 400, 600, 800, 1000 };
-        
-        LogDebug("=== Testing Day and Stress-based Color Cycle ===");
+        int[] testStressLevels = { 0, 25, 100, 200, 400, 600, 800, 1000 };
         
         foreach (int testDay in testDays)
         {
-            LogDebug($"--- Testing Day {testDay} ---");
             saveData.day = testDay;
             
             foreach (int testStress in testStressLevels)
@@ -397,8 +482,6 @@ public class StressBarIndicatorIbu : MonoBehaviour
                 UpdateDayAndStressBasedColors();
             }
         }
-        
-        LogDebug("=== End Day and Stress Color Cycle Test ===");
     }
     
     /// <summary>
@@ -408,26 +491,16 @@ public class StressBarIndicatorIbu : MonoBehaviour
     public void TestDayInfluenceOnZeroStress()
     {
         if (saveData == null)
-        {
-            LogError("Cannot test - save data is null");
             return;
-        }
         
         // Set stress to 0 and test different days
         saveData.mother_stress_level = 0;
-        
-        LogDebug("=== Testing Day Influence on Zero Stress ===");
-        LogDebug("Stress level set to 0 - observing day-based color changes:");
         
         // Test early days (bright colors)
         for (int day = 1; day <= 12; day++)
         {
             saveData.day = day;
             UpdateDayAndStressBasedColors();
-            if (day == 1 || day == 6 || day == 12)
-            {
-                LogDebug($"Day {day}: Using BRIGHT palette even at 0 stress");
-            }
         }
         
         // Test late days (dark colors)
@@ -435,46 +508,25 @@ public class StressBarIndicatorIbu : MonoBehaviour
         {
             saveData.day = day;
             UpdateDayAndStressBasedColors();
-            if (day == 13 || day == 15 || day == 20)
-            {
-                LogDebug($"Day {day}: Using DARK palette even at 0 stress");
-            }
         }
-        
-        LogDebug("=== End Day Influence Test ===");
     }
     
     /// <summary>
     /// Test method to verify fill amounts work correctly with the new scaling
-    /// 0.1 fill = 100 stress, 1.0 fill = 1000 stress
     /// </summary>
     [ContextMenu("Test Fill Amount Calculation")]
     public void TestFillAmountCalculation()
     {
         if (saveData == null)
-        {
-            LogError("Cannot test - save data is null");
             return;
-        }
         
-        int[] testStressLevels = { 0, 100, 250, 500, 750, 1000, 1200, 1500 };
-        
-        LogDebug("=== Testing Fill Amount Calculation (New Scale: stress/1000) ===");
+        int[] testStressLevels = { 0, 25, 100, 200, 400, 600, 800, 1000, 1200, 1500 };
         
         foreach (int testStress in testStressLevels)
         {
             saveData.mother_stress_level = testStress;
-            UpdateStressBar();
-            
-            float expectedFill = Mathf.Clamp01(testStress / 1000f);
-            LogDebug($"Stress {testStress}: Expected Fill = {expectedFill:F3} ({expectedFill * 100:F1}%)");
+            UpdateStressBarImmediate();
         }
-        
-        LogDebug("=== Fill Scale Examples ===");
-        LogDebug("100 stress = 0.1 fill (10%)");
-        LogDebug("500 stress = 0.5 fill (50%)");
-        LogDebug("1000 stress = 1.0 fill (100%)");
-        LogDebug("=== End Fill Amount Test ===");
     }
     
     /// <summary>
@@ -483,16 +535,10 @@ public class StressBarIndicatorIbu : MonoBehaviour
     [ContextMenu("Test 1000 Stress Level")]
     public void Test1000StressLevel()
     {
-        if (saveData == null)
+        if (saveData != null)
         {
-            LogError("Cannot test - save data is null");
-            return;
+            SetStressLevel(1000);
         }
-        
-        LogDebug("=== Testing 1000 Stress Level ===");
-        SetStressLevel(1000);
-        LogDebug($"Stress set to 1000, Fill Amount should be 1.0 (100%)");
-        LogDebug("=== End 1000 Stress Test ===");
     }
     
     /// <summary>
@@ -502,36 +548,44 @@ public class StressBarIndicatorIbu : MonoBehaviour
     public void TestCriticalStressLevels()
     {
         if (saveData == null)
-        {
-            LogError("Cannot test - save data is null");
             return;
-        }
         
         int[] criticalLevels = { 999, 1000, 1001, 1500 };
         
-        LogDebug("=== Testing Critical Stress Levels ===");
         foreach (int stress in criticalLevels)
         {
             SetStressLevel(stress);
-            LogDebug($"--- Stress {stress} tested ---");
         }
-        LogDebug("=== End Critical Stress Test ===");
     }
     
-    #region Logging Helpers
-    
-    private void LogDebug(string message)
+    /// <summary>
+    /// Test animated stress changes
+    /// </summary>
+    [ContextMenu("Test Stress Animation")]
+    public void TestStressAnimation()
     {
-        if (enableDebugLogs)
+        if (saveData == null)
+            return;
+        
+        StartCoroutine(TestStressAnimationCoroutine());
+    }
+    
+    private System.Collections.IEnumerator TestStressAnimationCoroutine()
+    {
+        // Test increasing stress
+        for (int i = 0; i <= 1000; i += 100)
         {
-            Debug.Log($"[StressBarIbu] {message}");
+            SetStressLevel(i);
+            yield return new WaitForSeconds(animationDuration + 0.1f);
+        }
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Test decreasing stress
+        for (int i = 1000; i >= 0; i -= 150)
+        {
+            SetStressLevel(i);
+            yield return new WaitForSeconds(animationDuration + 0.1f);
         }
     }
-    
-    private void LogError(string message)
-    {
-        Debug.LogError($"[StressBarIbu] {message}");
-    }
-    
-    #endregion
 }
