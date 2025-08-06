@@ -33,11 +33,27 @@ public class NarratorDay5 : NarratorBase
         // Mother comes angry and stressed
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 4));
         
-        // Seq1 IbuMarah (note: duplicate name in storyboard, should be Seq2)
+        // Seq2 IbuMarah
         bool seq2Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq1IbuMarah", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq2IbuMarah", 
             () => { seq2Complete = true; });
         yield return new WaitUntil(() => seq2Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq3 IbuMarah (continued anger)
+        bool seq3Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq3IbuMarah", 
+            () => { seq3Complete = true; });
+        yield return new WaitUntil(() => seq3Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq4 Penyesalan
+        bool seq4Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq4Penyesalan", 
+            () => { seq4Complete = true; });
+        yield return new WaitUntil(() => seq4Complete);
         
         FadeCloseEyes(); // Baby sleeps from exhaustion
         yield return new WaitForSeconds(2f);
@@ -66,6 +82,14 @@ public class NarratorDay5 : NarratorBase
         dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq5GangguanSetanHujan", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq6 Muak
+        bool seq6Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq6Muak", 
+            () => { seq6Complete = true; });
+        yield return new WaitUntil(() => seq6Complete);
         
         if (audioSource != null && audioSource.isPlaying)
         {

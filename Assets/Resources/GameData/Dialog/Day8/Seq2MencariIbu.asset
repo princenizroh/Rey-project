@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
-  m_Name: Seq2Curhatan
+  m_Name: Seq2MencariIbu
   m_EditorClassIdentifier: 
   coreBlock:
   - Type: 0
@@ -19,8 +19,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 1
-      dialogEntry: Gelap...
+      npcName: 0
+      dialogEntry: Ibu kok gak datang lagi
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -31,8 +31,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 1
-      dialogEntry: Sepi banget...
+      npcName: 0
+      dialogEntry: Rey ditinggal ya Ibu
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -43,8 +43,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 1
-      dialogEntry: Kenapa hidupku jadi kayak gini...
+      npcName: 0
+      dialogEntry: Ibu...
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -55,8 +55,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 1
-      dialogEntry: KENAPA AKU HARUS NGADEPIN SEMUA SENDIRIAN!
+      npcName: 0
+      dialogEntry: Rey Lapar
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -67,56 +67,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 1
-      dialogEntry: Ayah kemana sih!
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Gak pernah ada disaat aku butuh
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: AKU CAPEK TAU GAK! AKU CAPEK!
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Semua berantakan!
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Hidupku berantakan!
+      npcName: 0
+      dialogEntry: Ibu dimana...
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

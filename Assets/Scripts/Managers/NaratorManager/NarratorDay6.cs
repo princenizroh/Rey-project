@@ -47,15 +47,49 @@ public class NarratorDay6 : NarratorBase
         FadeCloseEyes(); // Baby sleeps
         yield return new WaitForSeconds(2f);
         
-        // Auto progression to Day 7
-        Debug.Log("Day 6 finished! Moving to Day 7...");
-        GoToNextDay();
+        GoToNextTimeOfDay();
     }
     
     [System.Obsolete]
     protected override IEnumerator PlayNightSequence()
     {
-        // Day 6 skips night sequence - goes directly to Day 7
-        yield return null;
+        TimeManager.instance.TimeOfDay = 1.0f; // Night
+        
+        yield return new WaitForSeconds(1f);
+        uiElements.narratorText.text = "Malam Hari\nSosok Mendekat";
+        yield return new WaitForSeconds(4f);
+        uiElements.narratorText.gameObject.SetActive(false);
+        
+        FadeOpenEyes(); // Baby wakes up
+        yield return new WaitForSeconds(1f);
+        
+        // Seq4 Sosok
+        bool seq4Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day6/Seq4Sosok", 
+            () => { seq4Complete = true; });
+        yield return new WaitUntil(() => seq4Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq5 Mendekat
+        bool seq5Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day6/Seq5Mendekat", 
+            () => { seq5Complete = true; });
+        yield return new WaitUntil(() => seq5Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq6 Khawatir
+        bool seq6Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day6/Seq6Khawatir", 
+            () => { seq6Complete = true; });
+        yield return new WaitUntil(() => seq6Complete);
+        
+        FadeCloseEyes(); // Baby sleeps
+        yield return new WaitForSeconds(2f);
+        
+        // Auto progression to Day 7
+        Debug.Log("Day 6 finished! Moving to Day 7...");
+        GoToNextDay();
     }
 }

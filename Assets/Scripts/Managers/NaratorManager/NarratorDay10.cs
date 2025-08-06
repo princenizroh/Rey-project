@@ -28,9 +28,9 @@ public class NarratorDay10 : NarratorBase
         FadeOpenEyes(); // Baby wakes up to chaos
         yield return new WaitForSeconds(1f);
 
-        // Seq1 KeanehanIbu
+        // Seq1 Lapar
         bool seq1Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq1KeanehanIbu", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq1Lapar", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
         
@@ -51,9 +51,20 @@ public class NarratorDay10 : NarratorBase
         TimeManager.instance.TimeOfDay = 1.0f; // Night
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Malam Hari\nCurhatan Patah Hati";
+        uiElements.narratorText.text = "Malam Hari\nKeanehan Ibu";
         yield return new WaitForSeconds(4f);
         uiElements.narratorText.gameObject.SetActive(false);
+        
+        FadeOpenEyes(); // Baby wakes up
+        yield return new WaitForSeconds(1f);
+        
+        // Seq2 Keanehan
+        bool seq2Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq2Keanehan", 
+            () => { seq2Complete = true; });
+        yield return new WaitUntil(() => seq2Complete);
+        
+        yield return new WaitForSeconds(2f);
         
         // Mother's emotional breakdown and paranoid thoughts
         PlayAudio("crying_breakdown");
@@ -61,11 +72,11 @@ public class NarratorDay10 : NarratorBase
         
         yield return new WaitForSeconds(2f);
         
-        // Seq2 Curhatan
-        bool seq2Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq2Curhatan", 
-            () => { seq2Complete = true; });
-        yield return new WaitUntil(() => seq2Complete);
+        // Seq3 Curhatan
+        bool seq3Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq3Curhatan", 
+            () => { seq3Complete = true; });
+        yield return new WaitUntil(() => seq3Complete);
         
         if (audioSource != null && audioSource.isPlaying)
         {

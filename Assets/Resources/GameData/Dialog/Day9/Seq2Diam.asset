@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
-  m_Name: Seq4BMencariIbu
+  m_Name: Seq2Diam
   m_EditorClassIdentifier: 
   coreBlock:
   - Type: 0
@@ -19,8 +19,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Linda sayang?
+      npcName: 0
+      dialogEntry: Ibu kenapa diam saja
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -31,8 +31,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Rey! Sayang!
+      npcName: 0
+      dialogEntry: Ibu makin aneh
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -43,8 +43,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Ya ampun... kamu kenapa?
+      npcName: 0
+      dialogEntry: Aku langsung tidur saja
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -55,8 +55,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Mukamu pucat banget
+      npcName: 0
+      dialogEntry: Aku gak mau merepotkan ibu
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -67,8 +67,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Kapan terakhir minum susu?
+      npcName: 0
+      dialogEntry: Ada bayangan gelap di sudut ruangan
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -79,8 +79,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Popoknya basah... udah berapa lama?
+      npcName: 0
+      dialogEntry: Sosok itu menatapku dengan mata kosong
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -91,8 +91,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Mama kamu dimana sayang?
+      npcName: 4
+      dialogEntry: Kamu tidak layak menjadi ibu
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -103,8 +103,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Sabar ya Rey
+      npcName: 0
+      dialogEntry: TIDAK! Pergi dari sini!
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

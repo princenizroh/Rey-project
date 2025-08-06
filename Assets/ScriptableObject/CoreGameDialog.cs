@@ -10,7 +10,7 @@ public class CoreGameDialog
     public DialogType dialogType;
     public Dialog3DLocation dialog3DLocation;
     public CamChoices camChoice;
-    public enum NpcName { Rey, Ibu, Ayah, Bidan, Hantu, None }
+    public enum NpcName { Rey, Ibu, Ayah, Bidan, Hantu, None, Penelpon }
     public NpcName npcName;
     [TextArea(4, 5)]
     public string dialogEntry;

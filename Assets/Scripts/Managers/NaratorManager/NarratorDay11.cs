@@ -31,6 +31,36 @@ public class NarratorDay11 : NarratorBase
         FadeCloseEyes(); // Baby sleeps
         yield return new WaitForSeconds(2f);
         
+        // Add evening sequence for Seq2 Selamat
+        StartCoroutine(PlayEveningSequence());
+        yield break;
+    }
+    
+    [System.Obsolete]
+    protected override IEnumerator PlayEveningSequence()
+    {
+        TimeManager.instance.TimeOfDay = 0.75f; // Evening
+        
+        yield return new WaitForSeconds(1f);
+        uiElements.narratorText.text = "Sore Hari\nIbu Menghampiri";
+        yield return new WaitForSeconds(3f);
+        uiElements.narratorText.gameObject.SetActive(false);
+        
+        FadeOpenEyes(); // Baby wakes up
+        yield return new WaitForSeconds(1f);
+        
+        // Mother approaches baby (rare moment of care)
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+        
+        // Seq2 Selamat
+        bool seq2Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day11/Seq2Selamat", 
+            () => { seq2Complete = true; });
+        yield return new WaitUntil(() => seq2Complete);
+        
+        FadeCloseEyes(); // Baby sleeps
+        yield return new WaitForSeconds(2f);
+        
         GoToNextTimeOfDay();
     }
     
@@ -49,15 +79,7 @@ public class NarratorDay11 : NarratorBase
         
         yield return new WaitForSeconds(2f);
 
-        // Seq2 Kelaparan
-        bool seq2Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day11/Seq2Kelaparan", 
-            () => { seq2Complete = true; });
-        yield return new WaitUntil(() => seq2Complete);
-        
-        yield return new WaitForSeconds(1f);
-        
-        // Seq3 Kelaparan (continuation)
+        // Seq3 Kelaparan
         bool seq3Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day11/Seq3Kelaparan", 
             () => { seq3Complete = true; });

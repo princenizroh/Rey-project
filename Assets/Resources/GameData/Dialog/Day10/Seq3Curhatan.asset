@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
-  m_Name: Seq4AMencariIbu
+  m_Name: Seq3Curhatan
   m_EditorClassIdentifier: 
   coreBlock:
   - Type: 0
@@ -19,8 +19,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: LINDA!
+      npcName: 1
+      dialogEntry: Aku gak kuat lagi...
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -31,8 +31,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Rey?!
+      npcName: 1
+      dialogEntry: Gak kuat... gak kuat...
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -43,8 +43,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Kenapa mukamu pucat?
+      npcName: 1
+      dialogEntry: AAAHHHHH!
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -55,8 +55,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Kapan terakhir makan?
+      npcName: 1
+      dialogEntry: Siapa itu?
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -67,8 +67,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Kurus banget...
+      npcName: 1
+      dialogEntry: Ada yang melihatku...
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -79,8 +79,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Popoknya basah kuyup...
+      npcName: 1
+      dialogEntry: Siapa yang ada disana?
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -91,8 +91,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Linda kemana?!
+      npcName: 1
+      dialogEntry: Mereka bilang aku ibu gak becus...
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -103,8 +103,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 0
-      dialogEntry: Ayah
+      npcName: 1
+      dialogEntry: Mereka bilang Rey lebih baik tanpa ku...
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -115,8 +115,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Ibu kamu kemana Rey?
+      npcName: 1
+      dialogEntry: Bener gak sih...
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -127,8 +127,56 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 2
-      dialogEntry: Ayah tinggal beberapa hari aja, kok jadi kayak gini?
+      npcName: 1
+      dialogEntry: Tetangga pasti tau aku jelek...
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Mereka pasti pada ngegosip...
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Bilang aku gak bisa ngurus anak...
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Gak papa...
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Gak papa, aku gak papa kok hahahaha
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

@@ -52,19 +52,27 @@ public class NarratorDay4 : NarratorBase
         // Mother goes back to work room
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
         
-        // Seq4 ReyDiletakkanKembali
+        // Seq4 Telephone
         bool seq4Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq4ReyDiletakkanKembali", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq4Telephone", 
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
         
         yield return new WaitForSeconds(1f);
         
-        // Seq5 Overwhelmed
+        // Seq5 Kerja
         bool seq5Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq5Overwhelmed", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq5Kerja", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq6 Lapar
+        bool seq6Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq6Lapar", 
+            () => { seq6Complete = true; });
+        yield return new WaitUntil(() => seq6Complete);
         
         FadeCloseEyes(); // Baby eventually sleeps
         yield return new WaitForSeconds(2f);
@@ -85,22 +93,22 @@ public class NarratorDay4 : NarratorBase
         FadeOpenEyes(); // Baby wakes up
         yield return new WaitForSeconds(1f);
         
-        // Seq6 DeadlinePressure
-        bool seq6Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq6DeadlinePressure", 
-            () => { seq6Complete = true; });
-        yield return new WaitUntil(() => seq6Complete);
+        // Mother stressed with baby
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 4));
+        
+        // Seq7 IbuMarahLagi
+        bool seq7Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq7IbuMarahLagi", 
+            () => { seq7Complete = true; });
+        yield return new WaitUntil(() => seq7Complete);
         
         yield return new WaitForSeconds(1f);
         
-        // Move to parents' room for breakdown
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
-        
-        // Seq7 MenyerahSementara
-        bool seq7Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq7MenyerahSementara", 
-            () => { seq7Complete = true; });
-        yield return new WaitUntil(() => seq7Complete);
+        // Seq8 Stres
+        bool seq8Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq8Stres", 
+            () => { seq8Complete = true; });
+        yield return new WaitUntil(() => seq8Complete);
         
         FadeCloseEyes(); // Baby sleeps
         yield return new WaitForSeconds(2f);
@@ -123,11 +131,19 @@ public class NarratorDay4 : NarratorBase
         
         yield return new WaitForSeconds(2f);
         
-        // Seq6 GangguanSetanRingan (supernatural sequence)
-        bool seq6Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq6GangguanSetanRingan", 
-            () => { seq6Complete = true; });
-        yield return new WaitUntil(() => seq6Complete);
+        // Seq9 GangguanSetanRingan
+        bool seq9Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq9GangguanSetanRingan", 
+            () => { seq9Complete = true; });
+        yield return new WaitUntil(() => seq9Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq10 Maaf
+        bool seq10Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq10Maaf", 
+            () => { seq10Complete = true; });
+        yield return new WaitUntil(() => seq10Complete);
         
         if (audioSource != null && audioSource.isPlaying)
         {

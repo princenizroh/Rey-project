@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f44a62d2f47d58144a62e91f1449782d, type: 3}
-  m_Name: Seq2Manifestasisupranatural
+  m_Name: Seq2Selamat
   m_EditorClassIdentifier: 
   coreBlock:
   - Type: 0
@@ -19,8 +19,32 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 5
-      dialogEntry: SFX SOSOK MUNCUL
+      npcName: 1
+      dialogEntry: Kenapa sih kamu menangis terus
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Minta susu ya
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 1
+      dialogEntry: Iya sini
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +56,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Ada bayangan gelap di sudut ruangan
+      dialogEntry: Rasanya aneh
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,19 +68,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Sosok itu menatapku dengan mata kosong
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 4
-      dialogEntry: Kamu tidak layak menjadi ibu
+      dialogEntry: Aku meminum susu Ibu. tapi keluarnya sangat sedikit
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -68,7 +80,31 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: TIDAK! Pergi dari sini!
+      dialogEntry: Ibu
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 0
+      dialogEntry: Apa ibu baik baik saja
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 0
+      dialogEntry: Ibu
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
