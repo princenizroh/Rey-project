@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public enum NarratorDay
 {
-    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13, Day14
+    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13, Day14, Helper
 }
 
 public enum TimeOfDay
@@ -496,6 +496,71 @@ public abstract class NarratorBase : MonoBehaviour
                 obj.SetActive(active);
             }
         }
+    }
+
+    protected GameObject SpawnChargeMeter(Canvas targetCanvas = null)
+    {
+        GameObject chargeMeterPrefab = Resources.Load<GameObject>("ChargeMeter");
+        
+        if (chargeMeterPrefab == null)
+        {
+            Debug.LogError("ChargeMeter prefab not found in Resources folder!");
+            return null;
+        }
+
+        GameObject chargeMeterInstance;
+        
+        if (targetCanvas != null)
+        {
+            // Spawn dengan parent Canvas yang spesifik
+            chargeMeterInstance = Instantiate(chargeMeterPrefab, targetCanvas.transform);
+            
+            // Set positioning untuk UI element
+            RectTransform rectTransform = chargeMeterInstance.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.anchoredPosition = Vector2.zero;
+                rectTransform.localScale = Vector3.one;
+            }
+            
+            Debug.Log($"ChargeMeter spawned in Canvas: {targetCanvas.name}");
+        }
+        else
+        {
+            // Spawn di world space
+            chargeMeterInstance = Instantiate(chargeMeterPrefab, Vector3.zero, Quaternion.identity);
+            Debug.Log("ChargeMeter spawned in world space");
+        }
+
+        return chargeMeterInstance;
+    }
+
+    protected GameObject SpawnChargeMeterByCanvasName(string canvasName)
+    {
+        Canvas targetCanvas = FindCanvasByName(canvasName);
+        
+        if (targetCanvas == null)
+        {
+            Debug.LogWarning($"Canvas with name '{canvasName}' not found! Spawning in world space instead.");
+            return SpawnChargeMeter(null);
+        }
+        
+        return SpawnChargeMeter(targetCanvas);
+    }
+
+    private Canvas FindCanvasByName(string canvasName)
+    {
+        Canvas[] allCanvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+        
+        foreach (Canvas canvas in allCanvases)
+        {
+            if (canvas.name.Equals(canvasName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return canvas;
+            }
+        }
+        
+        return null;
     }
 #endregion
 }

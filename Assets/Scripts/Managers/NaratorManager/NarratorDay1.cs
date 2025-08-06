@@ -7,19 +7,15 @@ public class NarratorDay1 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         TimeManager.instance.TimeOfDay = 1.0f;
-        // AppearObjects();
+        AppearObjects();
         // yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
-        // SetCharacterSpawn(CharacterType.Mother, 0);  // Ibu ke kasur
-        // SetCharacterSpawn(CharacterType.Father, 0);  // Ayah ke kursi  
-        // SetCharacterSpawn(CharacterType.Bidan, 0);   // Bidan posisi A
-        // SetCharacterSpawn(CharacterType.Baby, 0);    // Baby posisi awal
-        CloseEyes();
-        // Memainkan animasi ibu sedang duduk, ayah sedang duduk
-    
-        Debug.Log("Playing sitting animations for mother and father.");
+        SetCharacterSpawn(CharacterType.Mother, 0);  
+        SetCharacterSpawn(CharacterType.Father, 0);    
+        SetCharacterSpawn(CharacterType.Bidan, 0);   
+        SetCharacterSpawn(CharacterType.Baby, 0);    
+        CloseEyes(); 
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
         PlayCharacterAnimation(CharacterType.Father, "Sit");
-        Debug.Log("Playing narration for Day 1 Night sequence.");
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 1\nKelahiran";
@@ -27,7 +23,7 @@ public class NarratorDay1 : NarratorBase
         uiElements.narratorText.gameObject.SetActive(false);
 
         bool seq1Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/DalamPerut/Seq1DalamPerut", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq1DalamPerut", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
 
@@ -38,7 +34,7 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitForSeconds(1f);
 
         bool seq2Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/DalamPerut/Seq2Terlahir", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq2Terlahir", 
             () => { seq2Complete = true; });
         yield return new WaitUntil(() => seq2Complete);
 
@@ -49,14 +45,14 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitForSeconds(3f);
       
         bool seq3Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq3Kesehatan", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq3Kesehatan", 
             () => { seq3Complete = true; });
         yield return new WaitUntil(() => seq3Complete);
 
         yield return new WaitForSeconds(1f);
 
         bool seq4Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq4Kesadaran", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq4Kesadaran", 
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
 
@@ -66,21 +62,23 @@ public class NarratorDay1 : NarratorBase
         Debug.Log("Opening eyes");
         FadeOpenEyes();
 
+        // Instantiate(Resources.Load("ChargeMeter"));
+
         bool seq5Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq5MembukaMata", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq5MembukaMata", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
 
         yield return new WaitForSeconds(1f);
         // pergeseran bayi makin dekat ke ibu
-        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Baby, 1, 2f));
+        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Baby, 0, 2f));
         
         // Memainkan animasi
         
         yield return new WaitForSeconds(2f);
 
         bool seq6Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq6Makanan", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq6Makanan", 
             () => { seq6Complete = true; });
         yield return new WaitUntil(() => seq6Complete);
 
@@ -89,12 +87,13 @@ public class NarratorDay1 : NarratorBase
         // navmesh agent bidan
         // bidan akan bergerak dengan posisi yang telah ditentukan
         // Setelah sampai posisi yang ditentukan bidan berpindah di ruang keluarga
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
         Debug.Log("Closing eyes");
         FadeCloseEyes();
 
         yield return new WaitForSeconds(1f);
         bool seq7Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/KamarOrtu/Seq7Nama", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq7Nama", 
             () => { seq7Complete = true; });
         yield return new WaitUntil(() => seq7Complete);
         yield return new WaitForSeconds(1f);
