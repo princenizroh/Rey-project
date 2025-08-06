@@ -92,6 +92,10 @@ public class CoreGameManager : MonoBehaviour
     [Header("Core Game Settings")]
     public CoreGame coreGameData;
     
+    [Header("Save Data")]
+    [SerializeField] private CoreGameSaves saveData;
+    [SerializeField] private string saveDataPath = "Saves/coregamesaves"; // Path in Resources folder
+    
     [Header("Dialog Templates")]
     public GameObject npcDialogThemplate;
     public GameObject npcQuestionThemplate;
@@ -189,6 +193,29 @@ public class CoreGameManager : MonoBehaviour
         {
             Debug.LogError($"Error initializing AudioSource in CoreGameManager: {e.Message}. Dialog will work without audio.");
             dialogAudioSource = null;
+        }
+        
+        // Initialize saveData for stress system
+        try
+        {
+            if (saveData == null)
+            {
+                saveData = Resources.Load<CoreGameSaves>(saveDataPath);
+                if (saveData != null)
+                {
+                    Debug.Log($"[STRESS] saveData loaded successfully from: {saveDataPath}");
+                    // Synchronize stress values on startup
+                    SynchronizeStressValues();
+                }
+                else
+                {
+                    Debug.LogWarning($"[STRESS] Failed to load saveData from: {saveDataPath}. Stress UI integration will not work.");
+                }
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[STRESS] Error loading saveData: {e.Message}");
         }
     }
     
@@ -406,21 +433,325 @@ public class CoreGameManager : MonoBehaviour
     #region Helper Methods for Dialog Text Assignment
     
     /// <summary>
+    /// Convert NPC name enum to display string, handling 'None' case
+    /// </summary>
+    private string ConvertNpcNameToString(CoreGameDialog.NpcName npcName)
+    {
+        if (npcName == CoreGameDialog.NpcName.None)
+        {
+            return ""; // Return empty string for None
+        }
+        return npcName.ToString();
+    }
+    
+    /// <summary>
+    /// Convert NPC name enum to display string for choice responses, handling 'None' case
+    /// </summary>
+    private string ConvertNpcNameToString(CoreGameDialogChoicesResponse.NpcName npcName)
+    {
+        if (npcName == CoreGameDialogChoicesResponse.NpcName.None)
+        {
+            return ""; // Return empty string for None
+        }
+        return npcName.ToString();
+    }
+    
+    /// <summary>
+    /// Update both NPC name and dialog text simultaneously without delays
+    /// This ensures both elements update at exactly the same time
+    /// </summary>
+    public void UpdateDialogAndNameSynchronized(string npcName, string dialogText)
+    {
+        Debug.Log($"[SYNC] Synchronously updating NPC name: '{npcName}' and dialog: '{dialogText}'");
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogWarning("[SYNC] Dialog instance is null, cannot update dialog elements");
+            return;
+        }
+        
+        // Cache components if needed (but skip all the throttling and delays)
+        if (!componentsCached || !ValidateComponentCache())
+        {
+            CacheDialogComponents();
+        }
+        
+        bool nameUpdated = false;
+        bool textUpdated = false;
+        
+        // Update NPC name immediately (no throttling or delays)
+        if (!string.IsNullOrEmpty(npcName) || npcName == "") // Allow empty names for "None" case
+        {
+            if (cachedTextComponents.ContainsKey("DialogueName"))
+            {
+                try
+                {
+                    TMP_Text nameComponent = cachedTextComponents["DialogueName"];
+                    if (nameComponent != null && nameComponent.gameObject != null)
+                    {
+                        nameComponent.text = npcName;
+                        Debug.Log($"[SYNC] ✓ Updated NPC name via cached component: '{npcName}'");
+                        nameUpdated = true;
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[SYNC] Error updating cached name component: {e.Message}");
+                }
+            }
+            
+            // Fallback: Direct search for name component
+            if (!nameUpdated)
+            {
+                Transform nameTransform = dialogInstance.transform.Find("DialogueName");
+                if (nameTransform != null)
+                {
+                    TMP_Text nameText = nameTransform.GetComponent<TMP_Text>();
+                    if (nameText != null)
+                    {
+                        nameText.text = npcName;
+                        Debug.Log($"[SYNC] ✓ Updated NPC name via direct search: '{npcName}'");
+                        
+                        // Cache for future use
+                        cachedTextComponents["DialogueName"] = nameText;
+                        nameUpdated = true;
+                    }
+                }
+            }
+        }
+        
+        // Update dialog text immediately (no throttling or delays)
+        if (!string.IsNullOrEmpty(dialogText))
+        {
+            if (cachedTextComponents.ContainsKey("DialogueText"))
+            {
+                try
+                {
+                    TMP_Text textComponent = cachedTextComponents["DialogueText"];
+                    if (textComponent != null && textComponent.gameObject != null)
+                    {
+                        textComponent.text = dialogText;
+                        Debug.Log($"[SYNC] ✓ Updated dialog text via cached component");
+                        textUpdated = true;
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[SYNC] Error updating cached text component: {e.Message}");
+                }
+            }
+            
+            // Fallback: Direct search for text component
+            if (!textUpdated)
+            {
+                Transform textTransform = dialogInstance.transform.Find("DialogueText");
+                if (textTransform != null)
+                {
+                    TMP_Text textComponent = textTransform.GetComponent<TMP_Text>();
+                    if (textComponent != null)
+                    {
+                        textComponent.text = dialogText;
+                        Debug.Log($"[SYNC] ✓ Updated dialog text via direct search");
+                        
+                        // Cache for future use
+                        cachedTextComponents["DialogueText"] = textComponent;
+                        textUpdated = true;
+                    }
+                }
+            }
+            
+            // Fallback: Try DialogPrefabController
+            if (!textUpdated)
+            {
+                DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+                if (controller != null)
+                {
+                    try
+                    {
+                        controller.SetDialogText(dialogText);
+                        Debug.Log($"[SYNC] ✓ Updated dialog text via DialogPrefabController");
+                        textUpdated = true;
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogWarning($"[SYNC] Failed to update via DialogPrefabController: {e.Message}");
+                    }
+                }
+            }
+        }
+        
+        if (!nameUpdated && (!string.IsNullOrEmpty(npcName) || npcName == ""))
+        {
+            Debug.LogWarning($"[SYNC] Failed to update NPC name: '{npcName}'");
+        }
+        
+        if (!textUpdated && !string.IsNullOrEmpty(dialogText))
+        {
+            Debug.LogWarning($"[SYNC] Failed to update dialog text");
+        }
+        
+        Debug.Log($"[SYNC] Synchronization complete - Name: {(nameUpdated ? "✓" : "✗")}, Text: {(textUpdated ? "✓" : "✗")}");
+    }
+    
+    /// <summary>
+    /// Update NPC name immediately without any delays or throttling
+    /// Use this when you need instant synchronization with dialog text
+    /// </summary>
+    public void UpdateNpcNameImmediate(string npcName)
+    {
+        if (dialogInstance == null)
+        {
+            Debug.LogWarning("[IMMEDIATE] Dialog instance is null, cannot update NPC name");
+            return;
+        }
+        
+        // Convert null to empty string
+        if (npcName == null)
+        {
+            npcName = "";
+        }
+        
+        bool nameUpdated = false;
+        
+        // Try cached component first
+        if (cachedTextComponents.ContainsKey("DialogueName"))
+        {
+            try
+            {
+                TMP_Text nameComponent = cachedTextComponents["DialogueName"];
+                if (nameComponent != null && nameComponent.gameObject != null)
+                {
+                    nameComponent.text = npcName;
+                    nameUpdated = true;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[IMMEDIATE] Error updating cached name component: {e.Message}");
+            }
+        }
+        
+        // Direct search if cached failed
+        if (!nameUpdated)
+        {
+            Transform nameTransform = dialogInstance.transform.Find("DialogueName");
+            if (nameTransform != null)
+            {
+                TMP_Text nameText = nameTransform.GetComponent<TMP_Text>();
+                if (nameText != null)
+                {
+                    nameText.text = npcName;
+                    // Cache for future use
+                    cachedTextComponents["DialogueName"] = nameText;
+                    nameUpdated = true;
+                }
+            }
+        }
+        
+        if (!nameUpdated)
+        {
+            Debug.LogWarning($"[IMMEDIATE] Failed to update NPC name immediately: '{npcName}'");
+        }
+    }
+    
+    /// <summary>
+    /// Update dialog text immediately without any delays or throttling
+    /// Use this when you need instant synchronization with NPC name
+    /// </summary>
+    public void UpdateDialogTextImmediate(string dialogText)
+    {
+        if (dialogInstance == null || string.IsNullOrEmpty(dialogText))
+        {
+            return;
+        }
+        
+        bool textUpdated = false;
+        
+        // Try cached component first
+        if (cachedTextComponents.ContainsKey("DialogueText"))
+        {
+            try
+            {
+                TMP_Text textComponent = cachedTextComponents["DialogueText"];
+                if (textComponent != null && textComponent.gameObject != null)
+                {
+                    textComponent.text = dialogText;
+                    textUpdated = true;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[IMMEDIATE] Error updating cached text component: {e.Message}");
+            }
+        }
+        
+        // Direct search if cached failed
+        if (!textUpdated)
+        {
+            Transform textTransform = dialogInstance.transform.Find("DialogueText");
+            if (textTransform != null)
+            {
+                TMP_Text textComponent = textTransform.GetComponent<TMP_Text>();
+                if (textComponent != null)
+                {
+                    textComponent.text = dialogText;
+                    // Cache for future use
+                    cachedTextComponents["DialogueText"] = textComponent;
+                    textUpdated = true;
+                }
+            }
+        }
+        
+        // Fallback: Try DialogPrefabController
+        if (!textUpdated)
+        {
+            DialogPrefabController controller = dialogInstance.GetComponent<DialogPrefabController>();
+            if (controller != null)
+            {
+                try
+                {
+                    controller.SetDialogText(dialogText);
+                    textUpdated = true;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[IMMEDIATE] Failed to update via DialogPrefabController: {e.Message}");
+                }
+            }
+        }
+        
+        if (!textUpdated)
+        {
+            Debug.LogWarning($"[IMMEDIATE] Failed to update dialog text immediately");
+        }
+    }
+    
+    /// <summary>
     /// Helper method to update NPC name with enhanced error handling and spam protection
     /// </summary>
-    public void UpdateNpcNameSafe(string npcName)
+    /// <param name="npcName">The NPC name to display</param>
+    /// <param name="bypassThrottling">If true, skips all delays and throttling for immediate update</param>
+    public void UpdateNpcNameSafe(string npcName, bool bypassThrottling = false)
     {
-        Debug.Log($"[SAFE-NAME] Updating NPC name to: '{npcName}'");
+        Debug.Log($"[SAFE-NAME] Updating NPC name to: '{npcName}' (Bypass throttling: {bypassThrottling})");
         
-        if (string.IsNullOrEmpty(npcName))
+        // Allow empty/null names - this is needed to clear the display when NPC name is "None"
+        if (npcName == null)
         {
-            Debug.LogWarning("[SAFE-NAME] NPC name is null or empty, skipping update");
-            return;
+            npcName = ""; // Convert null to empty string
+            Debug.Log("[SAFE-NAME] Converting null NPC name to empty string");
         }
         
         if (dialogInstance == null)
         {
             Debug.LogWarning("[SAFE-NAME] Dialog instance is null, cannot update NPC name");
+            return;
+        }
+        
+        // Use immediate update if bypassing throttling
+        if (bypassThrottling)
+        {
+            UpdateNpcNameImmediate(npcName);
             return;
         }
         
@@ -1076,6 +1407,79 @@ public class CoreGameManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Test synchronized dialog and name updates - verifies both update at exactly the same time
+    /// </summary>
+    [ContextMenu("Test Synchronized Dialog Updates")]
+    public void TestSynchronizedDialogUpdates()
+    {
+        Debug.Log("=== TESTING SYNCHRONIZED DIALOG UPDATES ===");
+        
+        if (dialogInstance == null)
+        {
+            Debug.LogError("No dialog instance found! Please show a dialog first.");
+            return;
+        }
+        
+        // Test 1: Synchronized update
+        Debug.Log("Test 1: UpdateDialogAndNameSynchronized()");
+        UpdateDialogAndNameSynchronized("Synchronized NPC", "This text and name should update at exactly the same time!");
+        
+        Debug.Log("Waiting 2 seconds...");
+        StartCoroutine(TestSynchronizedDelayed());
+    }
+    
+    private IEnumerator TestSynchronizedDelayed()
+    {
+        yield return new WaitForSeconds(2f);
+        
+        // Test 2: Individual immediate updates
+        Debug.Log("Test 2: Individual immediate updates");
+        UpdateNpcNameImmediate("Immediate NPC");
+        UpdateDialogTextImmediate("This should also be instant with no delays!");
+        
+        yield return new WaitForSeconds(2f);
+        
+        // Test 3: Compare with old throttled method (should show delay)
+        Debug.Log("Test 3: Old throttled method (notice the delay)");
+        UpdateNpcNameSafe("Throttled NPC");
+        UpdateDialogTextSafe("This name might appear after some delay due to throttling");
+        
+        Debug.Log("=== SYNCHRONIZED DIALOG UPDATES TEST COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Test NPC name None handling - verifies that None enum shows blank
+    /// </summary>
+    [ContextMenu("Test NPC Name None Handling")]
+    public void TestNpcNameNoneHandling()
+    {
+        Debug.Log("=== TESTING NPC NAME NONE HANDLING ===");
+        
+        // Test CoreGameDialog.NpcName.None
+        CoreGameDialog.NpcName dialogNone = CoreGameDialog.NpcName.None;
+        string dialogNoneString = ConvertNpcNameToString(dialogNone);
+        Debug.Log($"CoreGameDialog.NpcName.None converts to: '{dialogNoneString}' (Length: {dialogNoneString.Length})");
+        
+        // Test CoreGameDialogChoicesResponse.NpcName.None  
+        CoreGameDialogChoicesResponse.NpcName responseNone = CoreGameDialogChoicesResponse.NpcName.None;
+        string responseNoneString = ConvertNpcNameToString(responseNone);
+        Debug.Log($"CoreGameDialogChoicesResponse.NpcName.None converts to: '{responseNoneString}' (Length: {responseNoneString.Length})");
+        
+        // Test updating the UI with empty name
+        if (dialogInstance != null)
+        {
+            Debug.Log("Testing UI update with empty NPC name...");
+            UpdateNpcNameSafe(dialogNoneString);
+        }
+        else
+        {
+            Debug.LogWarning("No dialog instance available for UI test");
+        }
+        
+        Debug.Log("=== END NPC NAME NONE HANDLING TEST ===");
+    }
+    
+    /// <summary>
     /// Debug method to inspect current dialog/choice data
     /// </summary>
     [ContextMenu("Debug Current Dialog Data")]
@@ -1245,7 +1649,8 @@ public class CoreGameManager : MonoBehaviour
                     {
                         var response = selectedChoice.dialogResponses[i];
                         string indicator = (i == currentChoiceResponseIndex) ? " <- CURRENT" : "";
-                        Debug.Log($"  Response {i}: '{response.NpcName}' says '{response.npcResponse}'{indicator}");
+                        string responseNpcName = ConvertNpcNameToString(response.npcName);
+                        Debug.Log($"  Response {i}: '{responseNpcName}' says '{response.npcResponse}'{indicator}");
                     }
                     
                     Debug.Log("Press SPACE to advance to next response or continue to next block.");
@@ -1577,7 +1982,7 @@ public class CoreGameManager : MonoBehaviour
         
         // Use selectedResponseIndex, but clamp it to valid range
         int responseIndex = Mathf.Clamp(selectedResponseIndex, 0, choice.dialogResponses.Length - 1);
-        return choice.dialogResponses[responseIndex].NpcName;
+        return ConvertNpcNameToString(choice.dialogResponses[responseIndex].npcName);
     }
     
     /// <summary>
@@ -1647,7 +2052,8 @@ public class CoreGameManager : MonoBehaviour
         for (int i = 0; i < choice.dialogResponses.Length; i++)
         {
             var response = choice.dialogResponses[i];
-            Debug.Log($"  [{i}] {response.NpcName}: {response.npcResponse}");
+            string responseNpcName = ConvertNpcNameToString(response.npcName);
+            Debug.Log($"  [{i}] {responseNpcName}: {response.npcResponse}");
         }
     }
     
@@ -1657,7 +2063,8 @@ public class CoreGameManager : MonoBehaviour
     private void UpdateNpcNameDisplay(string npcName)
     {
         Debug.Log($"UpdateNpcNameDisplay called with: '{npcName}'");
-        UpdateNpcNameSafe(npcName);
+        // Use immediate update to avoid delays and synchronize with dialog text
+        UpdateNpcNameImmediate(npcName);
     }
     
     /// <summary>
@@ -1778,10 +2185,24 @@ public class CoreGameManager : MonoBehaviour
                 string valueStr = match.Groups[1].Value;
                 if (int.TryParse(valueStr, out int stressValue))
                 {
-                    // Apply stress modifier to stressvariable
+                    // Apply stress modifier to both local variable and ScriptableObject
                     stressvariable += stressValue;
                     
-                    Debug.Log($"[STRESS] Applied stress modifier: {stressValue} (Total stress: {stressvariable})");
+                    // Sync with ScriptableObject for UI consistency
+                    if (saveData != null)
+                    {
+                        saveData.mother_stress_level += stressValue;
+                        Debug.Log($"[STRESS] Synced stress with ScriptableObject: {saveData.mother_stress_level}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[STRESS] saveData is null, stress not synced to ScriptableObject");
+                    }
+                    
+                    Debug.Log($"[STRESS] Applied stress modifier: {stressValue} (Local: {stressvariable}, ScriptableObject: {saveData?.mother_stress_level ?? -1})");
+                    
+                    // Refresh all stress bar UIs to reflect the change
+                    RefreshStressBars();
                 }
                 else
                 {
@@ -2280,10 +2701,21 @@ public class CoreGameManager : MonoBehaviour
     
     /// <summary>
     /// Get current stress value (for debugging or UI display)
+    /// Reads from ScriptableObject for consistency with UI
     /// </summary>
     public int GetCurrentStress()
     {
-        return stressvariable;
+        if (saveData != null)
+        {
+            // Ensure local variable is synced with ScriptableObject
+            SynchronizeStressValues();
+            return saveData.mother_stress_level;
+        }
+        else
+        {
+            Debug.LogWarning("[STRESS] saveData is null, returning local stress variable");
+            return stressvariable;
+        }
     }
     
     /// <summary>
@@ -2292,7 +2724,20 @@ public class CoreGameManager : MonoBehaviour
     public void SetStress(int value)
     {
         stressvariable = value;
-        Debug.Log($"Stress set to: {stressvariable}");
+        
+        // Sync with ScriptableObject for UI consistency
+        if (saveData != null)
+        {
+            saveData.mother_stress_level = value;
+            Debug.Log($"[STRESS] Stress set to: {stressvariable} (Synced to ScriptableObject: {saveData.mother_stress_level})");
+        }
+        else
+        {
+            Debug.Log($"[STRESS] Stress set to: {stressvariable} (saveData is null, not synced)");
+        }
+        
+        // Refresh all stress bar UIs to reflect the change
+        RefreshStressBars();
     }
     
     /// <summary>
@@ -2301,7 +2746,20 @@ public class CoreGameManager : MonoBehaviour
     public void AddStress(int value)
     {
         stressvariable += value;
-        Debug.Log($"Added {value} stress (Total: {stressvariable})");
+        
+        // Sync with ScriptableObject for UI consistency
+        if (saveData != null)
+        {
+            saveData.mother_stress_level += value;
+            Debug.Log($"[STRESS] Added {value} stress (Local: {stressvariable}, ScriptableObject: {saveData.mother_stress_level})");
+        }
+        else
+        {
+            Debug.Log($"[STRESS] Added {value} stress (Local: {stressvariable}, saveData is null)");
+        }
+        
+        // Refresh all stress bar UIs to reflect the change
+        RefreshStressBars();
     }
     
     /// <summary>
@@ -2352,8 +2810,9 @@ public class CoreGameManager : MonoBehaviour
     
     /// <summary>
     /// Public property to access current stress value
+    /// Reads from ScriptableObject for consistency with UI
     /// </summary>
-    public int CurrentStress => stressvariable;
+    public int CurrentStress => GetCurrentStress();
     
     /// <summary>
     /// Event triggered when an animation modifier is processed
@@ -2372,6 +2831,147 @@ public class CoreGameManager : MonoBehaviour
     /// Subscribe to this to handle prefab spawning in external systems
     /// </summary>
     public System.Action<string> OnPrefabSpawned;
+    
+    /// <summary>
+    /// Synchronize local stress variable with ScriptableObject
+    /// Ensures both values stay in sync
+    /// </summary>
+    private void SynchronizeStressValues()
+    {
+        if (saveData != null)
+        {
+            // Keep local variable in sync with ScriptableObject (ScriptableObject is the source of truth)
+            stressvariable = saveData.mother_stress_level;
+        }
+    }
+    
+    /// <summary>
+    /// Refresh all stress bar UIs in the scene to reflect current stress level
+    /// Call this after modifying stress to update all UI elements
+    /// </summary>
+    private void RefreshStressBars()
+    {
+        // Find all StressBarIndicatorIbu components in the scene
+        StressBarIndicatorIbu[] stressBars = UnityEngine.Object.FindObjectsByType<StressBarIndicatorIbu>(FindObjectsSortMode.None);
+        
+        if (stressBars.Length > 0)
+        {
+            Debug.Log($"[STRESS] Refreshing {stressBars.Length} stress bar(s) in the scene");
+            
+            foreach (StressBarIndicatorIbu stressBar in stressBars)
+            {
+                if (stressBar != null)
+                {
+                    // Force the stress bar to update by calling its internal update method
+                    // The stress bar should read from the same ScriptableObject we just updated
+                    try
+                    {
+                        // Call any public update method if available, or the component will update automatically
+                        stressBar.enabled = false;
+                        stressBar.enabled = true; // Force refresh by disabling/enabling component
+                        Debug.Log($"[STRESS] Refreshed stress bar: {stressBar.name}");
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogWarning($"[STRESS] Failed to refresh stress bar {stressBar.name}: {e.Message}");
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("[STRESS] No stress bars found in the scene to refresh");
+        }
+    }
+    
+    /// <summary>
+    /// Initialize the stress system - ensures saveData is loaded and synchronized
+    /// </summary>
+    [ContextMenu("Initialize Stress System")]
+    public void InitializeStressSystem()
+    {
+        Debug.Log("=== INITIALIZING STRESS SYSTEM ===");
+        
+        // Load saveData if not already loaded
+        if (saveData == null)
+        {
+            Debug.Log("Loading saveData from Resources...");
+            saveData = Resources.Load<CoreGameSaves>(saveDataPath);
+            
+            if (saveData != null)
+            {
+                Debug.Log($"saveData loaded successfully from: {saveDataPath}");
+            }
+            else
+            {
+                Debug.LogError($"Failed to load saveData from: {saveDataPath}");
+                return;
+            }
+        }
+        
+        Debug.Log($"Current saveData state:");
+        Debug.Log($"  - Day: {saveData.day}");
+        Debug.Log($"  - Mother Stress Level: {saveData.mother_stress_level}");
+        Debug.Log($"  - Local stress variable: {stressvariable}");
+        
+        // Synchronize values
+        SynchronizeStressValues();
+        Debug.Log($"After synchronization - Local stress variable: {stressvariable}");
+        
+        // Refresh all stress bars
+        RefreshStressBars();
+        
+        Debug.Log("=== STRESS SYSTEM INITIALIZATION COMPLETE ===");
+    }
+    
+    /// <summary>
+    /// Test complete stress system integration - modifiers, sync, and UI refresh
+    /// </summary>
+    [ContextMenu("Test Complete Stress System Integration")]
+    public void TestCompleteStressSystemIntegration()
+    {
+        Debug.Log("=== TESTING COMPLETE STRESS SYSTEM INTEGRATION ===");
+        
+        // Initialize if needed
+        if (saveData == null)
+        {
+            InitializeStressSystem();
+        }
+        
+        // Test data before
+        Debug.Log($"BEFORE TEST:");
+        Debug.Log($"  - ScriptableObject stress: {saveData?.mother_stress_level ?? -1}");
+        Debug.Log($"  - Local stress variable: {stressvariable}");
+        Debug.Log($"  - GetCurrentStress(): {GetCurrentStress()}");
+        Debug.Log($"  - CurrentStress property: {CurrentStress}");
+        
+        // Test SetStress
+        Debug.Log("\nTesting SetStress(150)...");
+        SetStress(150);
+        
+        // Test AddStress
+        Debug.Log("\nTesting AddStress(50)...");
+        AddStress(50);
+        
+        // Test stress modifiers
+        Debug.Log("\nTesting stress modifiers...");
+        string testDialog = "Hello! {+100stress} This should add stress. {-25stress} This should reduce it.";
+        string processed = ProcessStressModifiers(testDialog);
+        Debug.Log($"Processed dialog: '{processed}'");
+        
+        // Final state
+        Debug.Log($"\nAFTER TEST:");
+        Debug.Log($"  - ScriptableObject stress: {saveData?.mother_stress_level ?? -1}");
+        Debug.Log($"  - Local stress variable: {stressvariable}");
+        Debug.Log($"  - GetCurrentStress(): {GetCurrentStress()}");
+        Debug.Log($"  - CurrentStress property: {CurrentStress}");
+        
+        // Count stress bars in scene
+        StressBarIndicatorIbu[] stressBars = UnityEngine.Object.FindObjectsByType<StressBarIndicatorIbu>(FindObjectsSortMode.None);
+        Debug.Log($"\nFound {stressBars.Length} stress bar(s) in the scene that should reflect the changes.");
+        
+        Debug.Log("=== STRESS SYSTEM INTEGRATION TEST COMPLETE ===");
+    }
     
     /// <summary>
     /// Manually trigger an animation (can be called externally)
@@ -2712,7 +3312,11 @@ public class CoreGameManager : MonoBehaviour
         
         // CRITICAL: Assign NPC name to DialogueName component
         // Use NPC name from CoreGameDialog.npcName, or extract from dialog text as fallback
-        string npcName = !string.IsNullOrEmpty(dialog.npcName) ? dialog.npcName : ExtractNpcNameFromDialogText(dialog.dialogEntry);
+        string npcName = ConvertNpcNameToString(dialog.npcName);
+        if (string.IsNullOrEmpty(npcName))
+        {
+            npcName = ExtractNpcNameFromDialogText(dialog.dialogEntry);
+        }
         Debug.Log($"Final npcName for DialogueName component: '{npcName}'");
         
         // Process stress modifiers from the initial dialog entry
@@ -3210,7 +3814,8 @@ public class CoreGameManager : MonoBehaviour
     private void ValidateDialogData(CoreGameDialog dialog)
     {
         Debug.Log($"=== DIALOG DATA VALIDATION ===");
-        Debug.Log($"CoreGameDialog.npcName: '{dialog.npcName}' (Length: {dialog.npcName?.Length ?? 0})");
+        string debugNpcName = ConvertNpcNameToString(dialog.npcName);
+        Debug.Log($"CoreGameDialog.npcName: '{debugNpcName}' (Length: {debugNpcName?.Length ?? 0})");
         Debug.Log($"CoreGameDialog.dialogEntry: '{dialog.dialogEntry}' (Length: {dialog.dialogEntry?.Length ?? 0})");
         
         if (dialog.choices != null)
@@ -3233,7 +3838,8 @@ public class CoreGameManager : MonoBehaviour
                             if (response != null)
                             {
                                 Debug.Log($"      Response {j}:");
-                                Debug.Log($"        - NpcName: '{response.NpcName}' (Length: {response.NpcName?.Length ?? 0})");
+                                string debugResponseNpcName = ConvertNpcNameToString(response.npcName);
+                                Debug.Log($"        - NpcName: '{debugResponseNpcName}' (Length: {debugResponseNpcName?.Length ?? 0})");
                                 Debug.Log($"        - npcResponse: '{response.npcResponse}' (Length: {response.npcResponse?.Length ?? 0})");
                             }
                             else
@@ -3496,7 +4102,7 @@ public class CoreGameManager : MonoBehaviour
         }
         
         var response = selectedChoice.dialogResponses[responseIndex];
-        string npcName = response.NpcName;
+        string npcName = ConvertNpcNameToString(response.npcName);
         string npcResponse = response.npcResponse;
         AudioClip audioClip = selectedChoice.audioDialogResponse;
         
@@ -3536,11 +4142,11 @@ public class CoreGameManager : MonoBehaviour
                 ClearComponentCache();
             }
             
-            // Update NPC name display
+            // Update NPC name display immediately to synchronize with dialog animation
             if (!string.IsNullOrEmpty(npcName))
             {
                 Debug.Log($"Updating NPC name to: '{npcName}'");
-                UpdateNpcNameSafe(npcName);
+                UpdateNpcNameImmediate(npcName);
             }
             else
             {
