@@ -31,6 +31,7 @@ public class NarratorHelper : NarratorBase
         yield return null;
     }
     
+    [System.Obsolete]
     protected override IEnumerator PlayEveningSequence()
     {
         TimeManager.instance.TimeOfDay = 19.0f;

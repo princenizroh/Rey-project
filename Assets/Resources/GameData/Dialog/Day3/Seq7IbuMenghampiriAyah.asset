@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc95e7fb1be8ad24795b8b55a4b44a68, type: 3}
+  m_Name: Seq7IbuMenghampiriAyah
+  m_EditorClassIdentifier: 
+  sequences:
+  - npcName: 1
+    dialog: Udah pulang
+  - npcName: 2
+    dialog: Iya sayang, gimana Rey hari ini
+  - npcName: 1
+    dialog: Rewel terus, nangis melulu
+  - npcName: 2
+    dialog: Mungkin dia lagi growth spurt
+  - npcName: 1
+    dialog: Gak, terlalu cepat untuk Rey
+  - npcName: 2
+    dialog: Hahaha iya. Emangnya Rey bangun berapa kali hari ini
+  - npcName: 1
+    dialog: Baru 3 kali dan itu karna tiap pagi kamu bangunin terus
+  - npcName: 2
+    dialog: Hahaha iya iya
+  - npcName: 2
+    dialog: Tapi itu masih normal, beruntung Rey masih sering tidurnya daripada bangun
+  - npcName: 1
+    dialog: Pokoknya capek banget
+  - npcName: 2
+    dialog: Sabar sayang, Rey kan masih kecil
+  - npcName: 1
+    dialog: Aku ke dapur dulu
+  - npcName: 2
+    dialog: Oke sayang
+  - npcName: 2
+    dialog: Ayah mandi dulu ya nak

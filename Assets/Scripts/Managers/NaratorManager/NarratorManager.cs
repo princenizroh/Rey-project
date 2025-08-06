@@ -47,16 +47,19 @@ public class NarratorManager : MonoBehaviour
     [System.Obsolete]
     public void StartNarration(NarratorDay day, TimeOfDay time)
     {
+        Debug.Log($"=== NarratorManager.StartNarration({day}, {time}) ===");
         currentDay = day;
         currentTime = time;
 
         if (narratorDict.TryGetValue(day, out NarratorBase narrator))
         {
+            Debug.Log($"Found narrator for {day}: {narrator.name}");
             StartCoroutine(narrator.StartNarration());
         }
         else
         {
-            Debug.LogWarning($"Narrator for {day} not found!");
+            Debug.LogError($"Narrator for {day} not found in dictionary!");
+            Debug.Log($"Available narrators: {string.Join(", ", narratorDict.Keys)}");
         }
     }
 
@@ -80,7 +83,7 @@ public class NarratorManager : MonoBehaviour
     public void NextTimeOfDay()
     {
         TimeOfDay nextTime = currentTime + 1;
-        if ((int)nextTime > 4) // Midnight is the last (index 4)
+        if ((int)nextTime > 3) // Night is the last (index 3)
         {
             NextDay();
         }

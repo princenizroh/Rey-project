@@ -19,8 +19,8 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
-      dialogEntry: Nah... udah bersih dan wangi
+      npcName: 1
+      dialogEntry: Nah. udah bersih dan wangi
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Anak
+      npcName: 0
       dialogEntry: Hangat
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -43,31 +43,19 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 0
       dialogEntry: Lapar...
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: '*Neh* (Lapar)'
         dialogResponses:
-        - NpcName: 
+        - npcName: 1
           npcResponse: Iya iya bentar
         audioDialogResponse: {fileID: 0}
       - playerChoice: '*Oek* (Menangis)'
         dialogResponses:
-        - NpcName: 
-          npcResponse: Iya iya sabar dulu malah nangis
+        - npcName: 1
+          npcResponse: '{+1stress} Iya iya sabar dulu malah nangis'
         audioDialogResponse: {fileID: 0}
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: Ibu
-      dialogEntry: Lapar...
-      audioDialogEntry: {fileID: 0}
-      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

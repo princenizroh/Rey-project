@@ -19,6 +19,8 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 1\nKelahiran";
         yield return new WaitForSeconds(5f);
+        Debug.Log("Day 1 Night finished! Starting narration sequence...");
+        
         uiElements.narratorText.gameObject.SetActive(false);
 
         bool seq1Complete = false;
@@ -27,7 +29,7 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitUntil(() => seq1Complete);
 
         yield return new WaitForSeconds(0.3f);
-
+        
         PlayAudio("baby_crying");
 
         yield return new WaitForSeconds(1f);

@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 0
       dialogEntry: Lihat dia membuka matanya
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 0
       dialogEntry: Ihh... lucu sekali
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -43,7 +43,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 0
       dialogEntry: Iya ya dia mulai membuka matanya
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -55,7 +55,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 0
       dialogEntry: Halo nak ini ayah
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -67,7 +67,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 0
       dialogEntry: Dan ini ibumu
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -79,7 +79,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Ayah.. Ibu..
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -91,29 +91,29 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ???
+      npcName: 0
       dialogEntry: Lapar..
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: '*Neh* (Lapar)'
         dialogResponses:
-        - NpcName: Ayah
+        - npcName: 0
           npcResponse: Dia mengeluarkan suara, apa yang dia butuhkan
         audioDialogResponse: {fileID: 8300000, guid: 34fc5efa1b0dcce4c8ec06157917fae7, type: 3}
       - playerChoice: '*Oek* (Menangis)'
         dialogResponses:
-        - NpcName: Ibu
+        - npcName: 1
           npcResponse: Kenapa anak ini menangis? Berisik sekali
-        - NpcName: Bidan
+        - npcName: 0
           npcResponse: Kalau anaknya menangis terus itu tandanya dia butuh sesuatu
             ibu
-        - NpcName: Bidan
+        - npcName: 0
           npcResponse: Karena bayinya baru lahir sepertinya anaknya sedang lapar
-        - NpcName: Bidan
+        - npcName: 0
           npcResponse: Ibu bisa beri ASI untuk kebutuhan bayinya
-        - NpcName: Ayah
+        - npcName: 0
           npcResponse: Iya sayang kasih ASI untuk anak kita
-        - NpcName: Ibu
+        - npcName: 0
           npcResponse: Iya deh daripada berisik terus
         audioDialogResponse: {fileID: 8300000, guid: 117a016d2cb1f9446b8b68e56a57a9f7, type: 3}
     Animation:

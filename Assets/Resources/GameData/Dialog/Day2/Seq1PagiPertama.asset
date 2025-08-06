@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Selamat Pagi sayang kecil
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Rey
+      npcName: 0
       dialogEntry: Ayah
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -43,7 +43,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Sudah tidur pulas malah dibangunin
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -55,7 +55,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Biarlah, biar dia juga menghirup udara segar
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -67,7 +67,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Suka hati kau lah
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -79,7 +79,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Aku siapin makanan dulu
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -91,7 +91,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 2
       dialogEntry: Ayuk nak kita kebawah
       audioDialogEntry: {fileID: 0}
       choices: []

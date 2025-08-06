@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Udah siap berangkat?
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Iya sayang, tas udah dibawa
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -43,7 +43,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Jangan lupa makan siangnya
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -55,7 +55,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Iya sayang
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -67,13 +67,13 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Ayah berangkat kerja dulu ya nak
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: '*Nghh* (Merespon)'
         dialogResponses:
-        - NpcName: Ayah
+        - npcName: 2
           npcResponse: Ih dia merespon... lucunya
         audioDialogResponse: {fileID: 0}
     Animation:
@@ -84,7 +84,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Yaudah aku pergi dulu ya
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -96,7 +96,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Iya hati-hati
       audioDialogEntry: {fileID: 0}
       choices: []

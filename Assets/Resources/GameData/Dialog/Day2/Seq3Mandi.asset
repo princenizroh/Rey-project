@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Habis ini mandi dulu habis itu ganti popok
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Habis itu langsung tidurin Rey lagi. Ibu masih mau istirahat
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -43,7 +43,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Ibu juga mau nonton drakor
       audioDialogEntry: {fileID: 0}
       choices: []

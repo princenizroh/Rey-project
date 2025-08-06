@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc95e7fb1be8ad24795b8b55a4b44a68, type: 3}
+  m_Name: Seq3Kelaparan
+  m_EditorClassIdentifier: 
+  sequences:
+  - npcName: 5
+    dialog: '[Sound: Dering telepon]'
+  - npcName: 0
+    dialog: Aku lapar
+  - npcName: 0
+    dialog: Ibu sudah tidak bisa mengeluarkan susu
+  - npcName: 0
+    dialog: Aku tidak mengerti
+  - npcName: 0
+    dialog: Aku menangis meminta makan ke ibu
+  - npcName: 0
+    dialog: Tetapi ibu tak kunjung datang
+  - npcName: 0
+    dialog: Aku gak bisa menangis terus terusan
+  - npcName: 0
+    dialog: Aku kelaparan
+  - npcName: 0
+    dialog: Tetapi..
+  - npcName: 0
+    dialog: Tidak ada yang datang...

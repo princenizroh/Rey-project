@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc95e7fb1be8ad24795b8b55a4b44a68, type: 3}
+  m_Name: Seq5BMenemukanIbu
+  m_EditorClassIdentifier: 
+  sequences:
+  - npcName: 2
+    dialog: Linda?
+  - npcName: 2
+    dialog: Sayang... kamu disini?
+  - npcName: 2
+    dialog: Ayah baru pulang
+  - npcName: 2
+    dialog: Kamu kenapa duduk di lantai?
+  - npcName: 2
+    dialog: Linda...
+  - npcName: 2
+    dialog: Lihat papa
+  - npcName: 2
+    dialog: Ada apa sayang?
+  - npcName: 2
+    dialog: Kamu sakit ya?
+  - npcName: 2
+    dialog: Ayah harusnya gak ninggalin kamu sendirian
+  - npcName: 2
+    dialog: Maafin ayah...
+  - npcName: 2
+    dialog: Aku akan membawa Rey Kerumah sakit
