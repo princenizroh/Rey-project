@@ -1,16 +1,22 @@
 using UnityEngine;
+using System.Collections;
 
-public class NarratorDay3 : MonoBehaviour
+public class NarratorDay3 : NarratorBase
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [System.Obsolete]
+    public override IEnumerator Narrate()
     {
-        
-    }
+        ResetUIState();
 
-    // Update is called once per frame
-    void Update()
+        switch (NarratorManager.Instance.currentTime)
+        {
+            case TimeOfDay.Night:
+                yield return StartCoroutine(PlayNightSequence());
+                break;
+        }
+    }
+    private IEnumerator PlayNightSequence()
     {
-        
+        yield return null;
     }
 }

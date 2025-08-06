@@ -17,7 +17,7 @@ public enum TimeOfDay
 
 public enum CharacterType
 {
-    Mother, Father, Bidan, Baby
+    Mother, Father, Bidan, Baby, Object, Ghost
 }
 
 [System.Serializable]
@@ -40,7 +40,6 @@ public class CharacterData
     public Transform[] spawnPositions;
     public Transform[] movementPositions;
     
-    // Runtime references (initialized automatically)
     [System.NonSerialized] public NavMeshAgent agent;
     [System.NonSerialized] public Animator animator;
     
@@ -271,7 +270,6 @@ public abstract class NarratorBase : MonoBehaviour
 
     protected void PlayCharacterAnimation(CharacterType characterType, string animationName)
     {
-        // Lazy initialization - ensure character is initialized when needed
         if (!EnsureCharacterInitialized(characterType))
         {
             Debug.LogError($"Failed to initialize {characterType} for animation!");
@@ -282,14 +280,12 @@ public abstract class NarratorBase : MonoBehaviour
         {
             if (characterData.animator != null)
             {
-                // Check if GameObject is active
                 if (!characterData.characterObject.activeInHierarchy)
                 {
                     Debug.LogWarning($"{characterType} GameObject is not active!");
                     return;
                 }
                 
-                // Check if Animator is enabled
                 if (!characterData.animator.enabled)
                 {
                     Debug.LogWarning($"{characterType} Animator is not enabled!");
@@ -304,7 +300,7 @@ public abstract class NarratorBase : MonoBehaviour
                 }
                 if (characterType == CharacterType.Mother)
                 {
-                    characterData.animator.Play(animationName); // Play from start
+                    characterData.animator.Play(animationName); 
                 }
                 else
                 {
@@ -326,22 +322,18 @@ public abstract class NarratorBase : MonoBehaviour
     {
         if (characterDict.TryGetValue(characterType, out CharacterData characterData))
         {
-            // Check if needs reinitialization
             if (characterData.animator == null || characterData.agent == null)
             {
                 Debug.Log($"Re-initializing {characterType}");
                 
-                // Ensure GameObject is active
                 bool wasActive = characterData.characterObject.activeInHierarchy;
                 if (!wasActive)
                 {
                     characterData.characterObject.SetActive(true);
                 }
                 
-                // Re-initialize
                 characterData.Initialize();
                 
-                // Restore state
                 if (!wasActive)
                 {
                     characterData.characterObject.SetActive(wasActive);
@@ -442,7 +434,7 @@ public abstract class NarratorBase : MonoBehaviour
         }
     }
 #endregion
-
+#region GameObject Management
     protected void AppearObjects()
     {
         SetObjectsActive(gameObjects.activeObjects, true);
@@ -459,4 +451,5 @@ public abstract class NarratorBase : MonoBehaviour
             }
         }
     }
+#endregion
 }

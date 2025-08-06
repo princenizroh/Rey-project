@@ -67,7 +67,6 @@ public class NarratorDay2 : NarratorBase
         yield return null;
     }
 
-    // Public methods for Editor Tools
     public void SnapCharacterToSpawn(CharacterType characterType, int spawnIndex)
     {
         #if UNITY_EDITOR
@@ -99,7 +98,6 @@ public class NarratorDay2 : NarratorBase
         #endif
     }
     
-    // New method: Snap characters to different spawn indices
     public void SnapCharactersToMultipleSpawns(int motherIndex, int fatherIndex, int babyIndex, int bidanIndex)
     {
         #if UNITY_EDITOR
@@ -112,30 +110,14 @@ public class NarratorDay2 : NarratorBase
         #endif
     }
     
-    public void SetupDay2Positions()
-    {
-        #if UNITY_EDITOR
-        // Setup posisi untuk Day 2 berdasarkan timeline document
-        // Morning: Kamar Tidur → Kamar Mandi → Kamar Ortu
-        // Sekarang bisa menggunakan spawn index yang berbeda untuk setiap karakter
-        SnapCharacterToSpawn(CharacterType.Mother, 0); // Kamar Ortu
-        SnapCharacterToSpawn(CharacterType.Father, 0); // Kamar Ortu  
-        SnapCharacterToSpawn(CharacterType.Baby, 1);   // Bisa ke spawn position berbeda
-        SnapCharacterToSpawn(CharacterType.Bidan, 2);  // Bisa ke spawn position berbeda
-        
-        Debug.Log("Day 2 positions setup complete with varied spawn indices!");
-        #endif
-    }
     
-    // New method: Setup positions for different times of day
     public void SetupMorningPositions()
     {
         #if UNITY_EDITOR
-        // Morning specific positions
-        SnapCharacterToSpawn(CharacterType.Mother, 0); // Kamar Ortu
-        SnapCharacterToSpawn(CharacterType.Father, 0); // Kamar Ortu
-        SnapCharacterToSpawn(CharacterType.Baby, 0);   // Kamar Ortu
-        SnapCharacterToSpawn(CharacterType.Bidan, 1);  // Different position for Bidan
+        SnapCharacterToSpawn(CharacterType.Mother, 0); 
+        SnapCharacterToSpawn(CharacterType.Father, 0); 
+        SnapCharacterToSpawn(CharacterType.Baby, 0);   
+        SnapCharacterToSpawn(CharacterType.Bidan, 1);  
         
         Debug.Log("Morning positions setup complete!");
         #endif
@@ -145,10 +127,10 @@ public class NarratorDay2 : NarratorBase
     {
         #if UNITY_EDITOR
         // Afternoon specific positions
-        SnapCharacterToSpawn(CharacterType.Mother, 1); // Different room
-        SnapCharacterToSpawn(CharacterType.Father, 2); // Different room
-        SnapCharacterToSpawn(CharacterType.Baby, 1);   // With mother
-        SnapCharacterToSpawn(CharacterType.Bidan, 3);  // Different position
+        SnapCharacterToSpawn(CharacterType.Mother, 1); 
+        SnapCharacterToSpawn(CharacterType.Father, 2); 
+        SnapCharacterToSpawn(CharacterType.Baby, 1);   
+        SnapCharacterToSpawn(CharacterType.Bidan, 3);  
         
         Debug.Log("Afternoon positions setup complete!");
         #endif
@@ -157,11 +139,10 @@ public class NarratorDay2 : NarratorBase
     public void SetupEveningPositions()
     {
         #if UNITY_EDITOR
-        // Evening specific positions
-        SnapCharacterToSpawn(CharacterType.Mother, 2); // Living room
-        SnapCharacterToSpawn(CharacterType.Father, 2); // Living room
-        SnapCharacterToSpawn(CharacterType.Baby, 2);   // Living room
-        SnapCharacterToSpawn(CharacterType.Bidan, 4);  // Gone home or different area
+        SnapCharacterToSpawn(CharacterType.Mother, 2); 
+        SnapCharacterToSpawn(CharacterType.Father, 2); 
+        SnapCharacterToSpawn(CharacterType.Baby, 2);   
+        SnapCharacterToSpawn(CharacterType.Bidan, 4);  
         
         Debug.Log("Evening positions setup complete!");
         #endif
@@ -170,7 +151,6 @@ public class NarratorDay2 : NarratorBase
     public void ResetAllCharacterPositions()
     {
         #if UNITY_EDITOR
-        // Reset semua character ke posisi spawn 0
         foreach (var characterData in charactersDataArray)
         {
             if (characterData.HasValidSpawnPosition(0))
@@ -182,7 +162,6 @@ public class NarratorDay2 : NarratorBase
         #endif
     }
     
-    // Utility method to get available spawn positions for a character
     public int GetMaxSpawnIndex(CharacterType characterType)
     {
         #if UNITY_EDITOR
@@ -197,7 +176,6 @@ public class NarratorDay2 : NarratorBase
         #endif
     }
     
-    // Method to validate if all characters have required spawn positions
     public bool ValidateSpawnPositions(int requiredPositions)
     {
         #if UNITY_EDITOR
