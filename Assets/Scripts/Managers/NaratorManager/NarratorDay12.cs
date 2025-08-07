@@ -82,6 +82,6 @@ public class NarratorDay12 : NarratorBase
         yield return new WaitForSeconds(2f);
         
         // Final day, end narration
-        narratorManager.EndNarration();
+        
     }
 }
