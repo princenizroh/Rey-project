@@ -77,10 +77,10 @@ public class NarratorDay8 : NarratorBase
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
         
-        if (audioSource != null && audioSource.isPlaying)
-        {
-            StartCoroutine(FadeOutAudio(audioSource, 3f)); 
-        }
+        // if (audioSource != null && audioSource.isPlaying)
+        // {
+        //     StartCoroutine(FadeOutAudio(audioSource, 3f)); 
+        // }
         
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
