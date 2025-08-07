@@ -153,6 +153,75 @@ public abstract class NarratorBase : MonoBehaviour
         }
     }
 #endregion
+#region Sequence Detection
+    // Method to get the first available time of day for this narrator
+    public virtual TimeOfDay GetFirstAvailableTimeOfDay()
+    {
+        // Check which sequences are actually implemented (not just returning null)
+        System.Type thisType = this.GetType();
+        
+        // Check Morning
+        var morningMethod = thisType.GetMethod("PlayMorningSequence", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (morningMethod != null && morningMethod.DeclaringType != typeof(NarratorBase))
+        {
+            return TimeOfDay.Morning;
+        }
+        
+        // Check Afternoon
+        var afternoonMethod = thisType.GetMethod("PlayAfternoonSequence", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (afternoonMethod != null && afternoonMethod.DeclaringType != typeof(NarratorBase))
+        {
+            return TimeOfDay.Afternoon;
+        }
+        
+        // Check Evening
+        var eveningMethod = thisType.GetMethod("PlayEveningSequence", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (eveningMethod != null && eveningMethod.DeclaringType != typeof(NarratorBase))
+        {
+            return TimeOfDay.Evening;
+        }
+        
+        // Default to Night if nothing else is found
+        return TimeOfDay.Night;
+    }
+    
+    // Method to get next available time of day after current
+    public virtual TimeOfDay GetNextAvailableTimeOfDay(TimeOfDay currentTime)
+    {
+        System.Type thisType = this.GetType();
+        
+        // Start checking from the next time after current
+        for (int i = (int)currentTime + 1; i <= (int)TimeOfDay.Night; i++)
+        {
+            TimeOfDay checkTime = (TimeOfDay)i;
+            string methodName = $"Play{checkTime}Sequence";
+            
+            var method = thisType.GetMethod(methodName, 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (method != null && method.DeclaringType != typeof(NarratorBase))
+            {
+                return checkTime;
+            }
+        }
+        
+        // If no next time available, return Morning (will trigger next day)
+        return TimeOfDay.Morning;
+    }
+    
+    // Check if a specific time of day is implemented
+    public virtual bool HasTimeOfDaySequence(TimeOfDay timeOfDay)
+    {
+        System.Type thisType = this.GetType();
+        string methodName = $"Play{timeOfDay}Sequence";
+        
+        var method = thisType.GetMethod(methodName, 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        return method != null && method.DeclaringType != typeof(NarratorBase);
+    }
+#endregion
 #region Abstract Methods
     [System.Obsolete]
     public IEnumerator StartNarration()
@@ -164,7 +233,34 @@ public abstract class NarratorBase : MonoBehaviour
     protected virtual IEnumerator Narrate()
     {
         ResetUIState();
-        switch (NarratorManager.Instance.currentTime)
+        
+        TimeOfDay targetTime = NarratorManager.Instance.currentTime;
+        
+        // Check if the target time sequence is implemented
+        if (!HasTimeOfDaySequence(targetTime))
+        {
+            Debug.LogWarning($"{this.GetType().Name} does not have {targetTime}Sequence implemented. Finding next available sequence...");
+            
+            // Find next available sequence
+            TimeOfDay nextAvailable = GetNextAvailableTimeOfDay(targetTime);
+            if (nextAvailable != TimeOfDay.Morning || HasTimeOfDaySequence(TimeOfDay.Morning))
+            {
+                // Update the manager's current time and play the available sequence
+                NarratorManager.Instance.currentTime = nextAvailable;
+                targetTime = nextAvailable;
+                Debug.Log($"Switching to available sequence: {targetTime}");
+            }
+            else
+            {
+                // No sequences available, skip to next day
+                Debug.Log($"No sequences available for {this.GetType().Name}. Skipping to next day...");
+                GoToNextDay();
+                yield break;
+            }
+        }
+        
+        // Play the appropriate sequence
+        switch (targetTime)
         {
             case TimeOfDay.Morning:
                 yield return StartCoroutine(PlayMorningSequence());
@@ -620,7 +716,7 @@ public abstract class NarratorBase : MonoBehaviour
     protected IEnumerator SetCameraPanRangeLeft()
     {
         var panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
-        panTilt.PanAxis.Range = new Vector2(270f, 90f);
+        panTilt.PanAxis.Range = new Vector2(-90f, 90f);
         yield return null;
     }
 #endregion

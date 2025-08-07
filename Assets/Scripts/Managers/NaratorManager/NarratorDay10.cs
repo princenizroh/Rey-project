@@ -3,43 +3,43 @@ using System.Collections;
 
 public class NarratorDay10 : NarratorBase
 {
-    // Day 10 - Depresi Postpartum Day 2 (Multiple POV)
-    // Father still working overtime, mother's condition deteriorates further
+    // Day 10 - Postpartum Depression Deepens
+    // Mother's withdrawal becomes severe, supernatural activity peaks
     
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
-        TimeManager.instance.TimeOfDay = 0.5f; // Afternoon
-        AppearObjects();
-        SetCharacterSpawn(CharacterType.Mother, 0); // Bedroom - severe state
-        SetCharacterSpawn(CharacterType.Baby, 0);   // Back to parents' room
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
+        SetCharacterSpawn(CharacterType.Baby, 4);
+        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Father, 1);
+        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Day 10\nDepresi Postpartum - Day 2\nSiang Hari";
+        uiElements.narratorText.text = "Day 10\nPostpartum Depression Deepens\nSiang Hari";
         yield return new WaitForSeconds(5f);
         uiElements.narratorText.gameObject.SetActive(false);
 
-        // Sound effects of chaos
-        PlayAudio("objects_falling");
-        PlayAudio("plates_breaking");
-        
-        yield return new WaitForSeconds(2f);
-        
-        FadeOpenEyes(); // Baby wakes up to chaos
+        FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
 
-        // Seq1 Lapar
+        // Seq1 Sendirian
         bool seq1Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq1Lapar", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq1Sendirian", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
         
-        if (audioSource != null && audioSource.isPlaying)
-        {
-            StartCoroutine(FadeOutAudio(audioSource, 2f)); 
-        }
+        yield return new WaitForSeconds(1f);
         
-        FadeCloseEyes(); // Baby sleeps
+        // Seq2 AyahKhawatir
+        bool seq2Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq2AyahKhawatir", 
+            () => { seq2Complete = true; });
+        yield return new WaitUntil(() => seq2Complete);
+        
+        FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         
         GoToNextTimeOfDay();
@@ -48,45 +48,49 @@ public class NarratorDay10 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayNightSequence()
     {
-        TimeManager.instance.TimeOfDay = 1.0f; // Night
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 20.0f; // Night
+        SetCharacterSpawn(CharacterType.Baby, 4);
+        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Father, 0);
+        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Malam Hari\nKeanehan Ibu";
+        uiElements.narratorText.text = "Malam Hari\nPuncak Gangguan";
         yield return new WaitForSeconds(4f);
         uiElements.narratorText.gameObject.SetActive(false);
         
-        FadeOpenEyes(); // Baby wakes up
+        // Maximum supernatural intensity
+        PlayAudio("supernatural_peak");
+        
+        FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
         
-        // Seq2 Keanehan
-        bool seq2Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq2Keanehan", 
-            () => { seq2Complete = true; });
-        yield return new WaitUntil(() => seq2Complete);
-        
-        yield return new WaitForSeconds(2f);
-        
-        // Mother's emotional breakdown and paranoid thoughts
-        PlayAudio("crying_breakdown");
-        PlayAudio("furniture_thrown");
-        
-        yield return new WaitForSeconds(2f);
-        
-        // Seq3 Curhatan
+        // Seq3 GangguanSetanPuncak
         bool seq3Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq3Curhatan", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq3GangguanSetanPuncak", 
             () => { seq3Complete = true; });
         yield return new WaitUntil(() => seq3Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq4 Keputusasaan
+        bool seq4Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day10/Seq4Keputusasaan", 
+            () => { seq4Complete = true; });
+        yield return new WaitUntil(() => seq4Complete);
         
         if (audioSource != null && audioSource.isPlaying)
         {
             StartCoroutine(FadeOutAudio(audioSource, 3f)); 
         }
         
-        yield return new WaitForSeconds(3f);
+        FadeCloseEyes(); 
+        yield return new WaitForSeconds(2f);
         
-        // Auto progression to Day 11 (Psikosis begins)
-        Debug.Log("Day 10 finished! Moving to Day 11 - Psikosis Postpartum...");
+        // Auto progression to Day 11
+        Debug.Log("Day 10 finished! Moving to Day 11...");
         GoToNextDay();
     }
 }

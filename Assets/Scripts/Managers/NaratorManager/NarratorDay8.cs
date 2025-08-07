@@ -9,10 +9,12 @@ public class NarratorDay8 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
-        TimeManager.instance.TimeOfDay = 0.5f; // Afternoon
-        AppearObjects();
-        SetCharacterSpawn(CharacterType.Mother, 0); // Bedroom - complete withdrawal
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
         SetCharacterSpawn(CharacterType.Baby, 4);   // Baby's room
+        SetCharacterSpawn(CharacterType.Mother, 0); // Bedroom - complete withdrawal
+        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 8\nFinal Baby Blues Phase\nSiang Hari";
@@ -48,7 +50,7 @@ public class NarratorDay8 : NarratorBase
             () => { seq3Complete = true; });
         yield return new WaitUntil(() => seq3Complete);
         
-        FadeCloseEyes(); // Baby sleeps from trauma
+        FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         
         GoToNextTimeOfDay();
@@ -57,35 +59,49 @@ public class NarratorDay8 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayNightSequence()
     {
-        TimeManager.instance.TimeOfDay = 1.0f; // Night
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 20.0f; // Night
+        SetCharacterSpawn(CharacterType.Baby, 4);
+        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Father, 0);
+        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Malam Hari\nGangguan Supernatural Terparah";
+        uiElements.narratorText.text = "Malam Hari\nGangguan Supernatural Memuncak";
         yield return new WaitForSeconds(4f);
         uiElements.narratorText.gameObject.SetActive(false);
         
-        // Most intense supernatural encounter
+        // Intense supernatural disturbance
         PlayAudio("supernatural_intense");
-        PlayAudio("demon_presence");
-        PlayAudio("wind_howling");
         
-        yield return new WaitForSeconds(2f);
+        FadeOpenEyes(); 
+        yield return new WaitForSeconds(1f);
         
-        // Seq4 GangguanSetanSangatParah
+        // Seq4 GangguanSetanKuat
         bool seq4Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq4GangguanSetanSangatParah", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq4GangguanSetanKuat", 
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
         
+        yield return new WaitForSeconds(1f);
+        
+        // Seq5 Keputusasaan
+        bool seq5Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq5Keputusasaan", 
+            () => { seq5Complete = true; });
+        yield return new WaitUntil(() => seq5Complete);
+        
         if (audioSource != null && audioSource.isPlaying)
         {
-            StartCoroutine(FadeOutAudio(audioSource, 5f)); 
+            StartCoroutine(FadeOutAudio(audioSource, 3f)); 
         }
         
-        yield return new WaitForSeconds(3f);
+        FadeCloseEyes(); 
+        yield return new WaitForSeconds(2f);
         
-        // Auto progression to Day 9 (Postpartum Depression begins)
-        Debug.Log("Day 8 finished! Moving to Day 9 - Postpartum Depression begins...");
+        // Auto progression to Day 9
+        Debug.Log("Day 8 finished! Moving to Day 9...");
         GoToNextDay();
     }
 }

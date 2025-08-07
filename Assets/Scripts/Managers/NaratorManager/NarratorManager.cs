@@ -54,7 +54,21 @@ public class NarratorManager : MonoBehaviour
         if (narratorDict.TryGetValue(day, out NarratorBase narrator))
         {
             Debug.Log($"Found narrator for {day}: {narrator.name}");
-            StartCoroutine(narrator.StartNarration());
+            
+            // Check if the requested time sequence is available
+            if (narrator.HasTimeOfDaySequence(time))
+            {
+                Debug.Log($"Starting {day} {time} sequence");
+                StartCoroutine(narrator.StartNarration());
+            }
+            else
+            {
+                Debug.LogWarning($"{day} does not have {time} sequence. Finding first available...");
+                TimeOfDay firstAvailable = narrator.GetFirstAvailableTimeOfDay();
+                currentTime = firstAvailable;
+                Debug.Log($"Starting {day} with first available time: {firstAvailable}");
+                StartCoroutine(narrator.StartNarration());
+            }
         }
         else
         {
@@ -73,23 +87,55 @@ public class NarratorManager : MonoBehaviour
     [System.Obsolete]
     public void NextDay()
     {
-        if ((int)currentDay < 13) // Day14 is the last (index 13)
+        if ((int)currentDay < 13) 
         {
-            StartNarration(currentDay + 1, TimeOfDay.Morning);
-        }
-    }
-    [System.Obsolete]
-    
-    public void NextTimeOfDay()
-    {
-        TimeOfDay nextTime = currentTime + 1;
-        if ((int)nextTime > 3) // Night is the last (index 3)
-        {
-            NextDay();
+            NarratorDay nextDay = currentDay + 1;
+
+            if (narratorDict.TryGetValue(nextDay, out NarratorBase nextNarrator))
+            {
+                TimeOfDay firstAvailableTime = nextNarrator.GetFirstAvailableTimeOfDay();
+                StartNarration(nextDay, firstAvailableTime);
+                Debug.Log($"Starting {nextDay} with first available time: {firstAvailableTime}");
+            }
+            else
+            {
+                Debug.LogError($"Narrator for {nextDay} not found!");
+            }
         }
         else
         {
-            StartNarration(currentDay, nextTime);
+            Debug.Log("Story completed - reached final day!");
+        }
+    }
+    
+    [System.Obsolete]
+    public void NextTimeOfDay()
+    {
+        if (narratorDict.TryGetValue(currentDay, out NarratorBase currentNarrator))
+        {
+            TimeOfDay nextTime = currentNarrator.GetNextAvailableTimeOfDay(currentTime);
+            
+            // If nextTime is Morning, it means no more sequences for current day
+            if (nextTime == TimeOfDay.Morning && currentTime != TimeOfDay.Night)
+            {
+                // Skip to next day instead
+                NextDay();
+            }
+            else if (nextTime == TimeOfDay.Morning && currentTime == TimeOfDay.Night)
+            {
+                // End of current day, go to next day
+                NextDay();
+            }
+            else
+            {
+                // Stay on current day, move to next available time
+                StartNarration(currentDay, nextTime);
+                Debug.Log($"Moving to next available time: {nextTime} on {currentDay}");
+            }
+        }
+        else
+        {
+            Debug.LogError($"Current narrator for {currentDay} not found!");
         }
     }
 }

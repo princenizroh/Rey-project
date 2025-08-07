@@ -3,130 +3,151 @@ using System.Collections;
 
 public class NarratorDay12 : NarratorBase
 {
-    // Day 12 - Ayah's Return - Critical Discovery
-    // Choice point: Father's reaction determines the path
-    private bool fatherAngerChoice = false; // This could be set by player choice system
+    // Day 12 - Hope and Recovery Begin
+    // Father takes action, professional help is sought, supernatural activity subsides
     
     [System.Obsolete]
-    protected override IEnumerator PlayEveningSequence()
+    protected override IEnumerator PlayMorningSequence()
     {
-        TimeManager.instance.TimeOfDay = 0.75f; // Evening
-        AppearObjects();
-        SetCharacterSpawn(CharacterType.Father, 6);  // Outside door
-        SetCharacterSpawn(CharacterType.Mother, 4);  // Baby's room - catatonic
-        SetCharacterSpawn(CharacterType.Baby, 0);    // Parents' room - neglected
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 8.0f; // Morning
+        SetCharacterSpawn(CharacterType.Baby, 0);
+        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Father, 0);
+        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Day 12\nAyah's Return\nCritical Discovery";
+        uiElements.narratorText.text = "Day 12\nHope and Recovery Begin\nPagi Hari";
         yield return new WaitForSeconds(5f);
         uiElements.narratorText.gameObject.SetActive(false);
 
-        // Seq1 KepulanganAyah
+        FadeOpenEyes(); 
+        yield return new WaitForSeconds(1f);
+
+        // Seq1 PagiBaruHarapan
         bool seq1Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq1KepulanganAyah", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq1PagiBaruHarapan", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
         
         yield return new WaitForSeconds(1f);
         
-        // Father enters and discovers chaos
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 1)); // Living room
-        
-        // Seq2 Berantakan
+        // Seq2 AyahAmbilTindakan
         bool seq2Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq2Berantakan", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq2AyahAmbilTindakan", 
             () => { seq2Complete = true; });
         yield return new WaitUntil(() => seq2Complete);
         
-        yield return new WaitForSeconds(1f);
+        FadeCloseEyes(); 
+        yield return new WaitForSeconds(2f);
         
-        // CHOICE POINT - This would be determined by player choice system
-        // For now, we'll implement both paths
-        
-        if (fatherAngerChoice)
-        {
-            // Path A - Father Angry
-            yield return StartCoroutine(PlayAngryPath());
-        }
-        else
-        {
-            // Path B - Father Concerned  
-            yield return StartCoroutine(PlayConcernedPath());
-        }
-        
-        // Auto progression to Day 13
-        Debug.Log("Day 12 finished! Moving to Day 13...");
-        GoToNextDay();
+        GoToNextTimeOfDay();
     }
     
     [System.Obsolete]
-    private IEnumerator PlayAngryPath()
+    protected override IEnumerator PlayAfternoonSequence()
     {
-        // Seq3A KemarahanAyah
-        bool seq3AComplete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3AKemarahanAyah", 
-            () => { seq3AComplete = true; });
-        yield return new WaitUntil(() => seq3AComplete);
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeFront());
+        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
+        SetCharacterSpawn(CharacterType.Baby, 1);
+        SetCharacterSpawn(CharacterType.Mother, 1);
+        SetCharacterSpawn(CharacterType.Father, 1);
+        uiElements.narratorText.gameObject.SetActive(true);
+        
+        yield return new WaitForSeconds(1f);
+        uiElements.narratorText.text = "Siang Hari";
+        yield return new WaitForSeconds(3f);
+        uiElements.narratorText.gameObject.SetActive(false);
+
+        FadeOpenEyes(); 
+        yield return new WaitForSeconds(1f);
+
+        // Seq3 BantuanProfesional
+        bool seq3Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3BantuanProfesional", 
+            () => { seq3Complete = true; });
+        yield return new WaitUntil(() => seq3Complete);
         
         yield return new WaitForSeconds(1f);
         
-        // Move to parents' room to find Rey
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 0));
+        // Seq4 IbuMulaiPulih
+        bool seq4Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq4IbuMulaiPulih", 
+            () => { seq4Complete = true; });
+        yield return new WaitUntil(() => seq4Complete);
         
-        // Seq4A MencariIbu (Angry version)
-        bool seq4AComplete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq4AMencariIbu", 
-            () => { seq4AComplete = true; });
-        yield return new WaitUntil(() => seq4AComplete);
+        FadeCloseEyes(); 
+        yield return new WaitForSeconds(2f);
         
-        yield return new WaitForSeconds(1f);
-        
-        // Move to find mother
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 4));
-        
-        // Seq5A MenemukanIbu (Angry version)
-        bool seq5AComplete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq5AMenemukanIbu", 
-            () => { seq5AComplete = true; });
-        yield return new WaitUntil(() => seq5AComplete);
-    }
-    
-    [System.Obsolete]
-    private IEnumerator PlayConcernedPath()
-    {
-        // Seq3B Khawatir
-        bool seq3BComplete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3BKhawatir", 
-            () => { seq3BComplete = true; });
-        yield return new WaitUntil(() => seq3BComplete);
-        
-        yield return new WaitForSeconds(1f);
-        
-        // Move to parents' room to find Rey
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 0));
-        
-        // Seq4B MencariIbu (Concerned version)
-        bool seq4BComplete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq4BMencariIbu", 
-            () => { seq4BComplete = true; });
-        yield return new WaitUntil(() => seq4BComplete);
-        
-        yield return new WaitForSeconds(1f);
-        
-        // Move to find mother
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 4));
-        
-        // Seq5B MenemukanIbu (Concerned version)
-        bool seq5BComplete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq5BMenemukanIbu", 
-            () => { seq5BComplete = true; });
-        yield return new WaitUntil(() => seq5BComplete);
+        GoToNextTimeOfDay();
     }
     
     [System.Obsolete]
     protected override IEnumerator PlayNightSequence()
     {
-        // Day 12 ends with evening sequence
-        yield return null;
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 20.0f; // Night
+        SetCharacterSpawn(CharacterType.Baby, 0);
+        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Father, 0);
+        uiElements.narratorText.gameObject.SetActive(true);
+        
+        yield return new WaitForSeconds(1f);
+        uiElements.narratorText.text = "Malam Hari\nKetenangan Kembali";
+        yield return new WaitForSeconds(4f);
+        uiElements.narratorText.gameObject.SetActive(false);
+        
+        // Peaceful night, supernatural activity fading
+        PlayAudio("peaceful_night");
+        
+        FadeOpenEyes(); 
+        yield return new WaitForSeconds(1f);
+        
+        // Seq5 MalamTenang
+        bool seq5Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq5MalamTenang", 
+            () => { seq5Complete = true; });
+        yield return new WaitUntil(() => seq5Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Seq6 HarapanMasaDepan
+        bool seq6Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq6HarapanMasaDepan", 
+            () => { seq6Complete = true; });
+        yield return new WaitUntil(() => seq6Complete);
+        
+        yield return new WaitForSeconds(1f);
+        
+        // Final sequence - credits or next chapter
+        // Seq7 Epilog
+        bool seq7Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq7Epilog", 
+            () => { seq7Complete = true; });
+        yield return new WaitUntil(() => seq7Complete);
+        
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            StartCoroutine(FadeOutAudio(audioSource, 5f)); 
+        }
+        
+        FadeCloseEyes(); 
+        yield return new WaitForSeconds(3f);
+        
+        // Story completed or transition to next chapter
+        Debug.Log("Day 12 finished! Story completed!");
+        
+        // Could transition to credits, next chapter, or end game
+        // GoToNextDay(); // If continuing to Day 13+
+        // Or show credits/ending sequence
+        
+        yield return new WaitForSeconds(2f);
+        uiElements.narratorText.gameObject.SetActive(true);
+        uiElements.narratorText.text = "Chapter 1: The First 12 Days\nCompleted";
+        yield return new WaitForSeconds(5f);
+        uiElements.narratorText.gameObject.SetActive(false);
     }
 }

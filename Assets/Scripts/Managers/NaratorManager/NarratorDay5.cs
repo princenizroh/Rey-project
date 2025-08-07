@@ -9,10 +9,12 @@ public class NarratorDay5 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
-        TimeManager.instance.TimeOfDay = 0.5f; // Afternoon
-        AppearObjects();
-        SetCharacterSpawn(CharacterType.Mother, 3); // Work room
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
         SetCharacterSpawn(CharacterType.Baby, 4);   // Baby's room
+        SetCharacterSpawn(CharacterType.Mother, 3); // Work room
+        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 5\nBaby Blues Phase - Day 2\nSiang Hari";
@@ -64,7 +66,13 @@ public class NarratorDay5 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayNightSequence()
     {
-        TimeManager.instance.TimeOfDay = 1.0f; // Night
+        CloseEyes();
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 20.0f; // Night
+        SetCharacterSpawn(CharacterType.Baby, 4);
+        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Father, 0);
+        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Malam Hari\nGangguan Supernatural Meningkat";
@@ -76,6 +84,7 @@ public class NarratorDay5 : NarratorBase
         PlayAudio("wind_strong");
         
         yield return new WaitForSeconds(2f);
+        FadeOpenEyes(); 
         
         // Seq5 GangguanSetanHujan
         bool seq5Complete = false;
@@ -96,6 +105,7 @@ public class NarratorDay5 : NarratorBase
             StartCoroutine(FadeOutAudio(audioSource, 3f)); 
         }
         
+        FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         
         // Auto progression to Day 6

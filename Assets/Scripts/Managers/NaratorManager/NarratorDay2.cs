@@ -154,8 +154,8 @@ public class NarratorDay2 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         FadeCloseEyes(); 
-        yield return StartCoroutine(SetCameraPanRangeFront());
         yield return new WaitForSeconds(2f);
+        yield return StartCoroutine(SetCameraPanRangeFront());
         SetCharacterSpawn(CharacterType.Baby, 1);
         SetCharacterSpawn(CharacterType.Mother, 1);
         SetCharacterSpawn(CharacterType.Father, 3);
@@ -179,7 +179,7 @@ public class NarratorDay2 : NarratorBase
 
         yield return new WaitForSeconds(1f);
         
-        FadeCloseEyes(); // Scene transition
+        FadeCloseEyes(); 
         yield return new WaitForSeconds(4f);
         
         GoToNextTimeOfDay();
@@ -189,14 +189,16 @@ public class NarratorDay2 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeRight());
+        yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 20.0f; 
         SetCharacterSpawn(CharacterType.Baby, 3);
         SetCharacterSpawn(CharacterType.Mother, 4);
         SetCharacterSpawn(CharacterType.Father, 4);
+
         yield return new WaitForSeconds(1f);
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
+
         bool seq11Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
             () => { seq11Complete = true; });
