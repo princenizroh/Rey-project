@@ -214,15 +214,15 @@ Keadaan day 1 selesai
 **Lokasi:** Kamar Ortu 
 **Set Waktu:** Pagi
 
-### Seq1 PagiPertama
+### Seq0 PagiPertama
 
 **Keadaan: Cahaya pagi masuk melalui jendela.** 
 **Sound: suara pintu** 
 **Keadaan: Ayah berada di box bayi dan mendekat** 
 Ayah: _masuk kamar_ "Selamat Pagi sayang kecil" 
+### Seq1 PagiPertama
 Anak: "Ayah" 
 Ibu: "Sudah tidur pulas malah dibangunin"
-
 Ayah: "Biarlah, biar dia juga menghirup udara segar"
 
 Ibu: "Suka hati kau lah"
@@ -597,6 +597,7 @@ Ibu: _singkat_ "Iya hati-hati"
 **Keadaan:** Ayah pergi menuju keluar
 **Keadaan:** Ibu menuju kearah bayi
 ### Seq3 Mandi
+
 Ibu: _agak malas_ "Hari ini gak usah mandi ya"
 Ibu: _agak malas_ "Ibu cape mau langsung tidur"
 Ibu: _agak malas_ "Kamu juga tidur juga"
@@ -776,6 +777,7 @@ Ibu: "Hmm.. iya...  Yang penting langsung pulang"
 ### Seq11 ButuhSusu
 
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan:** Ayah berjalan ke arah Rey untuk memberikan susu
+Anak: "Lapar"
 Interaksi Pilihan: 
 Choice A: Mengeluarkan suara "Unghh" untuk berinteraksi dengan Ayah
 Choice B: Mengeluarkan suara "Unghh" untuk berinteraksi dengan Ibu
@@ -783,7 +785,7 @@ Choice B: Mengeluarkan suara "Unghh" untuk berinteraksi dengan Ibu
 Jika berdasarkan pilihan
 
 Choice A *Unghh* (Interaksi)
-	Ayah: "Iya sayang mau susu" Lalu kembali ke linear
+	Ayah: "Iya sayang mau susu ya" Lalu kembali ke linear
 Choice B *Unghh* (Interaksi)
 	Ibu: _lelah_ "Sayang, Rey butuh susu" Akan berulang jika tidak memilih Choice A
 
@@ -807,7 +809,7 @@ Anak: "Susu"
 
 Anak: "Gelap..."
 
-Anak: "Lapar.."
+Anak: "Lapar..."
 
 Interaksi Pilihan:
 
@@ -830,7 +832,7 @@ Ibu: "Iya sayang"
 Choice B: *Oek* (Menangis)
 ```
 Anak: "Lapar..." 
-Ibu: _bangun dengan kesal_ 
+Ibu: *Hnghh*
 Ibu: "Kenapa sih Rey" 
 Ibu: "Besok mama kerja tau" 
 Ayah: "Udah kasih makan aja" 
@@ -941,7 +943,6 @@ Ibu: "Halo"
 Penelpon: "Halo, Linda data dari peneliti sudah di kumpulkan semua"
 Ibu: "Iya pak sudah tinggal di masukkan ke database perusahaan"
 Penelpon: "Hari ini tolong semuanya diselesaikan ya. Ini ada data terbaru yang baru ditemukan."
-Ibu: ""
 Anak: "Ibu kemana"
 
 Choice A : Menangis keras
@@ -1058,15 +1059,13 @@ Jika berdasarkan pilihan
 Choice A: *Neh* (Lapar)
 
 ```
-Anak: "Anak: "Ibu.. Aku lapar""
+Anak: "Anak: Ibu... Aku lapar"
 Ibu: "Kenapa sih Rey"
-Keadaan: Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
 Choice B:  *Oek* (Menangis)
 	Anak: "Ibu... Aku sungguh lapar"
-	
-Ibu: "Haduh malah nangis" 
+	Ibu: "Haduh malah nangis" 
 Ibu: "Arghh cape" 
 Ibu: "Sakit kuping begini" 
 
@@ -1106,7 +1105,7 @@ Jika berdasarkan pilihan
 Choice A: *Oek* (Menangis)
 
 ```
-Anak: "Ibu Dimana.."
+Anak: "Ibu Dimana..."
 ```
 Ayah: "Itu si rey nangis coba samperin dulu"
 Ibu: "Iya" 
@@ -1245,21 +1244,11 @@ Ibu: "Ibu juga stres membagi dua pekerjaan ini"
 Ibu: "Ibu juga belum siap untuk menjadi ibu"
 Ibu: "Padahal setelah Ibu menikah dengan ayahmu, Ibu masih ingin bersenang-senang dulu bersama ayahmu"
 Ibu: "Momen ini gak pernah diduga dengan kelahiranmu"
-Ibu: "Ibu masih berharap"
 Ibu: "Rey"
 Ibu: "Bangun, kita mandi dulu"
-
-Interaksi Pilihan:
-
-Choice A : Membuka mata 
-
-Jika berdasarkan pilihan
-
-Choice A: (Membuka mata)
-	Anak: "Ibu..."
-
-Anak: "Ibu tampak gembira"
 Ibu: "Ayo Rey kita mandi dulu, sekalian makan"
+
+
 **Keadaan: Mandi berlangsung layar gelap**
 
 ## Malam Hari
@@ -1441,12 +1430,12 @@ Jika berdasarkan pilihan
 Choice A:  *Oek* (Menangis)
 
 ```
-Anak: "Ibu... Lapr"
+Anak: "Ibu... Lapar"
 **Keadaan: ** Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
 Choice B : *Oeeeekkkkk*  (Menangis makin keras)
-	Anak: "Ibu dimana..."
+	Anak: "Ibu dimana...Ibu..."
 
 ### Seq2 Sendirian
 Anak: "Ibu dimana"
@@ -1506,7 +1495,7 @@ Anak: "Jangan mendekat!"
 
 Setan: _bisikan mengerikan_ "Anak kecil..."
 Setan: "Main yuk..."
-Setan: "Ikut... denganku..."
+Setan: "Ikut denganku..."
 
 Anak: "WAJAHNYA MENGERIKAN!" 
 Anak: "JANGAN SENTUH AKU!"
@@ -1581,7 +1570,7 @@ Jika berdasarkan pilihan
 Choice A:   *Oek* (Menangis)
 
 ```
-Anak: "Ibu... Lapr"
+Anak: "Ibu... Lapar"
 **Keadaan: ** Ibu tidak datang lanjut ke sisa pilihan Choice B
 ```
 
@@ -1593,8 +1582,13 @@ Anak: "Ibu kok gak datang lagi"
 Anak: "Rey ditinggal ya Ibu"
 Anak: "Ibu..."
 Anak: "Rey Lapar"
+Interaksi Pilihan:
+
 Choice A : Menangis Makin Keras
-	Anak: "Ibu dimana..."
+	
+Jika berdasarkan pilihan
+Choice A: *Oeeeekkkkk*  (Menangis makin keras)
+	Anak: "Ibu dimana... Ibu..."
 ### Seq3 MarahBesar
 Keadaan: Ibu mendobrak pintu sambil marah marah
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
@@ -1798,12 +1792,13 @@ Ibu: "Ayah bisa cari istri yang lebih baik..."
  **POV:** Anak
 
 Sound: "Suara benda jatuh"
+Sound: "Suara Pukulan"
 Sound: "Suara piring pecah"
-Sound: "Suara benda jatuh"
+
 **Keadaan: Rey terbangun karena ada suara**
 Anak: "Ada suara.."
 Anak: "Aku mulai lapar..."
-Anak: "Ibu dimana ya?"
+Anak: "Ibu dimana..."
 
 Interaksi Pilihan:
 
@@ -1813,6 +1808,8 @@ Jika berdasarkan pilihan
 
 Choice A: *Oek* (Menangis)
 	Anak: "Ibu... lapar..." 
+Choice B *Oeekk* (Menangis Keras)
+	Anak: "Ibu... Aku lapar..." 
 ### Seq2  - Keanehan
 Ibu: "Terbangun ya"
 Ibu: "Ibu lagi gak enak perasaan ini"
@@ -1927,6 +1924,10 @@ Anak : "Ibu gak merespon"
 Interaksi Pilihan:
 
 Choice A : Menangis Kencang Keras
+Jika berdasarkan pilihan
+Choice A: 
+	*Oeeeekkkkk*  (Menangis makin keras)
+Ibu: "Ibu... Jangan jatuh"
 ### Seq2 Selamat
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 Keadaan: Ibu mendatangi rey dengan wajah pucat dan menggendong rey
@@ -1934,7 +1935,7 @@ Ibu: "Kenapa sih kamu menangis terus"
 Ibu: "Minta susu ya"
 Ibu: "Iya sini"
 Anak: "Rasanya aneh"
-Anak: "Aku meminum susu Ibu. tapi keluarnya sangat sedikit"
+Anak: "Aku meminum susu Ibu, tapi keluarnya sangat sedikit"
 Anak: "Ibu"
 Anak: "Apa ibu baik baik saja"
 Anak: "Ibu"
@@ -1991,7 +1992,8 @@ Ayah: "Dari tadi telpon gak diangkat"
 
 **Sound: Hening total - tidak ada jawaban**
 
-Ayah: "Manajer bilang Linda dari kemarin gak  kerja" Ayah: "Katanya sih sakit, tapi gak ada konfirmasi lagi kalau masuk kerjanya kapan" 
+Ayah: "Manajer bilang Linda dari kemarin gak  kerja" 
+Ayah: "Katanya sih sakit, tapi gak ada konfirmasi lagi kalau masuk kerjanya kapan" 
 Ayah: "Ayah baru dapat izin untuk pulang cepet"
 Ayah: "Linda! Rey! Ayah pulang!"
 ### Seq2 Berantakan

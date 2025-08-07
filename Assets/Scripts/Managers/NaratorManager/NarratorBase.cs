@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.AI;
 using System.Collections.Generic;
+using Unity.Cinemachine;
 
 public enum NarratorDay
 {
@@ -87,6 +88,8 @@ public class GameObjects
 
 public abstract class NarratorBase : MonoBehaviour
 {
+    [Header("Camera Control")]
+    [SerializeField] protected CinemachineCamera cinemachineCamera;
     [Header("UI Elements")]
     [SerializeField] protected UIElements uiElements;
 
@@ -591,5 +594,34 @@ public abstract class NarratorBase : MonoBehaviour
         }
     }
 
+#endregion
+#region CameraManagement
+    protected IEnumerator SetCameraPanRangeFront()
+    {
+        var panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
+        panTilt.PanAxis.Range = new Vector2(0f, 180f);
+        yield return null;
+    }
+
+    protected IEnumerator SetCameraPanRangeBack()
+    {
+        var panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
+        panTilt.PanAxis.Range = new Vector2(180f, 360f);
+        yield return null;
+    }
+
+    protected IEnumerator SetCameraPanRangeRight()
+    {
+        var panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
+        panTilt.PanAxis.Range = new Vector2(90f, 270f);
+        yield return null;
+    }
+
+    protected IEnumerator SetCameraPanRangeLeft()
+    {
+        var panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
+        panTilt.PanAxis.Range = new Vector2(270f, 90f);
+        yield return null;
+    }
 #endregion
 }
