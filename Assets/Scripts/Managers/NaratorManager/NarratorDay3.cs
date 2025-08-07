@@ -15,9 +15,9 @@ public class NarratorDay3 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 0);
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Mother, "Idle");
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 3\nPagi Kedua";
         yield return new WaitForSeconds(5f);
         uiElements.narratorText.gameObject.SetActive(false);

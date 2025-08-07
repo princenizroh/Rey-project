@@ -11,9 +11,9 @@ public class NarratorDay10 : NarratorBase
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 10\nKeanehan";
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);

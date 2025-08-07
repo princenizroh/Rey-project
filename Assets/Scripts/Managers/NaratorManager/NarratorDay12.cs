@@ -22,9 +22,9 @@ public class NarratorDay12 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Father, 0);
         AppearObjects();
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 12\nKekacauan";
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);

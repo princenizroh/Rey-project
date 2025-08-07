@@ -13,10 +13,10 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 0);  
         SetCharacterSpawn(CharacterType.Father, 0);    
         SetCharacterSpawn(CharacterType.Baby, 0);
-        uiElements.narratorText.gameObject.SetActive(true);
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Mother, "Idle");
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 2\nHari Pertamaku";
         yield return new WaitForSeconds(5f);
         uiElements.narratorText.gameObject.SetActive(false);

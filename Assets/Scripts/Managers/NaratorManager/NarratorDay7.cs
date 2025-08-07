@@ -11,9 +11,9 @@ public class NarratorDay7 : NarratorBase
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 7\nSendirian";
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
@@ -93,6 +93,7 @@ public class NarratorDay7 : NarratorBase
             () => { seq6Complete = true; });
         yield return new WaitUntil(() => seq6Complete);
 
+        yield return new WaitForSeconds(1f);
         
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
