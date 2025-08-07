@@ -154,13 +154,10 @@ public abstract class NarratorBase : MonoBehaviour
     }
 #endregion
 #region Sequence Detection
-    // Method to get the first available time of day for this narrator
     public virtual TimeOfDay GetFirstAvailableTimeOfDay()
     {
-        // Check which sequences are actually implemented (not just returning null)
         System.Type thisType = this.GetType();
         
-        // Check Morning
         var morningMethod = thisType.GetMethod("PlayMorningSequence", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (morningMethod != null && morningMethod.DeclaringType != typeof(NarratorBase))
@@ -168,7 +165,6 @@ public abstract class NarratorBase : MonoBehaviour
             return TimeOfDay.Morning;
         }
         
-        // Check Afternoon
         var afternoonMethod = thisType.GetMethod("PlayAfternoonSequence", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (afternoonMethod != null && afternoonMethod.DeclaringType != typeof(NarratorBase))
@@ -176,7 +172,6 @@ public abstract class NarratorBase : MonoBehaviour
             return TimeOfDay.Afternoon;
         }
         
-        // Check Evening
         var eveningMethod = thisType.GetMethod("PlayEveningSequence", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (eveningMethod != null && eveningMethod.DeclaringType != typeof(NarratorBase))
@@ -184,16 +179,13 @@ public abstract class NarratorBase : MonoBehaviour
             return TimeOfDay.Evening;
         }
         
-        // Default to Night if nothing else is found
         return TimeOfDay.Night;
     }
     
-    // Method to get next available time of day after current
     public virtual TimeOfDay GetNextAvailableTimeOfDay(TimeOfDay currentTime)
     {
         System.Type thisType = this.GetType();
         
-        // Start checking from the next time after current
         for (int i = (int)currentTime + 1; i <= (int)TimeOfDay.Night; i++)
         {
             TimeOfDay checkTime = (TimeOfDay)i;
@@ -207,11 +199,9 @@ public abstract class NarratorBase : MonoBehaviour
             }
         }
         
-        // If no next time available, return Morning (will trigger next day)
         return TimeOfDay.Morning;
     }
     
-    // Check if a specific time of day is implemented
     public virtual bool HasTimeOfDaySequence(TimeOfDay timeOfDay)
     {
         System.Type thisType = this.GetType();
@@ -236,30 +226,23 @@ public abstract class NarratorBase : MonoBehaviour
         
         TimeOfDay targetTime = NarratorManager.Instance.currentTime;
         
-        // Check if the target time sequence is implemented
         if (!HasTimeOfDaySequence(targetTime))
         {
             Debug.LogWarning($"{this.GetType().Name} does not have {targetTime}Sequence implemented. Finding next available sequence...");
             
-            // Find next available sequence
             TimeOfDay nextAvailable = GetNextAvailableTimeOfDay(targetTime);
             if (nextAvailable != TimeOfDay.Morning || HasTimeOfDaySequence(TimeOfDay.Morning))
             {
-                // Update the manager's current time and play the available sequence
                 NarratorManager.Instance.currentTime = nextAvailable;
                 targetTime = nextAvailable;
-                Debug.Log($"Switching to available sequence: {targetTime}");
             }
             else
             {
-                // No sequences available, skip to next day
-                Debug.Log($"No sequences available for {this.GetType().Name}. Skipping to next day...");
                 GoToNextDay();
                 yield break;
             }
         }
         
-        // Play the appropriate sequence
         switch (targetTime)
         {
             case TimeOfDay.Morning:
@@ -512,10 +495,6 @@ public abstract class NarratorBase : MonoBehaviour
 
             PlayCharacterAnimation(characterType, "Idle");
         }
-        else
-        {
-            Debug.LogWarning($"Character '{characterType}' not found for movement!");
-        }
     }
 
     private IEnumerator MoveObjectToPosition(Transform obj, Transform targetTransform, float duration)
@@ -556,10 +535,6 @@ public abstract class NarratorBase : MonoBehaviour
             Transform targetTransform = character.movementPositions[positionIndex];
             yield return StartCoroutine(MoveObjectToPosition(character.characterObject.transform, targetTransform, duration));
         }
-        else
-        {
-            Debug.LogWarning($"Character '{characterType}' not found for movement!");
-        }
     }
 
     protected IEnumerator MoveAgentToMovementPosition(CharacterType characterType, int positionIndex)
@@ -568,15 +543,10 @@ public abstract class NarratorBase : MonoBehaviour
         {
             if (!character.HasValidMovementPosition(positionIndex))
             {
-                Debug.LogWarning($"Invalid movement position index {positionIndex} for {characterType}");
                 yield break;
             }
             Transform target = character.movementPositions[positionIndex];
             yield return StartCoroutine(MoveAgentToTarget(characterType, target));
-        }
-        else
-        {
-            Debug.LogWarning($"Character '{characterType}' not found!");
         }
     }
 #endregion
@@ -604,7 +574,6 @@ public abstract class NarratorBase : MonoBehaviour
         
         if (chargeMeterPrefab == null)
         {
-            Debug.LogError("ChargeMeter prefab not found in Resources folder!");
             return null;
         }
 
@@ -612,10 +581,8 @@ public abstract class NarratorBase : MonoBehaviour
         
         if (targetCanvas != null)
         {
-            // Spawn dengan parent Canvas yang spesifik
             chargeMeterInstance = Instantiate(chargeMeterPrefab, targetCanvas.transform);
             
-            // Set positioning untuk UI element
             RectTransform rectTransform = chargeMeterInstance.GetComponent<RectTransform>();
             if (rectTransform != null)
             {
@@ -623,13 +590,10 @@ public abstract class NarratorBase : MonoBehaviour
                 rectTransform.localScale = Vector3.one;
             }
             
-            Debug.Log($"ChargeMeter spawned in Canvas: {targetCanvas.name}");
         }
         else
         {
-            // Spawn di world space
             chargeMeterInstance = Instantiate(chargeMeterPrefab, Vector3.zero, Quaternion.identity);
-            Debug.Log("ChargeMeter spawned in world space");
         }
 
         return chargeMeterInstance;
