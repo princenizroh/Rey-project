@@ -10,18 +10,18 @@ public class NarratorDay6 : NarratorBase
     protected override IEnumerator PlayAfternoonSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
-        SetCharacterSpawn(CharacterType.Baby, 4);   // Baby's room
-        SetCharacterSpawn(CharacterType.Mother, 0); // Bedroom - showing withdrawal
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 13.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
+        SetCharacterSpawn(CharacterType.Mother, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Day 6\nBaby Blues Escalation\nSiang Hari";
-        yield return new WaitForSeconds(5f);
+        uiElements.narratorText.text = "Day 6\nKeraguan";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
 
-        FadeOpenEyes(); // Baby wakes up
+        FadeOpenEyes();
         yield return new WaitForSeconds(1f);
 
         // Seq1 Keraguan
@@ -30,7 +30,7 @@ public class NarratorDay6 : NarratorBase
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
         
-        FadeCloseEyes(); // Baby sleeps due to fear
+        FadeCloseEyes();
         yield return new WaitForSeconds(2f);
         
         GoToNextTimeOfDay();
@@ -40,22 +40,22 @@ public class NarratorDay6 : NarratorBase
     protected override IEnumerator PlayEveningSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 18.0f; // Evening
-        SetCharacterSpawn(CharacterType.Baby, 4);
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 18.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Sore Hari";
-        yield return new WaitForSeconds(3f);
+        uiElements.narratorText.text = "Sore Hari\nHeran";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
         
-        FadeOpenEyes(); // Baby still sleeping
+        FadeOpenEyes();
         yield return new WaitForSeconds(1f);
         
         // Mother comes to check
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 4));
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         // Seq2 Heran
         bool seq2Complete = false;
@@ -73,19 +73,18 @@ public class NarratorDay6 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 20.0f; // Night
-        SetCharacterSpawn(CharacterType.Baby, 4);
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 1.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        SetCharacterSpawn(CharacterType.Father, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Malam Hari\nSosok Mendekat";
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
         
-        FadeOpenEyes(); // Baby wakes up
+        FadeOpenEyes();
         yield return new WaitForSeconds(1f);
         
         // Seq3 Gangguan
@@ -113,7 +112,7 @@ public class NarratorDay6 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         // Mother comes to help
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 4));
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         // Seq6 Khawatir
         bool seq6Complete = false;
@@ -121,11 +120,9 @@ public class NarratorDay6 : NarratorBase
             () => { seq6Complete = true; });
         yield return new WaitUntil(() => seq6Complete);
         
-        FadeCloseEyes(); // Baby sleeps
+        FadeCloseEyes();
         yield return new WaitForSeconds(2f);
         
-        // Auto progression to Day 7
-        Debug.Log("Day 6 finished! Moving to Day 7...");
         GoToNextDay();
     }
 }

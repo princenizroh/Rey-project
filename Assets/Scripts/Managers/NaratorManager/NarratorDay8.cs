@@ -3,25 +3,22 @@ using System.Collections;
 
 public class NarratorDay8 : NarratorBase
 {
-    // Day 8 - Final Baby Blues Phase / Pre-Postpartum Depression
-    // Complete breakdown, most critical supernatural encounter
-    
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
-        SetCharacterSpawn(CharacterType.Baby, 4);   // Baby's room
-        SetCharacterSpawn(CharacterType.Mother, 0); // Bedroom - complete withdrawal
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 13.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
+        SetCharacterSpawn(CharacterType.Mother, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Day 8\nFinal Baby Blues Phase\nSiang Hari";
-        yield return new WaitForSeconds(5f);
+        uiElements.narratorText.text = "Day 8\nIbu Marah Besar";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
 
-        FadeOpenEyes(); // Baby wakes up
+        FadeOpenEyes();
         yield return new WaitForSeconds(1f);
 
         // Seq1 Lapar
@@ -32,7 +29,6 @@ public class NarratorDay8 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
-        // Baby realizes mother is not coming
         // Seq2 KemanaIbu
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq2KemanaIbu", 
@@ -41,8 +37,8 @@ public class NarratorDay8 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
-        // Mother finally comes in complete breakdown
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 4));
+        // Mother comes
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         // Seq3 IbuMarahBesar
         bool seq3Complete = false;
@@ -60,20 +56,18 @@ public class NarratorDay8 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 20.0f; // Night
-        SetCharacterSpawn(CharacterType.Baby, 4);
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 1.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        SetCharacterSpawn(CharacterType.Father, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Malam Hari\nGangguan Supernatural Memuncak";
-        yield return new WaitForSeconds(4f);
+        uiElements.narratorText.text = "Malam Hari\nGangguan Memuncak";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
         
-        // Intense supernatural disturbance
-        PlayAudio("supernatural_intense");
+        // PlayAudio("supernatural_intense");
         
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
@@ -100,8 +94,6 @@ public class NarratorDay8 : NarratorBase
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         
-        // Auto progression to Day 9
-        Debug.Log("Day 8 finished! Moving to Day 9...");
         GoToNextDay();
     }
 }

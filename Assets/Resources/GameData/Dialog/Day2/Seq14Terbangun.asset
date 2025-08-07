@@ -36,7 +36,7 @@ MonoBehaviour:
       audioDialogEntry: {fileID: 0}
       choices:
       - playerChoice: '*Neh* (Lapar)'
-        correctChoice: 0
+        correctChoice: 1
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu lapar..

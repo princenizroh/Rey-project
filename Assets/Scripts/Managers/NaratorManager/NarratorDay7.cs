@@ -10,18 +10,18 @@ public class NarratorDay7 : NarratorBase
     protected override IEnumerator PlayAfternoonSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
-        SetCharacterSpawn(CharacterType.Baby, 4);   // Baby's room
-        SetCharacterSpawn(CharacterType.Mother, 0); // Bedroom - severe withdrawal
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 13.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
+        SetCharacterSpawn(CharacterType.Mother, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Day 7\nPre-Depression Phase\nSiang Hari";
-        yield return new WaitForSeconds(5f);
+        uiElements.narratorText.text = "Day 7\nSendirian Lagi";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
 
-        FadeOpenEyes(); // Baby wakes up
+        FadeOpenEyes();
         yield return new WaitForSeconds(1f);
 
         // Seq1 Lapar
@@ -48,22 +48,22 @@ public class NarratorDay7 : NarratorBase
     protected override IEnumerator PlayEveningSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 18.0f; // Evening
-        SetCharacterSpawn(CharacterType.Baby, 4);
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 18.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Sore Hari";
-        yield return new WaitForSeconds(3f);
+        uiElements.narratorText.text = "Sore Hari\nIbu Pulang";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
         
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
         
         // Mother returns
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 4));
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         // Seq3 IbuPulang
         bool seq3Complete = false;
@@ -89,16 +89,15 @@ public class NarratorDay7 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 20.0f; // Night
-        SetCharacterSpawn(CharacterType.Baby, 4);
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 1.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        SetCharacterSpawn(CharacterType.Father, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Malam Hari\nKondisi Memburuk";
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
         
         FadeOpenEyes(); 
@@ -121,8 +120,6 @@ public class NarratorDay7 : NarratorBase
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         
-        // Auto progression to Day 8
-        Debug.Log("Day 7 finished! Moving to Day 8...");
         GoToNextDay();
     }
 }

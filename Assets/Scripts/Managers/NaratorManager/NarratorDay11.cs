@@ -3,23 +3,20 @@ using System.Collections;
 
 public class NarratorDay11 : NarratorBase
 {
-    // Day 11 - Father Begins Intervention
-    // Father realizes the severity and starts taking action
-    
     [System.Obsolete]
     protected override IEnumerator PlayMorningSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 8.0f; // Morning
-        SetCharacterSpawn(CharacterType.Baby, 4);
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 8.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Father, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Day 11\nFather's Intervention\nPagi Hari";
-        yield return new WaitForSeconds(5f);
+        uiElements.narratorText.text = "Day 11\nAyah Sadar";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
 
         FadeOpenEyes(); 
@@ -34,7 +31,7 @@ public class NarratorDay11 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         // Father comes to baby
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 4));
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 0));
         
         // Seq2 PerhatianAyah
         bool seq2Complete = false;
@@ -52,16 +49,16 @@ public class NarratorDay11 : NarratorBase
     protected override IEnumerator PlayAfternoonSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeFront());
-        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 1);
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Father, 1);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Siang Hari";
-        yield return new WaitForSeconds(3f);
+        uiElements.narratorText.text = "Siang Hari\nAyah Merawat";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
 
         FadeOpenEyes(); 
@@ -83,8 +80,8 @@ public class NarratorDay11 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 20.0f; // Night
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 1.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Father, 0);
@@ -92,7 +89,7 @@ public class NarratorDay11 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Malam Hari\nHarapan Muncul";
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
         
         FadeOpenEyes(); 
@@ -115,8 +112,6 @@ public class NarratorDay11 : NarratorBase
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         
-        // Auto progression to Day 12
-        Debug.Log("Day 11 finished! Moving to Day 12...");
         GoToNextDay();
     }
 }

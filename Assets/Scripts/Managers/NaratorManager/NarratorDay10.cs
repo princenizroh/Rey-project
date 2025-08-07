@@ -3,23 +3,20 @@ using System.Collections;
 
 public class NarratorDay10 : NarratorBase
 {
-    // Day 10 - Postpartum Depression Deepens
-    // Mother's withdrawal becomes severe, supernatural activity peaks
-    
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 13.0f; // Afternoon
-        SetCharacterSpawn(CharacterType.Baby, 4);
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 13.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Father, 1);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Day 10\nPostpartum Depression Deepens\nSiang Hari";
-        yield return new WaitForSeconds(5f);
+        uiElements.narratorText.text = "Day 10\nSendirian Lagi";
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
 
         FadeOpenEyes(); 
@@ -49,20 +46,18 @@ public class NarratorDay10 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeBack());
-        TimeManager.instance.TimeOfDay = 20.0f; // Night
-        SetCharacterSpawn(CharacterType.Baby, 4);
+        yield return StartCoroutine(SetCameraPanRangeLeft());
+        TimeManager.instance.TimeOfDay = 1.0f;
+        SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        SetCharacterSpawn(CharacterType.Father, 0);
         uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Malam Hari\nPuncak Gangguan";
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
         
-        // Maximum supernatural intensity
-        PlayAudio("supernatural_peak");
+        // PlayAudio("supernatural_peak");
         
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
@@ -89,8 +84,6 @@ public class NarratorDay10 : NarratorBase
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         
-        // Auto progression to Day 11
-        Debug.Log("Day 10 finished! Moving to Day 11...");
         GoToNextDay();
     }
 }
