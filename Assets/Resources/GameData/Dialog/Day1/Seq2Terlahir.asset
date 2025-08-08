@@ -55,7 +55,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 2
       camChoice: 0
-      npcName: 0
+      npcName: 2
       dialogEntry: Sayang kamu berhasil
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -67,7 +67,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 2
       camChoice: 0
-      npcName: 0
+      npcName: 1
       dialogEntry: Aku mau mati rasanya
       audioDialogEntry: {fileID: 0}
       choices: []

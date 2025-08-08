@@ -4,63 +4,37 @@ using System.Collections;
 public class NarratorDay9 : NarratorBase
 {
     [System.Obsolete]
-    protected override IEnumerator PlayMorningSequence()
+    protected override IEnumerator PlayAfternoonSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeLeft());
-        TimeManager.instance.TimeOfDay = 8.0f;
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        SetCharacterSpawn(CharacterType.Father, 1);
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Day 9\nPagi Sepi";
+        uiElements.narratorText.gameObject.SetActive(true);
+        uiElements.narratorText.text = "Day 9\nBerubah";
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
 
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
 
-        // Seq1 Lapar
         bool seq1Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day9/Seq1Lapar", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
         
-        FadeCloseEyes(); 
-        yield return new WaitForSeconds(2f);
-        
-        GoToNextTimeOfDay();
-    }
-    
-    [System.Obsolete]
-    protected override IEnumerator PlayAfternoonSequence()
-    {
-        CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeLeft());
-        TimeManager.instance.TimeOfDay = 13.0f;
-        SetCharacterSpawn(CharacterType.Baby, 0);
-        SetCharacterSpawn(CharacterType.Mother, 0);
-        SetCharacterSpawn(CharacterType.Father, 1);
-        uiElements.narratorText.gameObject.SetActive(true);
-        
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Siang Hari\nAyah Datang";
-        yield return new WaitForSeconds(2f);
-        uiElements.narratorText.gameObject.SetActive(false);
-
-        FadeOpenEyes(); 
-        yield return new WaitForSeconds(1f);
-
-        // Father comes to help
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 0));
         
-        // Seq2 AyahDatang
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+        
         bool seq2Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day9/Seq2AyahDatang", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day9/Seq2Diam", 
             () => { seq2Complete = true; });
         yield return new WaitUntil(() => seq2Complete);
+        yield return new WaitForSeconds(1f);
         
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
@@ -72,35 +46,17 @@ public class NarratorDay9 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeLeft());
+        yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 1.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
-        uiElements.narratorText.text = "Malam Hari\nKegelapan Mengintai";
-        yield return new WaitForSeconds(2f);
-        uiElements.narratorText.gameObject.SetActive(false);
-        
-        FadeOpenEyes(); 
-        yield return new WaitForSeconds(1f);
-        
-        // Seq3 Sendirian
         bool seq3Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day9/Seq3Sendirian", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day9/Seq3PelampiasanEmosi", 
             () => { seq3Complete = true; });
         yield return new WaitUntil(() => seq3Complete);
         
-        yield return new WaitForSeconds(1f);
-        
-        // Seq4 GangguanSetanMalam
-        bool seq4Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day9/Seq4GangguanSetanMalam", 
-            () => { seq4Complete = true; });
-        yield return new WaitUntil(() => seq4Complete);
-        
-        FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         
         GoToNextDay();

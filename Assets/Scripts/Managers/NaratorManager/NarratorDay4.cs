@@ -7,13 +7,14 @@ public class NarratorDay4 : NarratorBase
     protected override IEnumerator PlayAfternoonSequence()
     {
         CloseEyes();
+        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 13.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);   
         SetCharacterSpawn(CharacterType.Mother, 0); 
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 4\n Tempat Berbeda";
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
@@ -27,9 +28,10 @@ public class NarratorDay4 : NarratorBase
         yield return new WaitUntil(() => seq1Complete);
         
         yield return new WaitForSeconds(1f);
-        
+        StartCoroutine(SwitchLights.Instance.SwitchToBright());
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
+
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq2IbuMarah", 
             () => { seq2Complete = true; });

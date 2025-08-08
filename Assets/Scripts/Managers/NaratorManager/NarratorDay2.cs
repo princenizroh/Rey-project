@@ -7,16 +7,18 @@ public class NarratorDay2 : NarratorBase
     protected override IEnumerator PlayMorningSequence()
     {
         CloseEyes();
+        DisableNavMeshAgent(CharacterType.Father);
+        DisableNavMeshAgent(CharacterType.Mother);
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 8.00f; 
         AppearObjects();
         SetCharacterSpawn(CharacterType.Mother, 0);  
         SetCharacterSpawn(CharacterType.Father, 0);    
         SetCharacterSpawn(CharacterType.Baby, 0);
-        uiElements.narratorText.gameObject.SetActive(true);
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Mother, "Idle");
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 2\nHari Pertamaku";
         yield return new WaitForSeconds(5f);
         uiElements.narratorText.gameObject.SetActive(false);
@@ -189,6 +191,8 @@ public class NarratorDay2 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
+        DisableNavMeshAgent(CharacterType.Mother);
+        DisableNavMeshAgent(CharacterType.Father);
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 20.0f; 
         SetCharacterSpawn(CharacterType.Baby, 3);
@@ -231,6 +235,8 @@ public class NarratorDay2 : NarratorBase
     protected IEnumerator PlayMidnightSequence()
     {
         CloseEyes();
+        DisableNavMeshAgent(CharacterType.Mother);
+        DisableNavMeshAgent(CharacterType.Father);
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 1.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -248,6 +254,7 @@ public class NarratorDay2 : NarratorBase
         yield return new WaitUntil(() => seq14Complete);
         
         SetCharacterSpawn(CharacterType.Mother, 6);
+        EnableNavMeshAgent(CharacterType.Mother);
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
         FadeCloseEyes(); 

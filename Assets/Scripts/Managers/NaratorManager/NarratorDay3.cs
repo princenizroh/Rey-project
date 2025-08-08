@@ -7,6 +7,8 @@ public class NarratorDay3 : NarratorBase
     protected override IEnumerator PlayMorningSequence()
     {
         CloseEyes();
+        DisableNavMeshAgent(CharacterType.Mother);
+        DisableNavMeshAgent(CharacterType.Father);
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 8.00f; 
         AppearObjects();
@@ -15,9 +17,9 @@ public class NarratorDay3 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 0);
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Mother, "Idle");
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 3\nPagi Kedua";
         yield return new WaitForSeconds(5f);
         uiElements.narratorText.gameObject.SetActive(false);
@@ -181,6 +183,8 @@ public class NarratorDay3 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         CloseEyes();
+        DisableNavMeshAgent(CharacterType.Mother);
+        DisableNavMeshAgent(CharacterType.Father);
         yield return StartCoroutine(SetCameraPanRangeFront());
         TimeManager.instance.TimeOfDay = 1.0f;
         SetCharacterSpawn(CharacterType.Baby, 1);
@@ -204,6 +208,7 @@ public class NarratorDay3 : NarratorBase
         yield return new WaitUntil(() => seq11Complete);
 
         yield return new WaitForSeconds(1f);
+        EnableNavMeshAgent(CharacterType.Father);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 3));
 
         bool seq12Complete = false;
@@ -223,6 +228,9 @@ public class NarratorDay3 : NarratorBase
     protected IEnumerator PlayMidnightSequence()
     {
         CloseEyes();
+        EnableNavMeshAgent(CharacterType.Mother);
+        EnableNavMeshAgent(CharacterType.Father);
+        
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 1.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);

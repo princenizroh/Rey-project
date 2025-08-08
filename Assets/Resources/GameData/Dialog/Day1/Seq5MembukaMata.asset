@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 0
+      npcName: 2
       dialogEntry: Lihat dia membuka matanya
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 0
+      npcName: 2
       dialogEntry: Ihh... lucu sekali
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -43,7 +43,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 0
+      npcName: 1
       dialogEntry: Iya ya dia mulai membuka matanya
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -55,7 +55,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 0
+      npcName: 2
       dialogEntry: Halo nak ini ayah
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -67,7 +67,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 0
+      npcName: 2
       dialogEntry: Dan ini ibumu
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -98,24 +98,29 @@ MonoBehaviour:
       - playerChoice: '*Neh* (Lapar)'
         correctChoice: 1
         dialogResponses:
-        - npcName: 0
+        - npcName: 2
           npcResponse: Dia mengeluarkan suara, apa yang dia butuhkan
+        - npcName: 3
+          npcResponse: Itu tandanya dia butuh ASI
+        - npcName: 3
+          npcResponse: Tanda seperti itu menandakan dia sedang lapar
+        - npcName: 2
+          npcResponse: Sayang, beri dia ASI
+        - npcName: 1
+          npcResponse: Iya sayang
         audioDialogResponse: {fileID: 8300000, guid: 34fc5efa1b0dcce4c8ec06157917fae7, type: 3}
       - playerChoice: '*Oek* (Menangis)'
         correctChoice: 1
         dialogResponses:
         - npcName: 1
           npcResponse: Kenapa anak ini menangis? Berisik sekali
-        - npcName: 0
-          npcResponse: Kalau anaknya menangis terus itu tandanya dia butuh sesuatu
-            ibu
-        - npcName: 0
+        - npcName: 3
+          npcResponse: Kalau anaknya menangis terus itu tandanya dia butuh sesuatu ibu
+        - npcName: 3
           npcResponse: Karena bayinya baru lahir sepertinya anaknya sedang lapar
-        - npcName: 0
+        - npcName: 3
           npcResponse: Ibu bisa beri ASI untuk kebutuhan bayinya
-        - npcName: 0
-          npcResponse: Iya sayang kasih ASI untuk anak kita
-        - npcName: 0
+        - npcName: 1
           npcResponse: Iya deh daripada berisik terus
         audioDialogResponse: {fileID: 8300000, guid: 117a016d2cb1f9446b8b68e56a57a9f7, type: 3}
     Animation:

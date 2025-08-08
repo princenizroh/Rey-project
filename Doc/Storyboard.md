@@ -188,7 +188,7 @@ Bidan: "Ini wajar, namanya baby blues karena perubahan hormon. Jangan dipendam s
 Bidan: "Nanti jika butuh bantuan, jangan ragu hubungi saya atau segera ke fasilitas kesehatan ya ibu"
 Ibu: "Iya bu bidan"
 
-### Seq6Nama
+### Seq7Nama
 Ayah: "Sayang, kira kira namanya mau dipanggil siapa"
 Ayah: "Ayah sudah menyimpan nama untuk anak kita"
 Ibu: "Apa itu sayang"
@@ -641,7 +641,8 @@ Choice C : *Oeekk* (Menangis Keras)
 	Anak: "Ibu dimana..."
 
 ### Seq5 Rewel
-**System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan**: Ibu datang dengan terburu-buru dan  dan mencapai depan keranjang bayi rey
+**System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan
+**Keadaan**: Ibu datang dengan terburu-buru dan  dan mencapai depan keranjang bayi rey
 
 Ibu:  *agak kesel* "Seperti biasa udah rewel aja"
 Ibu:  *agak kesel* "Gimana kalau pas udah mulai kerja ini"
@@ -776,7 +777,6 @@ Ibu: "Hmm.. iya...  Yang penting langsung pulang"
 
 ### Seq11 ButuhSusu
 
-**System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan **Keadaan:** Ayah berjalan ke arah Rey untuk memberikan susu
 Anak: "Lapar"
 Interaksi Pilihan: 
 Choice A: Mengeluarkan suara "Unghh" untuk berinteraksi dengan Ayah
@@ -1666,7 +1666,7 @@ Choice A: *Oeeeekkkkk*  (Menangis makin keras)
 **System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan 
 **Keadaan**: Ibu datang terburu-buru dan mengangkat rey 
 **Keadaan**: Pintu terbuka
-### Seq5 MarahSangatBesar
+### Seq5 Keputusasaan
 Ibu: "REY BERISIK TAU GAK"
 Ibu: "IBU CAPE"
 Ibu: "BERHENTI LAH MENANGIS"
@@ -1811,6 +1811,7 @@ Choice A: *Oek* (Menangis)
 Choice B *Oeekk* (Menangis Keras)
 	Anak: "Ibu... Aku lapar..." 
 ### Seq2  - Keanehan
+**System**: menggunakan navmesh agent lalu berdasarkan posisi yang telah diletakkan
 Ibu: "Terbangun ya"
 Ibu: "Ibu lagi gak enak perasaan ini"
 Anak: "Ibu kembali seperti biasa"
@@ -1974,7 +1975,7 @@ Anak: "Tidak ada yang datang..."
 **Timeline:** Malam hari
 
 ---
-
+## Sore Hari
 ## Kedatangan Ayah
 
 ### Seq1 KepulanganAyah

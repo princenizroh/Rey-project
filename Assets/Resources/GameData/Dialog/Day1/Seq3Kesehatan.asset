@@ -43,7 +43,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Ibu, ini ada vitamin zat besi sama asam folat untuk pemulihan
         Ibu
       audioDialogEntry: {fileID: 0}
@@ -56,7 +56,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Diminum sehari sekali setelah makan ya
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -68,7 +68,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Usahakan makan makanan bergizi dan minum air putih yang banyak
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -80,7 +80,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Ini penting untuk membantu produksi ASI Ibu
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -92,7 +92,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Nanti akan ada pendarahan nifas, seperti haid tapi lebih banyak
         di awal
       audioDialogEntry: {fileID: 0}
@@ -105,7 +105,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Lama nggak?
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -117,7 +117,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Sekitar 40 hari bu, paling banyak minggu pertama
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -129,7 +129,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Jaga kebersihan area jalan lahir biar nggak infeksi
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -141,7 +141,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Yang penting, kalau bayi tidur, ibu juga tidur. Istirahat itu
         yang terpenting
       audioDialogEntry: {fileID: 0}
@@ -154,7 +154,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 2
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Ya udah
       audioDialogEntry: {fileID: 0}
       choices: []

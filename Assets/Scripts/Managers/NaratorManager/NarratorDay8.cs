@@ -11,9 +11,9 @@ public class NarratorDay8 : NarratorBase
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        uiElements.narratorText.gameObject.SetActive(true);
         
         yield return new WaitForSeconds(1f);
+        uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 8\nIbu Marah Besar";
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
@@ -77,10 +77,10 @@ public class NarratorDay8 : NarratorBase
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
         
-        if (audioSource != null && audioSource.isPlaying)
-        {
-            StartCoroutine(FadeOutAudio(audioSource, 3f)); 
-        }
+        // if (audioSource != null && audioSource.isPlaying)
+        // {
+        //     StartCoroutine(FadeOutAudio(audioSource, 3f)); 
+        // }
         
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
