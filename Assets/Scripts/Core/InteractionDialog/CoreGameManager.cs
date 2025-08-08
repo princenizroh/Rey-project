@@ -128,6 +128,10 @@ public class CoreGameManager : MonoBehaviour
     private bool isPlayingCutscene = false;
     private bool isTextAnimating = false;
     
+    // FIXED: Add fields to track current animation state for proper skip handling
+    private string lastProcessedDialogText = "";
+    private TMP_Text lastTextComponent = null;
+    
     // Enhanced input throttling to prevent spam clicking and race conditions
     private float lastInputTime = 0f;
     private const float INPUT_COOLDOWN = 0.5f; // Increased cooldown to prevent spam
@@ -2599,7 +2603,7 @@ public class CoreGameManager : MonoBehaviour
             
             if (selectedChoice.correctChoice)
             {
-                // Correct choice - continue to next block
+                // Correct choice - continue to next block (this is fine to auto-continue)
                 Debug.Log("[SIMPLE-FILTER] Correct choice, continuing to next block");
                 ResetDialogResponseState();
                 ClearAll3DDialogs();
@@ -2611,14 +2615,15 @@ public class CoreGameManager : MonoBehaviour
             }
             else
             {
-                // Incorrect choice - JUST RESPAWN THE QUESTION BAR
-                Debug.Log("[SIMPLE-FILTER] Incorrect choice, respawning question bar with filtered choices");
+                // FIXED: Incorrect choice - DON'T auto-respawn, just mark as ready for user input
+                Debug.Log("[SIMPLE-FILTER] Incorrect choice response shown, waiting for user to press SPACE to continue");
                 
-                // Reset response state
-                ResetDialogResponseState();
+                // Reset the text animation state so user can proceed with SPACE
+                isTextAnimating = false;
+                isInDialogTransition = false;
                 
-                // Filter out the incorrect choice and respawn
-                FilterIncorrectChoiceAndRespawn(selectedChoiceIndex);
+                // DO NOT automatically respawn choices here - let HandleDialogProgression handle it when user presses SPACE
+                // The automatic respawn was causing the "no SPACE required" bug
             }
         }
         else
@@ -6383,8 +6388,12 @@ public class CoreGameManager : MonoBehaviour
             dialogAudioSource.Stop();
         }
         
-        // Handle special prefixes (same as your original system)
+        // FIXED: Process special prefixes AND store both original and processed text
         string displayText = ProcessSpecialPrefixes(fullText);
+        
+        // Store the processed text for skip functionality to prevent variables showing in UI
+        lastProcessedDialogText = displayText;
+        lastTextComponent = textComponent;
         
         textComponent.text = "";
         int len = displayText.Length;
@@ -6445,6 +6454,10 @@ public class CoreGameManager : MonoBehaviour
             .setOnComplete(() => {
                 textComponent.text = displayText;
                 isTextAnimating = false;
+                
+                // Clear stored text data since animation completed normally
+                lastProcessedDialogText = "";
+                lastTextComponent = null;
                 
                 // RE-ENABLE DialogSpace when text animation completes
                 SetDialogSpaceActive(true);
@@ -6953,8 +6966,21 @@ public class CoreGameManager : MonoBehaviour
             // Only complete text display if we were actually animating
             if (wasTextAnimating)
             {
-                // Force complete the text display with enhanced safety
-                CompleteCurrentTextDisplay();
+                // FIXED: Use the stored processed text to prevent variables from showing
+                if (lastTextComponent != null && !string.IsNullOrEmpty(lastProcessedDialogText))
+                {
+                    lastTextComponent.text = lastProcessedDialogText;
+                    Debug.Log("[SKIP-ANIM] Text completed with processed content (variables removed)");
+                    
+                    // Clear stored data after using it
+                    lastProcessedDialogText = "";
+                    lastTextComponent = null;
+                }
+                else
+                {
+                    // Fallback to the original method if we don't have stored data
+                    CompleteCurrentTextDisplay();
+                }
                 
                 // RE-ENABLE DialogSpace when text animation is skipped
                 SetDialogSpaceActive(true);
