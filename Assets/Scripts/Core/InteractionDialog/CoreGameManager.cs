@@ -2601,30 +2601,16 @@ public class CoreGameManager : MonoBehaviour
         {
             Debug.Log($"[SIMPLE-FILTER] Last response for choice '{selectedChoice.playerChoice}' (correct: {selectedChoice.correctChoice})");
             
-            if (selectedChoice.correctChoice)
-            {
-                // Correct choice - continue to next block (this is fine to auto-continue)
-                Debug.Log("[SIMPLE-FILTER] Correct choice, continuing to next block");
-                ResetDialogResponseState();
-                ClearAll3DDialogs();
-                if (!IsNext2DDialog() && !isUsingFilteredChoices)
-                {
-                    DestroyDialogInstances();
-                }
-                ContinueToNextBlock();
-            }
-            else
-            {
-                // FIXED: Incorrect choice - DON'T auto-respawn, just mark as ready for user input
-                Debug.Log("[SIMPLE-FILTER] Incorrect choice response shown, waiting for user to press SPACE to continue");
-                
-                // Reset the text animation state so user can proceed with SPACE
-                isTextAnimating = false;
-                isInDialogTransition = false;
-                
-                // DO NOT automatically respawn choices here - let HandleDialogProgression handle it when user presses SPACE
-                // The automatic respawn was causing the "no SPACE required" bug
-            }
+            // FIXED: ALWAYS wait for user input, regardless of whether choice is correct or incorrect
+            // This ensures the last dialog response doesn't just disappear automatically
+            Debug.Log("[SIMPLE-FILTER] Dialog response animation completed, waiting for user to press SPACE to continue");
+            
+            // Reset the text animation state so user can proceed with SPACE
+            isTextAnimating = false;
+            isInDialogTransition = false;
+            
+            // DO NOT automatically continue here - let HandleDialogProgression handle it when user presses SPACE
+            // This applies to both correct AND incorrect choices for consistent behavior
         }
         else
         {

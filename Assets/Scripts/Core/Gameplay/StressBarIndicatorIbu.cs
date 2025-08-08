@@ -60,7 +60,7 @@ public class StressBarIndicatorIbu : MonoBehaviour
     [SerializeField] private bool enableStressChangeAnimation = true;
     
     [Header("Debug")]
-    [SerializeField] private bool enableDebugLogs = true; // Temporarily enabled for debugging
+    [SerializeField] private bool enableDebugLogs = false; // Debug logs removed
 
     void Start()
     {
@@ -77,7 +77,7 @@ public class StressBarIndicatorIbu : MonoBehaviour
         stressBarFillImage = GameObject.Find("Background").GetComponent<Image>();
         if (stressBarFillImage == null)
         {
-            Debug.LogError("[StressBarIbu] Background GameObject not found in the scene or doesn't have an Image component.");
+            // Background GameObject not found in the scene or doesn't have an Image component
         }
         else
         {
@@ -100,7 +100,7 @@ public class StressBarIndicatorIbu : MonoBehaviour
             indicatorStressImage = indicatorStressGO.GetComponent<Image>();
             if (indicatorStressImage == null)
             {
-                Debug.LogError("[StressBarIbu] IndicatorStress GameObject found but doesn't have an Image component.");
+                // IndicatorStress GameObject found but doesn't have an Image component
             }
             else
             {
@@ -110,7 +110,7 @@ public class StressBarIndicatorIbu : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[StressBarIbu] IndicatorStress GameObject not found in the scene.");
+            // IndicatorStress GameObject not found in the scene
         }
     }
     
@@ -125,8 +125,8 @@ public class StressBarIndicatorIbu : MonoBehaviour
             saveData = Resources.Load<CoreGameSaves>(saveDataPath);
             if (saveData == null)
             {
-                Debug.LogError("[StressBarIbu] CoreGameSaves not found at Resources/" + saveDataPath);
-                Debug.LogError("[StressBarIbu] Please assign CoreGameSaves ScriptableObject in inspector or place it in Resources folder");
+                // CoreGameSaves not found at Resources path
+                // Please assign CoreGameSaves ScriptableObject in inspector or place it in Resources folder
                 return;
             }
             else
@@ -284,8 +284,6 @@ public class StressBarIndicatorIbu : MonoBehaviour
         int currentStress = saveData.mother_stress_level;
         bool useDarkPalette = currentDay >= darkDayThreshold;
         
-        if (enableDebugLogs) Debug.Log($"[StressBar] UpdateColors called - Day: {currentDay}, Stress: {currentStress}, UseDarkPalette: {useDarkPalette}");
-        
         // Update fill color based on day and stress
         UpdateDayAndStressBasedFillColor(currentStress, useDarkPalette);
         
@@ -302,8 +300,6 @@ public class StressBarIndicatorIbu : MonoBehaviour
         if (indicatorStressImage == null)
             return;
             
-        if (enableDebugLogs) Debug.Log($"[StressBar] UpdateFillColor called with stressLevel={stressLevel}, useDarkPalette={useDarkPalette}");
-            
         Color fillColor;
         
         // Select color palette based on day
@@ -314,26 +310,21 @@ public class StressBarIndicatorIbu : MonoBehaviour
         Color highColor = useDarkPalette ? darkHighStressColor : highStressColor;
         Color maxColor = useDarkPalette ? darkMaxStressColor : maxStressColor;
         
-        if (enableDebugLogs) Debug.Log($"[StressBar] Selected colors - lowColor={lowColor}, mediumLowColor={mediumLowColor}");
-        
         // Determine color based on stress level with new thresholds
         // <= 5: Green, <= 50: Yellow, <= 250: Yellow-Orange, <= 500: Orange, <= 1000: Red, 1000+: Dark Red
         if (stressLevel <= 4)
         {
             // 0-5: Green
             fillColor = lowColor;
-            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Green");
         }
         else if (stressLevel <= 5)
         {
             // 5-50: Pure Yellow
             fillColor = mediumLowColor;
-            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Pure Yellow {mediumLowColor}");
             
             // FORCE TEST: Set to bright red to see if this actually works
             if (stressLevel == 50) {
                 fillColor = Color.red;
-                if (enableDebugLogs) Debug.Log($"[StressBar] FORCE TEST: Setting stress 50 to RED for testing");
             }
         }
         else if (stressLevel <= 6)
@@ -341,31 +332,26 @@ public class StressBarIndicatorIbu : MonoBehaviour
             // 50-250: Yellow to Orange transition
             float t = (stressLevel - 50f) / 200f;
             fillColor = Color.Lerp(mediumLowColor, mediumStressColor, t);
-            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Yellow-Orange interpolation (t={t:F2})");
         }
         else if (stressLevel <= 500)
         {
             // 250-500: Orange
             fillColor = mediumStressColor;
-            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Orange");
         }
         else if (stressLevel <= 1000)
         {
             // 500-1000: Red (interpolate from orange to red)
             float t = (stressLevel - 500f) / 500f;
             fillColor = Color.Lerp(mediumStressColor, highColor, t);
-            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Red interpolation (t={t:F2})");
         }
         else
         {
             // 1000+: Dark Red
             fillColor = maxColor;
-            if (enableDebugLogs) Debug.Log($"[StressBar] Stress {stressLevel} -> Dark Red");
         }
         
         // Apply fill color
         indicatorStressImage.color = fillColor;
-        if (enableDebugLogs) Debug.Log($"[StressBar] Final applied color: {fillColor} to {indicatorStressImage.name}");
     }
     
     /// <summary>
@@ -590,9 +576,6 @@ public class StressBarIndicatorIbu : MonoBehaviour
         if (saveData != null)
         {
             SetStressLevel(50);
-            Debug.Log($"[StressBar] Manual test - set stress to 50. Current stress: {saveData.mother_stress_level}");
-            Debug.Log($"[StressBar] IndicatorStress GameObject: {(indicatorStressImage != null ? indicatorStressImage.name : "NULL")}");
-            Debug.Log($"[StressBar] Current color: {(indicatorStressImage != null ? indicatorStressImage.color : Color.clear)}");
         }
     }
     
