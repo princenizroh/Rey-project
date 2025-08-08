@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Tuh sayang bayinya menyusu dengan tenang
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: 'iya. Kupikir aku akan mendengar tangisan setiap hari '
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -43,7 +43,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Kamu akan mendengar bayi ini menangis setiap hari jika kamu tidak
         menenangkannya
       audioDialogEntry: {fileID: 0}
@@ -56,7 +56,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Aku sungguh tidak kuat
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -68,7 +68,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Bu Bidan, bagaimana dengan makanan bayi
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -80,7 +80,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 3
       dialogEntry: Untuk makanannya bisa dari ASI atau susu formula
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -92,7 +92,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Susu formula?
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -104,7 +104,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Iya bu, di hari-hari pertama ini perut bayi masih sangat kecil,
         sekecil kelereng
       audioDialogEntry: {fileID: 0}
@@ -117,7 +117,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Jadi, kolostrum atau ASI pertama yang kental dan kekuningan yang
         keluar sedikit itu sudah sangat cukup dan penuh dengan antibod
       audioDialogEntry: {fileID: 0}
@@ -130,7 +130,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Begitu ya, berarti gak papa dong kalau susu formula aja soalnya
         ini sakit banget kalau lagi menyusui
       audioDialogEntry: {fileID: 0}
@@ -143,7 +143,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Rasa sakit saat awal menyusui itu memang sangat tidak nyaman
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -155,7 +155,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Itu juga pertanda bahwa posisi menyusuinya belum tepat
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -167,7 +167,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Lalu jangan dibiasakan keseringan pakai dot,  karena dapat merusak
         struktur gigi dan rahangnya
       audioDialogEntry: {fileID: 0}
@@ -180,7 +180,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Menyusu itu untuk membantu melatih otot wajah bayi berkembang
         sempurna
       audioDialogEntry: {fileID: 0}
@@ -193,7 +193,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Akibatnya,  ada risiko lebih tinggi untuk mengalami maloklusi
         atau posisi gigi yang tidak sejajar di kemudian hari
       audioDialogEntry: {fileID: 0}
@@ -206,7 +206,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Lalu ada risiko karies gigi dini. Ini terjadi jika bayi tertidur
         dengan sisa susu formula yang menggenang di mulutnya, yang bisa merusak giginya
         yang baru akan tumbuh
@@ -220,7 +220,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Yang terakhir walaupun nutrisi dalam susu formula itu lengkap,
         penyerapannya tidak seefisien ASI. Contohnya zat besi
       audioDialogEntry: {fileID: 0}
@@ -233,7 +233,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Tubuh bayi menyerap zat besi dari ASI jauh lebih baik daripada
         dari susu formula
       audioDialogEntry: {fileID: 0}
@@ -246,7 +246,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Begitu ibu
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -258,7 +258,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Iya deh iya. Lalu untuk susu formula, gimana cara pembuatannya
         bu bidan?
       audioDialogEntry: {fileID: 0}
@@ -271,7 +271,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Untuk susu formula. ada tahap tahapannya ibu
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -283,7 +283,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Pertama, sebelum membuat susu tangan harus dicuci bersih. Semua
         peralatan, dari botol sampai dotnya, harus disterilkan
       audioDialogEntry: {fileID: 0}
@@ -296,7 +296,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Kedua, takarannya harus sempurna. Harus mengikuti petunjuk yang
         di kaleng. Jangan dikurangi atau dilebihkan, karena bisa membenai ginjal
         bayi yang masih mungil
@@ -310,7 +310,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Ketiga, air dan suhunya harus hangat. Jangan pakai air panas mendidih,
         karena bisa merusak vitamin di dalam susu
       audioDialogEntry: {fileID: 0}
@@ -323,7 +323,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Keempat, cara memberikannya. Saat menyusu, dekap si kecil dengan
         posisi kepala sedikit lebih tinggi. Miringkan botolnya agar dot terisi penuh
         susu, bukan udara, untuk mengurangi risiko kembung
@@ -337,7 +337,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Kelima, kenali tanda kenyang dan selalu sendawakan. Kalau bayi
         sudah berhenti menghisap atau mendoro dot, artinya dia sudah cukup
       audioDialogEntry: {fileID: 0}
@@ -350,7 +350,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Setelah itu, wajib disendawakan agar udara yang tertelan bisa
         keluar
       audioDialogEntry: {fileID: 0}
@@ -363,7 +363,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Susuin kapan aja?
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -375,7 +375,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Tandanya lapar itu kalau dia mulai gelisah. Jangan tunggu sampai
         dia menangis kencang, karena itu tanda lapar yang sudah terlambat
       audioDialogEntry: {fileID: 0}
@@ -388,7 +388,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Dan juga bayi baru lahir akan sering buang air kecil dan besar.
         Ini tandanya dia cukup minum. Rajin-rajin dicek dan diganti ya, Bu, supaya
         kulitnya tidak iritasi
@@ -402,7 +402,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Lalu, untuk beberapa hari ke depan perasaan ibu mungkin akan campur
         aduk. Kadang sangat bahagia, kadang bisa tiba-tiba sedih
       audioDialogEntry: {fileID: 0}
@@ -415,7 +415,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Ini wajar, namanya baby blues karena perubahan hormon. Jangan
         dipendam sendiri, ceritakan pada suami
       audioDialogEntry: {fileID: 0}
@@ -428,7 +428,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Nanti jika butuh bantuan, jangan ragu hubungi saya atau segera
         ke fasilitas kesehatan ya ibu
       audioDialogEntry: {fileID: 0}
@@ -441,7 +441,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 
+      npcName: 0
       dialogEntry: Iya Bu Bidan, saya mengerti
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -453,7 +453,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Bidan
+      npcName: 3
       dialogEntry: Yaudah kalau gitu, saya pamit pulang duluan ya.. Pak.. Bu...
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -465,7 +465,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ibu
+      npcName: 1
       dialogEntry: Iya, hati hati bu bidan
       audioDialogEntry: {fileID: 0}
       choices: []
@@ -477,7 +477,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: Ayah
+      npcName: 2
       dialogEntry: Hati hati di jalan
       audioDialogEntry: {fileID: 0}
       choices: []

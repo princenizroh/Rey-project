@@ -188,7 +188,7 @@ Bidan: "Ini wajar, namanya baby blues karena perubahan hormon. Jangan dipendam s
 Bidan: "Nanti jika butuh bantuan, jangan ragu hubungi saya atau segera ke fasilitas kesehatan ya ibu"
 Ibu: "Iya bu bidan"
 
-### Seq6Nama
+### Seq7Nama
 Ayah: "Sayang, kira kira namanya mau dipanggil siapa"
 Ayah: "Ayah sudah menyimpan nama untuk anak kita"
 Ibu: "Apa itu sayang"
