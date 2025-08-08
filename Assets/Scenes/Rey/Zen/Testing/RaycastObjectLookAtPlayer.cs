@@ -3,7 +3,6 @@ using UnityEngine;
 public class RaycastObjectLookAtPlayer : MonoBehaviour
 {
     [Header("Menu Settings")]
-    public string interactionMenuName = "interaction menu";
     public float lookAtSpeed = 5f;
     
     [Header("Outline Settings")]
@@ -20,14 +19,7 @@ public class RaycastObjectLookAtPlayer : MonoBehaviour
     private GameObject outlineObject; // Store reference to outline object
     
     void Start()
-    {
-        // Find the interaction menu GameObject
-        interactionMenu = GameObject.Find(interactionMenuName);
-        if (interactionMenu == null)
-        {
-            Debug.LogWarning($"Could not find GameObject named '{interactionMenuName}'. Make sure it exists in the scene.");
-        }
-        
+    {        
         // Find the main camera (assuming it's the player camera)
         playerCamera = Camera.main;
         if (playerCamera == null)
