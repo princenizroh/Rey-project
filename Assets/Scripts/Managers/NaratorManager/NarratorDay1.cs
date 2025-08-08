@@ -14,6 +14,7 @@ public class NarratorDay1 : NarratorBase
         SetCharacterSpawn(CharacterType.Father, 0);    
         SetCharacterSpawn(CharacterType.Bidan, 0);   
         SetCharacterSpawn(CharacterType.Baby, 0);    
+        SetCharacterSpawn(CharacterType.Object, 0);
         CloseEyes(); 
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
         PlayCharacterAnimation(CharacterType.Father, "Sit");
@@ -87,6 +88,7 @@ public class NarratorDay1 : NarratorBase
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq7Nama", 
             () => { seq7Complete = true; });
         yield return new WaitUntil(() => seq7Complete);
+        SetCharacterSpawn(CharacterType.Object, 1);
 
         yield return new WaitForSeconds(2f);
         GoToNextDay();
