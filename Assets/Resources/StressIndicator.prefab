@@ -112,8 +112,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 130, y: -25}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 239.00806, y: -49}
+  m_SizeDelta: {x: 418.016, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2400128398556110561
 CanvasRenderer:
@@ -145,8 +145,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Tingkat Stress Ibu
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3d632f2cde59ea64b8835f3465b5a01a, type: 2}
+  m_sharedMaterial: {fileID: -8184810967434301325, guid: 3d632f2cde59ea64b8835f3465b5a01a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -208,7 +208,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -438.84024, w: 0}
+  m_margin: {x: 0, y: 0, z: 1.7073822, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -248,8 +248,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 380.0666, y: -82}
-  m_SizeDelta: {x: 690.1544, y: 40}
+  m_AnchoredPosition: {x: 244.7301, y: -106}
+  m_SizeDelta: {x: 423.3392, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1054859756114829355
 CanvasRenderer:
@@ -323,8 +323,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 380, y: -82}
-  m_SizeDelta: {x: 700, y: 50}
+  m_AnchoredPosition: {x: 244.68933, y: -106}
+  m_SizeDelta: {x: 429.3785, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1713965197689591615
 CanvasRenderer:
