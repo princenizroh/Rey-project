@@ -441,7 +441,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 0
+      npcName: 1
       dialogEntry: Iya Bu Bidan, saya mengerti
       audioDialogEntry: {fileID: 0}
       choices: []

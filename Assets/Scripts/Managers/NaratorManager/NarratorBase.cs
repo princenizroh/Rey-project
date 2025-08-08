@@ -549,6 +549,28 @@ public abstract class NarratorBase : MonoBehaviour
             yield return StartCoroutine(MoveAgentToTarget(characterType, target));
         }
     }
+
+    protected void EnableNavMeshAgent(CharacterType characterType)
+    {
+        if (characterDict.TryGetValue(characterType, out CharacterData character))
+        {
+            if (character.agent != null)
+            {
+                character.agent.enabled = true;
+            }
+        }
+    }
+
+    protected void DisableNavMeshAgent(CharacterType characterType)
+    {
+        if (characterDict.TryGetValue(characterType, out CharacterData character))
+        {
+            if (character.agent != null)
+            {
+                character.agent.enabled = false;
+            }
+        }
+    }
 #endregion
 #region GameObject Management
     protected void AppearObjects()

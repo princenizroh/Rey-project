@@ -8,6 +8,8 @@ public class NarratorDay1 : NarratorBase
     {
         TimeManager.instance.TimeOfDay = 1.0f;
         AppearObjects();
+        DisableNavMeshAgent(CharacterType.Mother);
+        DisableNavMeshAgent(CharacterType.Father);
         SetCharacterSpawn(CharacterType.Mother, 0);  
         SetCharacterSpawn(CharacterType.Father, 0);    
         SetCharacterSpawn(CharacterType.Bidan, 0);   
