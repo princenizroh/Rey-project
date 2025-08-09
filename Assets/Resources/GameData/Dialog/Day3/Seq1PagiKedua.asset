@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Udah pagi lagi aja
+      dialogEntry: '{animation: Head Gesture} Udah pagi lagi aja'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -141,7 +141,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Gak tau dah cape, aku turun dulu
+      dialogEntry: '{animation: Angry} Gak tau dah cape, aku turun dulu'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

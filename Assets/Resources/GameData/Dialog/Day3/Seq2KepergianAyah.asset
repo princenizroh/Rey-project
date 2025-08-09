@@ -20,7 +20,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ada yang ketinggalan gak?
+      dialogEntry: '{animation: Head Gesture} Ada yang ketinggalan gak?'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Gak ada sepertinya
+      dialogEntry: '{animation: Thinking} Gak ada sepertinya'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -44,7 +44,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Yaudah cepet pulang
+      dialogEntry: '{animation: Bashful} Yaudah cepet pulang'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

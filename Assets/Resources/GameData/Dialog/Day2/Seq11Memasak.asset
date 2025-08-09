@@ -56,7 +56,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ayam panggang khas banjarmasin
+      dialogEntry: Ayam panggang khas Banjarmasin
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -80,7 +80,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Amazing, beautiful. Ini yang ayah cari selama ini. Ayah mau lima
+      dialogEntry: '{animation: Thankful} Amazing, beautiful. Ini yang ayah cari
+        selama ini. Ayah mau lima'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -92,7 +93,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Siapa yang mau ngabisin kalau ayamnya lima
+      dialogEntry: '{animation: Talking} Siapa yang mau ngabisin kalau ayamnya lima'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -104,7 +105,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Nanti Rey bantu habisin
+      dialogEntry: '{animation: Talking} Nanti Rey bantu habisin'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -116,7 +117,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Nguawur
+      dialogEntry: '{animation: Head Gesture} Nguawur'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -128,8 +129,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Loh gak papa, biar dia tau rasanya ayam khas kampung halaman ayah
-        itu sangat enak
+      dialogEntry: '{animation: Talking} Loh gak papa, biar dia tau rasanya ayam
+        khas kampung halaman ayah itu sangat enak'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -141,7 +142,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Apalagi dimasakin oleh istriku tercintahh
+      dialogEntry: '{animation: Talking} Apalagi dimasakin oleh istriku tercintahh'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -153,7 +154,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Iya mau aku masakin sepuluh juga kumasakin asal dihabisin
+      dialogEntry: '{animation: Talking} Iya mau aku masakin sepuluh juga kumasakin
+        asal dihabisin'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -165,7 +167,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Aku gak suka kalau ada makanan yang dibuang buang
+      dialogEntry: '{animation: Angry} Aku gak suka kalau ada makanan yang dibuang
+        buang'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -177,7 +180,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Siap istriku yang cantik
+      dialogEntry: '{animation: Thankful} Siap istriku yang cantik'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -189,7 +192,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Ih apasih
+      dialogEntry: '{animation: Head Gesture} Ih apasih'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -250,7 +253,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
-      dialogEntry: Siap cantik
+      dialogEntry: '{animation: Thankful} Siap cantik'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
