@@ -139,47 +139,38 @@ public class NarratorMainMenu : NarratorBase
         }
     }
 
-    /// <summary>
-    /// Setup characters in main menu positions before playing animations
-    /// </summary>
     private void SetupMainMenuPositions()
     {
-        // Set characters to main menu spawn positions (index 0 usually)
-        AppearObjects();
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Father, 0);
         SetCharacterSpawn(CharacterType.Baby, 0);
-        SetCharacterSpawn(CharacterType.Bidan, 0);
-        
-        // Disable NavMesh agents for main menu (static poses)
-        DisableNavMeshAgent(CharacterType.Mother);
-        DisableNavMeshAgent(CharacterType.Father);
-        DisableNavMeshAgent(CharacterType.Bidan);
+        SetCharacterSpawn(CharacterType.Object, 0);
+
     }
 
     #region Day-Specific Animation Methods
     
     private void PlayDay1MainMenuAnimation()
     {
-        // Day 1: Birth scene - showing family welcoming new baby
+        
+        SetObjectsActive(gameObjects.activeObjects, true); 
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");
-        PlayCharacterAnimation(CharacterType.Baby, "Idle");
         
-        SetCharacterSpawn(CharacterType.Object, 0); // Birth objects
+        SetCharacterSpawn(CharacterType.Object, 0); 
         
         Debug.Log("[NarratorMainMenu] Playing Day 1 animations: Birth scene");
     }
 
     private void PlayDay2MainMenuAnimation()
     {
-        // Day 2: First day home - parents caring for baby
-        PlayCharacterAnimation(CharacterType.Mother, "Idle");
+        SetObjectsActive(gameObjects.inActiveObjects, false);
+        PlayCharacterAnimation(CharacterType.Mother, "Angry");
         PlayCharacterAnimation(CharacterType.Father, "Sitting_Talking");
         PlayCharacterAnimation(CharacterType.Baby, "Idle");
         
-        SetCharacterSpawn(CharacterType.Object, 1); // Home objects
+        SetCharacterSpawn(CharacterType.Object, 1);
         
         Debug.Log("[NarratorMainMenu] Playing Day 2 animations: First day home");
     }

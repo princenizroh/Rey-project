@@ -8,46 +8,46 @@ public class NarratorHelper : NarratorBase
     private Vector3[] lastSpawnPositions;
     private Quaternion[] lastSpawnRotations;
 
-    [System.Obsolete]
-    protected override IEnumerator PlayMorningSequence()
-    {    
-        Debug.Log("Playing narration for Day 2 Morning sequence.");
-        PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        PlayCharacterAnimation(CharacterType.Father, "Sit");
-        yield return new WaitForSeconds(5f);
-
-        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Baby, 0, 2f));
-        yield return new WaitForSeconds(5f);
-
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
-    }
-    
-    [System.Obsolete]
-    protected override IEnumerator PlayAfternoonSequence()
-    {
-        TimeManager.instance.TimeOfDay = 13.0f;
-        PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        Debug.Log("Playing narration for Day 2 Afternoon sequence.");
-        yield return null;
-    }
-    
-    [System.Obsolete]
-    protected override IEnumerator PlayEveningSequence()
-    {
-        TimeManager.instance.TimeOfDay = 19.0f;
-        PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        Debug.Log("Playing narration for Day 2 Evening sequence.");
-        yield return null;
-    }
-    
-    [System.Obsolete]
-    protected override IEnumerator PlayNightSequence()
-    {
-        TimeManager.instance.TimeOfDay = 1.0f;
-        PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        Debug.Log("Playing narration for Day 2 Night sequence.");
-        yield return null;
-    }
+    // [System.Obsolete]
+    // protected override IEnumerator PlayMorningSequence()
+    // {    
+    //     Debug.Log("Playing narration for Day 2 Morning sequence.");
+    //     PlayCharacterAnimation(CharacterType.Mother, "Sit");
+    //     PlayCharacterAnimation(CharacterType.Father, "Sit");
+    //     yield return new WaitForSeconds(5f);
+    //
+    //     yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Baby, 0, 2f));
+    //     yield return new WaitForSeconds(5f);
+    //
+    //     yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
+    // }
+    // 
+    // [System.Obsolete]
+    // protected override IEnumerator PlayAfternoonSequence()
+    // {
+    //     TimeManager.instance.TimeOfDay = 13.0f;
+    //     PlayCharacterAnimation(CharacterType.Mother, "Sit");
+    //     Debug.Log("Playing narration for Day 2 Afternoon sequence.");
+    //     yield return null;
+    // }
+    // 
+    // [System.Obsolete]
+    // protected override IEnumerator PlayEveningSequence()
+    // {
+    //     TimeManager.instance.TimeOfDay = 19.0f;
+    //     PlayCharacterAnimation(CharacterType.Mother, "Sit");
+    //     Debug.Log("Playing narration for Day 2 Evening sequence.");
+    //     yield return null;
+    // }
+    // 
+    // [System.Obsolete]
+    // protected override IEnumerator PlayNightSequence()
+    // {
+    //     TimeManager.instance.TimeOfDay = 1.0f;
+    //     PlayCharacterAnimation(CharacterType.Mother, "Sit");
+    //     Debug.Log("Playing narration for Day 2 Night sequence.");
+    //     yield return null;
+    // }
 
     public void SnapCharacterToSpawn(CharacterType characterType, int spawnIndex)
     {

@@ -610,7 +610,7 @@ public abstract class NarratorBase : MonoBehaviour
         SetObjectsActive(gameObjects.inActiveObjects, false);
     }
 
-    private void SetObjectsActive(GameObject[] objects, bool active)
+    protected void SetObjectsActive(GameObject[] objects, bool active)
     {
         foreach (var obj in objects)
         {
