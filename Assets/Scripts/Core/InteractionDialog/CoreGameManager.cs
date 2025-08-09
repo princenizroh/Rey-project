@@ -139,6 +139,12 @@ public class CoreGameManager : MonoBehaviour
     private bool isInDialogTransition = false; // Prevent input during dialog transitions
     private float lastDialogUpdateTime = 0f; // Track last dialog update time
     
+    // Audio tracking for dialog responses to prevent replaying
+    private string lastPlayedAudioPath = ""; // Track the last played audio clip path
+    private bool hasPlayedCurrentResponseAudio = false; // Track if current response audio was already played
+    private int lastAudioPlayedForChoiceIndex = -1; // Track which choice index we played audio for
+    private string lastPlayedChoiceText = ""; // Track the choice text we played audio for
+    
     // Component safety tracking
     private Dictionary<string, TMP_Text> cachedTextComponents = new Dictionary<string, TMP_Text>();
     private bool componentsCached = false;
@@ -3781,29 +3787,106 @@ public class CoreGameManager : MonoBehaviour
         // Example implementation - you can customize this based on your animation system
         try
         {
-            // Method 1: Try to find an Animator component on this GameObject
+            // Method 1: Try DialogCharacterAnimatorManager for character animations
+            DialogCharacterAnimatorManager animManager = FindFirstObjectByType<DialogCharacterAnimatorManager>();
+            if (animManager != null)
+            {
+                // Try to play the animation on the current NPC
+                CoreGameBlock currentBlock = coreGameData.coreBlock[currentBlockIndex];
+                if (currentBlock.Dialog != null)
+                {
+                    CoreGameDialog.NpcName currentNpc = currentBlock.Dialog.npcName;
+                    
+                    // Try to get the animator for the current NPC and play the animation directly
+                    var animatorEntries = animManager.characterAnimators;
+                    foreach (var entry in animatorEntries)
+                    {
+                        if (entry.npcName == currentNpc && entry.animator != null)
+                        {
+                            // Try Play first (for animation state names) - most common case
+                            try
+                            {
+                                entry.animator.Play(animationName);
+                                Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on {currentNpc} using Play");
+                                return;
+                            }
+                            catch (System.Exception playEx)
+                            {
+                                Debug.LogWarning($"[ANIMATION] Play failed for '{animationName}' on {currentNpc}: {playEx.Message}");
+                                // If Play fails, try SetTrigger (for trigger parameters)
+                                try
+                                {
+                                    entry.animator.SetTrigger(animationName);
+                                    Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on {currentNpc} using SetTrigger");
+                                    return;
+                                }
+                                catch (System.Exception triggerEx)
+                                {
+                                    Debug.LogWarning($"[ANIMATION] SetTrigger also failed for '{animationName}' on {currentNpc}: {triggerEx.Message}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Method 2: Try to find an Animator component on this GameObject
             Animator animator = GetComponent<Animator>();
             if (animator != null)
             {
-                animator.SetTrigger(animationName);
-                Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on local Animator");
-                return;
+                try
+                {
+                    animator.Play(animationName);
+                    Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on local Animator using Play");
+                    return;
+                }
+                catch (System.Exception playEx)
+                {
+                    Debug.LogWarning($"[ANIMATION] Play failed for '{animationName}' on local Animator: {playEx.Message}");
+                    try
+                    {
+                        animator.SetTrigger(animationName);
+                        Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on local Animator using SetTrigger");
+                        return;
+                    }
+                    catch (System.Exception triggerEx)
+                    {
+                        Debug.LogWarning($"[ANIMATION] SetTrigger also failed for '{animationName}' on local Animator: {triggerEx.Message}");
+                    }
+                }
             }
             
-            // Method 2: Look for global animation manager or specific objects
+            // Method 3: Look for global animation manager or specific objects
             GameObject animationTarget = GameObject.Find("AnimationManager");
             if (animationTarget != null)
             {
                 Animator targetAnimator = animationTarget.GetComponent<Animator>();
                 if (targetAnimator != null)
                 {
-                    targetAnimator.SetTrigger(animationName);
-                    Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on AnimationManager");
-                    return;
+                    try
+                    {
+                        targetAnimator.Play(animationName);
+                        Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on AnimationManager using Play");
+                        return;
+                    }
+                    catch (System.Exception playEx)
+                    {
+                        Debug.LogWarning($"[ANIMATION] Play failed for '{animationName}' on AnimationManager: {playEx.Message}");
+                        try
+                        {
+                            targetAnimator.SetTrigger(animationName);
+                            Debug.Log($"[ANIMATION] ✓ Triggered animation '{animationName}' on AnimationManager using SetTrigger");
+                            return;
+                        }
+                        catch (System.Exception triggerEx)
+                        {
+                            Debug.LogWarning($"[ANIMATION] SetTrigger also failed for '{animationName}' on AnimationManager: {triggerEx.Message}");
+                        }
+                    }
                 }
             }
             
-            // Method 3: Custom animation handling - you can add your own logic here
+            // Method 4: Custom animation handling - you can add your own logic here
             HandleCustomAnimation(animationName);
             
         }
@@ -4624,6 +4707,14 @@ public class CoreGameManager : MonoBehaviour
 
     private void Show3DDialog(CoreGameDialog dialog)
     {
+        // Reset audio tracking for new dialog (choice-level tracking)
+        hasPlayedCurrentResponseAudio = false;
+        lastPlayedAudioPath = "";
+        lastAudioPlayedForChoiceIndex = -1;
+        lastPlayedChoiceText = "";
+        
+        Debug.Log("[AUDIO] Reset choice-level audio tracking for new 3D dialog");
+        
         // Handle cutscene fade effect for 3D dialogs
         HandleCutsceneFade(dialog.cutsceneType);
         
@@ -4708,9 +4799,16 @@ public class CoreGameManager : MonoBehaviour
 
     private void Show2DDialog(CoreGameDialog dialog)
     {
+        // Reset audio tracking for new dialog (choice-level tracking)
+        hasPlayedCurrentResponseAudio = false;
+        lastPlayedAudioPath = "";
+        lastAudioPlayedForChoiceIndex = -1;
+        lastPlayedChoiceText = "";
+        
         Debug.Log($"=== Show2DDialog FIELD MAPPING DEBUG ===");
         Debug.Log($"CoreGameDialog.npcName = '{dialog.npcName}' -> should go to DialogueName");
         Debug.Log($"CoreGameDialog.dialogEntry = '{dialog.dialogEntry}' -> should go to DialogueText");
+        Debug.Log($"[AUDIO] Reset choice-level audio tracking for new 2D dialog");
         
         // Validate the dialog data structure
         ValidateDialogData(dialog);
@@ -5682,6 +5780,29 @@ public class CoreGameManager : MonoBehaviour
         string npcResponse = response.npcResponse;
         AudioClip audioClip = selectedChoice.audioDialogResponse;
         
+        // ENHANCED: Check if this is a new choice selection (not just a new response index)
+        // Audio should only play once per CHOICE, not once per response within that choice
+        bool isNewChoiceSelection = (selectedChoiceIndex != lastAudioPlayedForChoiceIndex) || 
+                                   (selectedChoice.playerChoice != lastPlayedChoiceText);
+        
+        if (isNewChoiceSelection)
+        {
+            // This is a completely new choice selection - reset audio tracking
+            hasPlayedCurrentResponseAudio = false;
+            lastPlayedAudioPath = "";
+            lastAudioPlayedForChoiceIndex = selectedChoiceIndex;
+            lastPlayedChoiceText = selectedChoice.playerChoice;
+            Debug.Log($"[AUDIO] New choice selection detected: '{selectedChoice.playerChoice}' - audio can play");
+        }
+        else
+        {
+            // This is the same choice, just a different response index - don't reset audio tracking
+            Debug.Log($"[AUDIO] Same choice selection: '{selectedChoice.playerChoice}' - audio already played, won't replay");
+        }
+        
+        // Update the current response index
+        currentChoiceResponseIndex = responseIndex;
+        
         // Process stress modifiers from the dialog response
         string processedResponse = ProcessStressModifiers(npcResponse);
         
@@ -6377,12 +6498,8 @@ public class CoreGameManager : MonoBehaviour
     
     private void AnimateDialogText(string fullText, TMP_Text textComponent, AudioClip audioClip = null, System.Action onComplete = null)
     {
-        // Stop any existing audio and tweens
+        // Stop any existing tweens but be smart about audio
         if (dialogTween != null) LeanTween.cancel(gameObject, dialogTween.id);
-        if (dialogAudioSource != null && dialogAudioSource.isPlaying)
-        {
-            dialogAudioSource.Stop();
-        }
         
         // FIXED: Process special prefixes AND store both original and processed text
         string displayText = ProcessSpecialPrefixes(fullText);
@@ -6397,40 +6514,66 @@ public class CoreGameManager : MonoBehaviour
         // Always use normal text-based animation duration (no audio sync)
         float animationDuration = len * 0.02f; // Normal typing speed regardless of audio
         bool hasValidAudio = false;
+        bool shouldPlayAudio = false;
         
-        // Play audio if available, but don't sync text animation to audio duration
+        // Smart audio handling: Only play if we haven't played this audio clip for this response yet
         if (audioClip != null && audioClip.length > 0)
         {
-            try
+            string audioPath = audioClip.name; // Use clip name as identifier
+            
+            // Check if this is a new audio clip or if we're skipping/replaying the same response
+            if (!hasPlayedCurrentResponseAudio || lastPlayedAudioPath != audioPath)
             {
-                // Play the audio clip if AudioSource is available
-                if (dialogAudioSource != null)
-                {
-                    dialogAudioSource.clip = audioClip;
-                    dialogAudioSource.Play();
-                    hasValidAudio = true;
-                    Debug.Log($"Playing audio for dialog: {audioClip.name} (Duration: {audioClip.length}s)");
-                    Debug.Log($"Text animation will use normal speed, not synced to audio duration");
-                }
-                else
-                {
-                    Debug.LogWarning("DialogAudioSource is null, cannot play audio.");
-                }
+                shouldPlayAudio = true;
+                lastPlayedAudioPath = audioPath;
+                hasPlayedCurrentResponseAudio = true;
+                Debug.Log($"[AUDIO] Will play new audio: {audioPath}");
             }
-            catch (System.Exception e)
+            else
             {
-                Debug.LogWarning($"Failed to play audio clip '{audioClip.name}': {e.Message}");
+                Debug.Log($"[AUDIO] Skipping audio replay for: {audioPath} (already played for this response)");
+            }
+            
+            // Stop currently playing audio if we're starting a new one
+            if (shouldPlayAudio && dialogAudioSource != null && dialogAudioSource.isPlaying)
+            {
+                dialogAudioSource.Stop();
+                Debug.Log("[AUDIO] Stopped previous audio to play new clip");
+            }
+            
+            // Play audio if we should
+            if (shouldPlayAudio)
+            {
+                try
+                {
+                    if (dialogAudioSource != null)
+                    {
+                        dialogAudioSource.clip = audioClip;
+                        dialogAudioSource.Play();
+                        hasValidAudio = true;
+                        Debug.Log($"[AUDIO] Playing audio for dialog: {audioClip.name} (Duration: {audioClip.length}s)");
+                        Debug.Log($"[AUDIO] Text animation will use normal speed, not synced to audio duration");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[AUDIO] DialogAudioSource is null, cannot play audio.");
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[AUDIO] Failed to play audio clip '{audioClip.name}': {e.Message}");
+                }
             }
         }
         else
         {
             if (audioClip == null)
             {
-                Debug.Log("No audio file provided for dialog. Using normal text animation timing.");
+                Debug.Log("[AUDIO] No audio file provided for dialog. Using normal text animation timing.");
             }
             else
             {
-                Debug.LogWarning($"Audio clip provided but has invalid length ({audioClip.length}). Using normal text timing.");
+                Debug.LogWarning($"[AUDIO] Audio clip provided but has invalid length ({audioClip.length}). Using normal text timing.");
             }
         }
         
@@ -6906,6 +7049,13 @@ public class CoreGameManager : MonoBehaviour
         currentChoiceResponseIndex = -1;
         selectedChoiceIndex = -1;
         isInDialogTransition = false;
+        
+        // Reset audio tracking when dialog response state is reset
+        hasPlayedCurrentResponseAudio = false;
+        lastPlayedAudioPath = "";
+        lastAudioPlayedForChoiceIndex = -1;
+        lastPlayedChoiceText = "";
+        Debug.Log("[AUDIO] Reset choice-level audio tracking in ResetDialogResponseState");
     }
     
     /// <summary>
@@ -8096,3 +8246,37 @@ public class CoreGameManager : MonoBehaviour
     
     #endregion
 }
+
+/*
+ * AUDIO TRACKING FIX SUMMARY:
+ * 
+ * Problem: Audio kept playing repeatedly when pressing SPACE during dialog responses,
+ * especially when there are multiple responses in a sequence (response 1, 2, 3, etc.)
+ * 
+ * Root Cause: AnimateDialogText() was called every time space was pressed to progress
+ * through dialog responses, and it would stop + restart the same audio clip each time.
+ * 
+ * Solution: Added choice-level audio tracking system with four variables:
+ * 1. hasPlayedCurrentResponseAudio - tracks if current choice's audio was already played
+ * 2. lastPlayedAudioPath - tracks the name of the last played audio clip
+ * 3. lastAudioPlayedForChoiceIndex - tracks which choice index we played audio for
+ * 4. lastPlayedChoiceText - tracks the choice text we played audio for
+ * 
+ * Key Behavior Change:
+ * - Audio now plays ONCE PER CHOICE SELECTION, not once per individual response
+ * - If a choice has 3 responses, audio plays only when showing response 1
+ * - Pressing space through responses 2 and 3 will NOT replay the audio
+ * - Only when selecting a completely different choice will audio play again
+ * 
+ * Changes Made:
+ * 1. Added choice-level audio tracking variables to class fields
+ * 2. Modified AnimateDialogText() to check if audio was already played for current choice
+ * 3. Modified ShowDialogResponse() to detect new vs. existing choice selections
+ * 4. Reset audio tracking in:
+ *    - Show2DDialog() - when starting new dialogs
+ *    - Show3DDialog() - when starting new dialogs  
+ *    - ResetDialogResponseState() - when ending dialog response state
+ * 
+ * Result: Audio plays only once per choice selection, regardless of how many responses
+ * that choice has. No more repeated audio when pressing space through multiple responses.
+ */
