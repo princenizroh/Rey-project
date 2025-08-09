@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class RaycastObjectCam : MonoBehaviour
@@ -5,6 +7,9 @@ public class RaycastObjectCam : MonoBehaviour
     [Header("Raycast Settings")]
     public float rayDistance = 10f;
     public LayerMask layerMask = -1; // All layers by default
+    public CoreGameManager coreGameManager;
+
+    public TextMeshProUGUI narratorText;
     
     [Header("Visual Settings")]
     public LineRenderer lineRenderer;
@@ -167,7 +172,7 @@ public class RaycastObjectCam : MonoBehaviour
                 Debug.Log($"{interactionMessage} - Object: {currentHitBehaviour.gameObject.name}");
                 
                 // Optional: Call a method on the hit behaviour for additional interaction logic
-                OnInteractionKeyPressed(currentHitBehaviour);
+                StartCoroutine(OnInteractionKeyPressed(currentHitBehaviour));
             }
         }
     }
@@ -175,15 +180,20 @@ public class RaycastObjectCam : MonoBehaviour
     /// <summary>
     /// Called when interaction key is pressed while detecting an object
     /// </summary>
-    private void OnInteractionKeyPressed(RaycastObjectBehaviour hitBehaviour)
+    private IEnumerator OnInteractionKeyPressed(RaycastObjectBehaviour hitBehaviour)
     {
         // You can add additional interaction logic here
         // For example: trigger animations, play sounds, open UI, etc.
 
         // Check the GameObject name
-        if (hitBehaviour.gameObject.name == "SpecialObject")
+        if (hitBehaviour.gameObject.name == "Linda_Model")
         {
-            // dialog here
+            narratorText.text = "ggagag";
+            yield return null;
+            // bool seq14Complete = false;
+            // coreGameManager.StartCoreGame("GameData/Dialog/Day2/Seq14Terbangun", 
+            //     () => { seq14Complete = true; });
+            // yield return new WaitUntil(() => seq14Complete);
         }
         Debug.Log($"Interacting with object: {hitBehaviour.gameObject.name}");
     }
