@@ -431,6 +431,14 @@ public abstract class NarratorBase : MonoBehaviour
                 {
                     characterData.animator.Play(animationName); 
                 }
+                if (characterType == CharacterType.Father)
+                {
+                    characterData.animator.Play(animationName);
+                }
+                if (characterType == CharacterType.Ghost)
+                {
+                    characterData.animator.Play(animationName);
+                }
                 else
                 {
                     characterData.animator.SetTrigger(animationName);

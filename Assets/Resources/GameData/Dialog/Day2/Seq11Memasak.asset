@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Kesukaan ayah
+      dialogEntry: '{animation: Thinking} Kesukaan ayah'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

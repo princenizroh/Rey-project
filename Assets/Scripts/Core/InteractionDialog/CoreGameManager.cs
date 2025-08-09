@@ -4747,7 +4747,12 @@ public class CoreGameManager : MonoBehaviour
             npcName = ExtractNpcNameFromDialogText(dialog.dialogEntry);
         }
         Debug.Log($"Final npcName for DialogueName component: '{npcName}'");
-        
+        // Setelah menentukan npcName
+        BlendShapeManager blendShapeManager = FindObjectOfType<BlendShapeManager>();
+        if (blendShapeManager != null)
+        {
+            blendShapeManager.SetExpressionByNpcName(dialog.npcName);
+        }
         // Process stress modifiers from the initial dialog entry
         string processedDialogEntry = ProcessStressModifiers(dialog.dialogEntry);
         Debug.Log($"Original dialog entry: '{dialog.dialogEntry}'");
