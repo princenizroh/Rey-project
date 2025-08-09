@@ -4747,6 +4747,11 @@ public class CoreGameManager : MonoBehaviour
             npcName = ExtractNpcNameFromDialogText(dialog.dialogEntry);
         }
         Debug.Log($"Final npcName for DialogueName component: '{npcName}'");
+        DialogCharacterAnimatorManager animManager = FindObjectOfType<DialogCharacterAnimatorManager>();
+        if (animManager != null)
+        {
+            animManager.HandleCharacterAnimation(dialog.npcName); // ✅ otomatis reset + play
+        }
         // Setelah menentukan npcName
         BlendShapeManager blendShapeManager = FindObjectOfType<BlendShapeManager>();
         if (blendShapeManager != null)

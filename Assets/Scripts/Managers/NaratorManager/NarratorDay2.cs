@@ -15,6 +15,7 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 0);  
         SetCharacterSpawn(CharacterType.Father, 0);    
         SetCharacterSpawn(CharacterType.Baby, 0);
+        SetCharacterSpawn(CharacterType.Object, 1);
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Mother, "Idle");
         yield return new WaitForSeconds(1f);
