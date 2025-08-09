@@ -24,9 +24,6 @@ public class NarratorDay2 : NarratorBase
         yield return new WaitForSeconds(5f);
         uiElements.narratorText.gameObject.SetActive(false);
 
-        EnableHeadTracking(CharacterType.Mother, true);
-        
-        EnableHeadTracking(CharacterType.Father, true);
         bool seq0Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq0PagiPertama", 
             () => { seq0Complete = true; });

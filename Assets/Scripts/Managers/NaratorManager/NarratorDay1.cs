@@ -20,9 +20,11 @@ public class NarratorDay1 : NarratorBase
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");
         
-        EnableHeadTracking(CharacterType.Mother, true);
-        EnableHeadTracking(CharacterType.Father, true);
-        
+        // Enable head tracking - all characters focus on baby (POV camera)
+        SetHeadTargetCamera(CharacterType.Mother);
+        SetHeadTargetCamera(CharacterType.Father);
+        SetHeadTargetCamera(CharacterType.Bidan);
+
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 1\nKelahiran";
         yield return new WaitForSeconds(5f); 
@@ -66,7 +68,18 @@ public class NarratorDay1 : NarratorBase
 
         yield return new WaitForSeconds(0.5f);
         FadeOpenEyes();
-        yield return new WaitForSeconds(30f);
+        
+        // When baby opens eyes - parents look at each other in amazement
+        SetHeadTargetFather(CharacterType.Mother);
+        SetHeadTargetMother(CharacterType.Father);
+        
+        yield return new WaitForSeconds(2f);
+        
+        // Then back to looking at baby
+        SetHeadTargetCamera(CharacterType.Mother);
+        SetHeadTargetCamera(CharacterType.Father);
+        
+        yield return new WaitForSeconds(28f);
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq5MembukaMata", 
             () => { seq5Complete = true; });
@@ -84,6 +97,9 @@ public class NarratorDay1 : NarratorBase
 
         yield return new WaitForSeconds(1f);
         
+        // Disable head tracking during movement for natural look
+        DisableHeadTracking(CharacterType.Bidan);
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
         FadeCloseEyes();
 
@@ -94,8 +110,8 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitUntil(() => seq7Complete);
         SetCharacterSpawn(CharacterType.Object, 1);
 
-        // Disable head tracking before transitioning to next day
-        EnableAllHeadTracking(false);
+        // Disable all head tracking before transition
+        EnableGlobalHeadTracking(false);
         
         yield return new WaitForSeconds(2f);
         GoToNextDay();

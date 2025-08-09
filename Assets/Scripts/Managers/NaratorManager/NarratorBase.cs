@@ -838,54 +838,91 @@ public abstract class NarratorBase : MonoBehaviour
 
 #region Head Tracking Management
     /// <summary>
-    /// Enable/disable head tracking for specific character
+    /// Set head target for specific character using HeadTarget enum
     /// </summary>
-    protected void EnableHeadTracking(CharacterType characterType, bool enable)
+    protected void SetHeadTarget(CharacterType characterType, string targetName)
     {
-        var headTrackerManager = FindFirstObjectByType(System.Type.GetType("HeadTrackerManager"));
-        if (headTrackerManager != null)
+        var headTrackingManager = FindFirstObjectByType(System.Type.GetType("HeadTrackingManager"));
+        if (headTrackingManager != null)
         {
-            var method = headTrackerManager.GetType().GetMethod("EnableHeadTracking");
-            if (method != null)
+            // Get HeadTarget enum type
+            var headTargetType = System.Type.GetType("HeadTarget");
+            if (headTargetType != null)
             {
-                method.Invoke(headTrackerManager, new object[] { characterType, enable });
+                var targetEnum = System.Enum.Parse(headTargetType, targetName);
+                var method = headTrackingManager.GetType().GetMethod("SetHeadTarget", new System.Type[] { typeof(CharacterType), headTargetType });
+                if (method != null)
+                {
+                    method.Invoke(headTrackingManager, new object[] { characterType, targetEnum });
+                }
             }
         }
         else
         {
-            Debug.LogWarning("[NarratorBase] HeadTrackerManager not found in scene!");
+            Debug.LogWarning("[NarratorBase] HeadTrackingManager not found in scene!");
         }
+    }
+    
+    /// <summary>
+    /// Helper methods for easier calling
+    /// </summary>
+    protected void SetHeadTargetCamera(CharacterType characterType)
+    {
+        SetHeadTarget(characterType, "Camera");
+    }
+    
+    protected void SetHeadTargetMother(CharacterType characterType)
+    {
+        SetHeadTarget(characterType, "Mother");
+    }
+    
+    protected void SetHeadTargetFather(CharacterType characterType)
+    {
+        SetHeadTarget(characterType, "Father");
+    }
+    
+    protected void SetHeadTargetBaby(CharacterType characterType)
+    {
+        SetHeadTarget(characterType, "Baby");
+    }
+    
+    protected void SetHeadTargetBidan(CharacterType characterType)
+    {
+        SetHeadTarget(characterType, "Bidan");
+    }
+    
+    /// <summary>
+    /// Disable head tracking for specific character
+    /// </summary>
+    protected void DisableHeadTracking(CharacterType characterType)
+    {
+        SetHeadTarget(characterType, "None");
     }
     
     /// <summary>
     /// Enable/disable head tracking for all characters
     /// </summary>
-    protected void EnableAllHeadTracking(bool enable)
+    protected void EnableGlobalHeadTracking(bool enable)
     {
-        var headTrackerManager = FindFirstObjectByType(System.Type.GetType("HeadTrackerManager"));
-        if (headTrackerManager != null)
+        var headTrackingManager = FindFirstObjectByType(System.Type.GetType("HeadTrackingManager"));
+        if (headTrackingManager != null)
         {
-            var method = headTrackerManager.GetType().GetMethod("EnableAllHeadTracking");
+            var method = headTrackingManager.GetType().GetMethod("EnableGlobalHeadTracking");
             if (method != null)
             {
-                method.Invoke(headTrackerManager, new object[] { enable });
+                method.Invoke(headTrackingManager, new object[] { enable });
             }
         }
     }
     
     /// <summary>
-    /// Reset character head to original position
+    /// Set multiple characters to look at same target
     /// </summary>
-    protected void ResetHeadToOriginal(CharacterType characterType)
+    protected void SetMultipleHeadTargetsCamera(CharacterType[] characters)
     {
-        var headTrackerManager = FindFirstObjectByType(System.Type.GetType("HeadTrackerManager"));
-        if (headTrackerManager != null)
+        foreach (var character in characters)
         {
-            var method = headTrackerManager.GetType().GetMethod("ResetHeadToOriginal");
-            if (method != null)
-            {
-                method.Invoke(headTrackerManager, new object[] { characterType });
-            }
+            SetHeadTargetCamera(character);
         }
     }
 #endregion
