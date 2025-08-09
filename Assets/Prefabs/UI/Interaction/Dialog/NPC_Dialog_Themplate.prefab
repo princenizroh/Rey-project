@@ -109,8 +109,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1133.0979, y: -73.35797}
-  m_SizeDelta: {x: 312.0229, y: 41.2155}
+  m_AnchoredPosition: {x: 1281.0662, y: -73.35797}
+  m_SizeDelta: {x: 591.6332, y: 41.2155}
   m_Pivot: {x: 0.52919453, y: 0.93435556}
 --- !u!222 &3171987923602644890
 CanvasRenderer:
@@ -140,10 +140,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Tekan spasi untuk melanjutkan
+  m_text: Tekan spasi
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3d632f2cde59ea64b8835f3465b5a01a, type: 2}
-  m_sharedMaterial: {fileID: -8184810967434301325, guid: 3d632f2cde59ea64b8835f3465b5a01a, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 152c5344fee1a1f46a5988f2bd1cc0c8, type: 2}
+  m_sharedMaterial: {fileID: -8951847174312865853, guid: 152c5344fee1a1f46a5988f2bd1cc0c8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -167,15 +167,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 1024
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
