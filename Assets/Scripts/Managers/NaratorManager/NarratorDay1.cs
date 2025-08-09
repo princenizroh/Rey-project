@@ -63,7 +63,7 @@ public class NarratorDay1 : NarratorBase
 
         yield return new WaitForSeconds(0.5f);
         FadeOpenEyes();
-
+        yield return new WaitForSeconds(30f);
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq5MembukaMata", 
             () => { seq5Complete = true; });
