@@ -43,6 +43,8 @@ public class NarratorDay3 : NarratorBase
         FadeCloseEyes();
 
         yield return new WaitForSeconds(2f);
+        EnableNavMeshAgent(CharacterType.Father);
+        EnableNavMeshAgent(CharacterType.Mother);
         SetCharacterSpawn(CharacterType.Baby, 1); 
         SetCharacterSpawn(CharacterType.Father, 1);
         SetCharacterSpawn(CharacterType.Mother, 1);
