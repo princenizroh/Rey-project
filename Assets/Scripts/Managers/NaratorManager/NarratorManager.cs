@@ -29,11 +29,19 @@ public class NarratorManager : MonoBehaviour
     {
         narratorDict = new Dictionary<NarratorDay, NarratorBase>();
 
-        for (int i = 0; i < dayNarrators.Length && i < 14; i++)
+        for (int i = 0; i < dayNarrators.Length; i++)
         {
             if (dayNarrators[i] != null)
             {
-                narratorDict[(NarratorDay)i] = dayNarrators[i];
+                // Handle all narrator types including MainMenu and Helper
+                if (i < 15) // Day1-Day14 + Helper
+                {
+                    narratorDict[(NarratorDay)i] = dayNarrators[i];
+                }
+                else if (i == 15) // DayMainMenu
+                {
+                    narratorDict[NarratorDay.DayMainMenu] = dayNarrators[i];
+                }
             }
         }
     }
@@ -136,6 +144,49 @@ public class NarratorManager : MonoBehaviour
         else
         {
             Debug.LogError($"Current narrator for {currentDay} not found!");
+        }
+    }
+
+    /// <summary>
+    /// Start Main Menu narrator (for main menu scenes)
+    /// </summary>
+    [System.Obsolete]
+    public void StartMainMenu()
+    {
+        Debug.Log("=== Starting Main Menu ===");
+        
+        if (narratorDict.TryGetValue(NarratorDay.DayMainMenu, out NarratorBase mainMenuNarrator))
+        {
+            currentDay = NarratorDay.DayMainMenu;
+            currentTime = TimeOfDay.Morning; // Default time for main menu
+            
+            // Use reflection to call PlayMainMenuSequence if it exists
+            var playMethod = mainMenuNarrator.GetType().GetMethod("PlayMainMenuSequence");
+            if (playMethod != null)
+            {
+                playMethod.Invoke(mainMenuNarrator, null);
+                Debug.Log("Main Menu sequence started");
+            }
+            else
+            {
+                Debug.LogError("PlayMainMenuSequence method not found in MainMenu narrator!");
+            }
+        }
+        else
+        {
+            Debug.LogError("MainMenu narrator not found! Make sure to assign NarratorMainMenu in the inspector.");
+        }
+    }
+
+    /// <summary>
+    /// Refresh main menu (useful after save changes)
+    /// </summary>
+    [System.Obsolete]
+    public void RefreshMainMenu()
+    {
+        if (currentDay == NarratorDay.DayMainMenu)
+        {
+            StartMainMenu();
         }
     }
 }

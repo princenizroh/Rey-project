@@ -8,7 +8,7 @@ using Unity.Cinemachine;
 
 public enum NarratorDay
 {
-    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13, Day14, Helper
+    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13, Day14, Helper, DayMainMenu
 }
 
 public enum TimeOfDay
@@ -98,6 +98,9 @@ public abstract class NarratorBase : MonoBehaviour
 
     [Header("Core Manager")]
     [SerializeField] protected CoreGameManager dialogGameManager;
+    
+    // SaveFileManager will be auto-found, no need for Inspector assignment
+    protected SaveFileManager saveFileManager;
 
     [Header("Characters")]
     [SerializeField] protected CharacterData[] charactersDataArray;
@@ -114,6 +117,7 @@ public abstract class NarratorBase : MonoBehaviour
     {
         InitializeAudioSystem();
         InitializeCharacterSystem();
+        InitializeSaveFileManager();
     }
 
     protected virtual void Start()
@@ -145,6 +149,25 @@ public abstract class NarratorBase : MonoBehaviour
             }
         }
     }
+    
+    private void InitializeSaveFileManager()
+    {
+        // Auto-find SaveFileManager in scene
+        if (saveFileManager == null)
+        {
+            saveFileManager = FindFirstObjectByType<SaveFileManager>();
+        }
+        
+        if (saveFileManager == null)
+        {
+            Debug.LogWarning("[NarratorBase] SaveFileManager not found in scene. Auto-save will be disabled.");
+        }
+        else
+        {
+            Debug.Log("[NarratorBase] SaveFileManager auto-found and initialized.");
+        }
+    }
+    
     private void InitializeCharacterComponents()
     {
         foreach (var characterData in charactersDataArray)
@@ -660,6 +683,9 @@ public abstract class NarratorBase : MonoBehaviour
     [System.Obsolete]
     protected void GoToNextTimeOfDay()
     {
+        // Auto-save before transitioning to next time of day
+        AutoSaveProgress();
+        
         if (NarratorManager.Instance != null)
         {
             NarratorManager.Instance.NextTimeOfDay();
@@ -669,6 +695,9 @@ public abstract class NarratorBase : MonoBehaviour
     [System.Obsolete]
     protected void GoToNextDay()
     {
+        // Auto-save before transitioning to next day
+        AutoSaveProgress();
+        
         if (NarratorManager.Instance != null)
         {
             NarratorManager.Instance.NextDay();
@@ -712,6 +741,98 @@ public abstract class NarratorBase : MonoBehaviour
         var panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
         panTilt.PanAxis.Range = new Vector2(-90f, 90f);
         yield return null;
+    }
+#endregion
+
+#region Save Management
+    /// <summary>
+    /// Auto-save game progress after completing a sequence
+    /// </summary>
+    protected void AutoSaveProgress()
+    {
+        if (saveFileManager == null)
+        {
+            Debug.LogWarning("[NarratorBase] SaveFileManager not assigned, skipping auto-save.");
+            return;
+        }
+
+        try
+        {
+            // Update day progress based on current narrator
+            if (NarratorManager.Instance != null)
+            {
+                int currentDayNumber = (int)NarratorManager.Instance.currentDay + 1; // Convert enum to 1-based day number
+                
+                // Update ScriptableObject day value before saving
+                UpdateSaveDataDay(currentDayNumber);
+                
+                // Save current progress to JSON
+                saveFileManager.SaveToCoreGameSavesJSON();
+                
+                Debug.Log($"[NarratorBase] Auto-saved progress: Day {currentDayNumber}, Time: {NarratorManager.Instance.currentTime}");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[NarratorBase] Auto-save failed: {e.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Update the day value in SaveFileManager's target ScriptableObject
+    /// </summary>
+    private void UpdateSaveDataDay(int dayNumber)
+    {
+        // Access the SaveFileManager's target ScriptableObject through reflection or direct access
+        // This assumes SaveFileManager has a public getter or we add one
+        var saveDataField = saveFileManager.GetType().GetField("targetSaveObject", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        
+        if (saveDataField != null)
+        {
+            var coreGameSaves = saveDataField.GetValue(saveFileManager);
+            if (coreGameSaves != null)
+            {
+                // Update day field using reflection
+                var dayField = coreGameSaves.GetType().GetField("day");
+                if (dayField != null)
+                {
+                    dayField.SetValue(coreGameSaves, dayNumber);
+                    Debug.Log($"[NarratorBase] Updated save data day to: {dayNumber}");
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Manual save method that can be called from child classes
+    /// </summary>
+    protected void ManualSave()
+    {
+        AutoSaveProgress();
+    }
+    
+    /// <summary>
+    /// Save with custom day number (useful for special cases)
+    /// </summary>
+    protected void SaveWithDay(int dayNumber)
+    {
+        if (saveFileManager == null)
+        {
+            Debug.LogWarning("[NarratorBase] SaveFileManager not assigned, skipping save.");
+            return;
+        }
+
+        try
+        {
+            UpdateSaveDataDay(dayNumber);
+            saveFileManager.SaveToCoreGameSavesJSON();
+            Debug.Log($"[NarratorBase] Saved progress with custom day: {dayNumber}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[NarratorBase] Custom save failed: {e.Message}");
+        }
     }
 #endregion
 }

@@ -58,10 +58,8 @@ public class NarratorDay2 : NarratorBase
 
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 1));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
-        PlayCharacterAnimation(CharacterType.Father, "Right Turn");
-        PlayCharacterAnimation(CharacterType.Mother, "Left Turn");
-        PlayCharacterAnimation(CharacterType.Father, "Idle");
-        PlayCharacterAnimation(CharacterType.Mother, "Idle");
+        PlayCharacterAnimation(CharacterType.Father, "Left Turn");
+        PlayCharacterAnimation(CharacterType.Mother, "Right Turn");
         
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq2KeberangkatanAyah", 
