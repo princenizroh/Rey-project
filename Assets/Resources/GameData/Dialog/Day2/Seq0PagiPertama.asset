@@ -21,7 +21,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: 5
       dialogEntry: '*Krkk'
-      audioDialogEntry: {fileID: 0}
+      audioDialogEntry: {fileID: 8300000, guid: 2b2f2791225b4824db3fb78da63b062b, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

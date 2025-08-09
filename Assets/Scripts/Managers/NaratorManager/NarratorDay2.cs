@@ -16,7 +16,7 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Father, 0);    
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Object, 1);
-        PlayCharacterAnimation(CharacterType.Father, "Sit");
+        PlayCharacterAnimation(CharacterType.Father, "Sitting_Talking");
         PlayCharacterAnimation(CharacterType.Mother, "Idle");
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.gameObject.SetActive(true);
@@ -30,6 +30,9 @@ public class NarratorDay2 : NarratorBase
         yield return new WaitUntil(() => seq0Complete);
         yield return new WaitForSeconds(0.5f);
         FadeOpenEyes();
+        yield return new WaitForSeconds(2f);
+        PlayCharacterAnimation(CharacterType.Mother, "Angry");
+        yield return new WaitForSeconds(1f);
         bool seq1Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq1PagiPertama", 
             () => { seq1Complete = true; });
@@ -55,6 +58,10 @@ public class NarratorDay2 : NarratorBase
 
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 1));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
+        PlayCharacterAnimation(CharacterType.Father, "Right Turn");
+        PlayCharacterAnimation(CharacterType.Mother, "Left Turn");
+        PlayCharacterAnimation(CharacterType.Father, "Idle");
+        PlayCharacterAnimation(CharacterType.Mother, "Idle");
         
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq2KeberangkatanAyah", 
