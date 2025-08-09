@@ -24,6 +24,10 @@ public class NarratorDay2 : NarratorBase
         yield return new WaitForSeconds(5f);
         uiElements.narratorText.gameObject.SetActive(false);
 
+        // Enable head tracking for dialog interaction
+        Debug.Log("[NarratorDay2] Enabling head tracking for Mother and Father");
+        EnableHeadTracking(CharacterType.Mother, true);
+        EnableHeadTracking(CharacterType.Father, true);
         bool seq0Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq0PagiPertama", 
             () => { seq0Complete = true; });

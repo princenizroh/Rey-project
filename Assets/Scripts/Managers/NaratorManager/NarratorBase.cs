@@ -835,4 +835,58 @@ public abstract class NarratorBase : MonoBehaviour
         }
     }
 #endregion
+
+#region Head Tracking Management
+    /// <summary>
+    /// Enable/disable head tracking for specific character
+    /// </summary>
+    protected void EnableHeadTracking(CharacterType characterType, bool enable)
+    {
+        var headTrackerManager = FindFirstObjectByType(System.Type.GetType("HeadTrackerManager"));
+        if (headTrackerManager != null)
+        {
+            var method = headTrackerManager.GetType().GetMethod("EnableHeadTracking");
+            if (method != null)
+            {
+                method.Invoke(headTrackerManager, new object[] { characterType, enable });
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[NarratorBase] HeadTrackerManager not found in scene!");
+        }
+    }
+    
+    /// <summary>
+    /// Enable/disable head tracking for all characters
+    /// </summary>
+    protected void EnableAllHeadTracking(bool enable)
+    {
+        var headTrackerManager = FindFirstObjectByType(System.Type.GetType("HeadTrackerManager"));
+        if (headTrackerManager != null)
+        {
+            var method = headTrackerManager.GetType().GetMethod("EnableAllHeadTracking");
+            if (method != null)
+            {
+                method.Invoke(headTrackerManager, new object[] { enable });
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Reset character head to original position
+    /// </summary>
+    protected void ResetHeadToOriginal(CharacterType characterType)
+    {
+        var headTrackerManager = FindFirstObjectByType(System.Type.GetType("HeadTrackerManager"));
+        if (headTrackerManager != null)
+        {
+            var method = headTrackerManager.GetType().GetMethod("ResetHeadToOriginal");
+            if (method != null)
+            {
+                method.Invoke(headTrackerManager, new object[] { characterType });
+            }
+        }
+    }
+#endregion
 }

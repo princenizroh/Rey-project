@@ -20,6 +20,9 @@ public class NarratorDay1 : NarratorBase
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");
         
+        EnableHeadTracking(CharacterType.Mother, true);
+        EnableHeadTracking(CharacterType.Father, true);
+        
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 1\nKelahiran";
         yield return new WaitForSeconds(5f); 
@@ -80,6 +83,7 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitUntil(() => seq6Complete);
 
         yield return new WaitForSeconds(1f);
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
         FadeCloseEyes();
 
@@ -90,6 +94,9 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitUntil(() => seq7Complete);
         SetCharacterSpawn(CharacterType.Object, 1);
 
+        // Disable head tracking before transitioning to next day
+        EnableAllHeadTracking(false);
+        
         yield return new WaitForSeconds(2f);
         GoToNextDay();
     }
