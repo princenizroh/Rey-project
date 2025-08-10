@@ -178,6 +178,7 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Father, 3);
         FadeOpenEyes();
 
+        StartCoroutine(ResetHeadTracking());
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 3));
         StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
         
@@ -222,6 +223,11 @@ public class NarratorDay2 : NarratorBase
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
 
+        bool seq11Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
+            () => { seq11Complete = true; });
+        yield return new WaitUntil(() => seq11Complete);
+
         // Enable raycast interaction system for player choice
         this.EnableRaycastInteraction();
 
@@ -256,21 +262,27 @@ public class NarratorDay2 : NarratorBase
             }
         }
 
+        SetCharacterSpawn(CharacterType.Object, 0);
+
         // Disable raycast interaction system after player made correct choice
         this.DisableRaycastInteraction();
 
         yield return new WaitForSeconds(1f);
         
+        EnableNavMeshAgent(CharacterType.Father);
+        EnableNavMeshAgent(CharacterType.Mother);
+
+        yield return new WaitForSeconds(1f);
         
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 4));
+        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Object, 0, 1f));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby, 0.2f));
         bool seq12Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12BuatinSusu", 
             () => { seq12Complete = true; });
         yield return new WaitUntil(() => seq12Complete);
         
         yield return new WaitForSeconds(1f);
-        
-        
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 4));
         
         
         bool seq13Complete = false;

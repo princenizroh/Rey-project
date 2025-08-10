@@ -126,7 +126,7 @@ public abstract class NarratorBase : MonoBehaviour
         InitializeCharacterSystem();
         InitializeSaveFileManager();
         InitializeHeadTrackingManager();
-        InitializeRaycastCamera();
+            InitializeRaycastCamera();
     }
 
     protected virtual void Start()
