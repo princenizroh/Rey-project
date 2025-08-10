@@ -4,5 +4,6 @@ using UnityEngine;
 public class CoreGameSaves : ScriptableObject
 {
     public int day;
+    public TimeOfDay timeOfDay;
     public int mother_stress_level;
 }

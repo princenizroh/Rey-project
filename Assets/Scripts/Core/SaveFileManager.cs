@@ -23,19 +23,31 @@ public class SaveFileManager : MonoBehaviour
     {
         public int day;
         public int mother_stress_level;
+        public TimeOfDay timeOfDay;
         
         // Constructor for easy initialization
         public SaveData()
         {
-            day = 1;
+            day = 0;
             mother_stress_level = 0;
+            timeOfDay = TimeOfDay.Morning; // Default to Morning
         }
         
-        public SaveData(int day, int motherStress)
+        public SaveData(int day, int motherStress, TimeOfDay timeOfDay)
         {
             this.day = day;
             this.mother_stress_level = motherStress;
+            this.timeOfDay = timeOfDay;
         }
+    }
+
+    // Temporary class for parsing JSON with string enums
+    [System.Serializable]
+    public class TempSaveData
+    {
+        public int day;
+        public int mother_stress_level;
+        public string timeOfDay;
     }
     
     /// <summary>
@@ -114,7 +126,7 @@ public class SaveFileManager : MonoBehaviour
 
             // Parse JSON data
             string jsonContent = jsonFile.text;
-            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            SaveData saveData = ParseSaveDataFromJSON(jsonContent);
             
             if (saveData == null)
             {
@@ -129,6 +141,7 @@ public class SaveFileManager : MonoBehaviour
             LogDebug($"✓ Save restored successfully from {resourcePath}.json");
             LogDebug($"  - Day: {saveData.day}");
             LogDebug($"  - Mother Stress Level: {saveData.mother_stress_level}");
+            LogDebug($"  - Time of Day: {saveData.timeOfDay}");
         }
         catch (System.Exception e)
         {
@@ -150,13 +163,78 @@ public class SaveFileManager : MonoBehaviour
         
         targetSaveObject.day = saveData.day;
         targetSaveObject.mother_stress_level = saveData.mother_stress_level;
+        targetSaveObject.timeOfDay = saveData.timeOfDay;
         
         // Mark as dirty for Unity to save changes in editor
         #if UNITY_EDITOR
         UnityEditor.EditorUtility.SetDirty(targetSaveObject);
         #endif
         
-        LogDebug("ScriptableObject updated with save data");
+        LogDebug($"ScriptableObject updated with save data - Day: {saveData.day}, Stress: {saveData.mother_stress_level}, TimeOfDay: {saveData.timeOfDay}");
+    }
+
+    /// <summary>
+    /// Parse JSON with custom handling for TimeOfDay enum (supports both string and integer values)
+    /// </summary>
+    private SaveData ParseSaveDataFromJSON(string jsonContent)
+    {
+        try
+        {
+            // First try standard Unity JsonUtility
+            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            
+            if (saveData != null)
+            {
+                LogDebug("Successfully parsed JSON with standard JsonUtility");
+                return saveData;
+            }
+        }
+        catch (System.Exception e)
+        {
+            LogDebug($"Standard JsonUtility failed: {e.Message}, trying custom parsing...");
+        }
+
+        // If standard parsing fails, try custom parsing for enum strings
+        try
+        {
+            return ParseSaveDataWithCustomEnum(jsonContent);
+        }
+        catch (System.Exception e)
+        {
+            LogError($"Custom enum parsing also failed: {e.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Custom parser that handles TimeOfDay as string values
+    /// </summary>
+    private SaveData ParseSaveDataWithCustomEnum(string jsonContent)
+    {
+        TempSaveData tempData = JsonUtility.FromJson<TempSaveData>(jsonContent);
+        
+        if (tempData == null)
+        {
+            throw new System.Exception("Failed to parse JSON even with custom parser");
+        }
+
+        SaveData saveData = new SaveData();
+        saveData.day = tempData.day;
+        saveData.mother_stress_level = tempData.mother_stress_level;
+
+        // Convert string timeOfDay to enum
+        if (System.Enum.TryParse<TimeOfDay>(tempData.timeOfDay, true, out TimeOfDay parsedTimeOfDay))
+        {
+            saveData.timeOfDay = parsedTimeOfDay;
+            LogDebug($"Successfully converted TimeOfDay string '{tempData.timeOfDay}' to enum: {parsedTimeOfDay}");
+        }
+        else
+        {
+            LogError($"Failed to parse TimeOfDay string: '{tempData.timeOfDay}', defaulting to Morning");
+            saveData.timeOfDay = TimeOfDay.Morning;
+        }
+
+        return saveData;
     }
     
     /// <summary>
@@ -230,7 +308,7 @@ public class SaveFileManager : MonoBehaviour
         try
         {
             string jsonContent = File.ReadAllText(saveFilePath);
-            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            SaveData saveData = ParseSaveDataFromJSON(jsonContent);
             
             if (saveData == null)
             {
@@ -243,6 +321,7 @@ public class SaveFileManager : MonoBehaviour
             LogDebug($"✓ Save loaded from local My Games folder: {saveFilePath}");
             LogDebug($"  - Day: {saveData.day}");
             LogDebug($"  - Mother Stress Level: {saveData.mother_stress_level}");
+            LogDebug($"  - Time of Day: {saveData.timeOfDay}");
         }
         catch (System.Exception e)
         {
@@ -265,7 +344,7 @@ public class SaveFileManager : MonoBehaviour
         try
         {
             // Create save data from current ScriptableObject
-            SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level);
+            SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level, targetSaveObject.timeOfDay);
             
             // Convert to JSON with pretty formatting
             string jsonContent = JsonUtility.ToJson(currentData, true);
@@ -310,13 +389,14 @@ public class SaveFileManager : MonoBehaviour
         try
         {
             string jsonContent = File.ReadAllText(saveFilePath);
-            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            SaveData saveData = ParseSaveDataFromJSON(jsonContent);
             
             LogDebug($"✓ Save data retrieved from: {saveFilePath}");
             if (saveData != null)
             {
                 LogDebug($"  - Day: {saveData.day}");
                 LogDebug($"  - Mother Stress Level: {saveData.mother_stress_level}");
+                LogDebug($"  - Time of Day: {saveData.timeOfDay}");
             }
             
             return saveData;
@@ -362,12 +442,13 @@ public class SaveFileManager : MonoBehaviour
                 LogDebug($"Content preview:\n{jsonContent}");
                 
                 // Validate JSON structure
-                SaveData testData = JsonUtility.FromJson<SaveData>(jsonContent);
+                SaveData testData = ParseSaveDataFromJSON(jsonContent);
                 if (testData != null)
                 {
                     LogDebug($"✓ JSON structure is valid:");
                     LogDebug($"  - Day: {testData.day}");
                     LogDebug($"  - Mother Stress Level: {testData.mother_stress_level}");
+                    LogDebug($"  - Time of Day: {testData.timeOfDay}");
                 }
                 else
                 {
@@ -437,7 +518,7 @@ public class SaveFileManager : MonoBehaviour
         try
         {
             // Create save data from current ScriptableObject
-            SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level);
+            SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level, targetSaveObject.timeOfDay);
             
             // Convert to JSON
             string jsonContent = JsonUtility.ToJson(currentData, true);
@@ -456,6 +537,7 @@ public class SaveFileManager : MonoBehaviour
             LogDebug($"✓ Current data saved to: {filePath}");
             LogDebug($"  - Day: {currentData.day}");
             LogDebug($"  - Mother Stress Level: {currentData.mother_stress_level}");
+            LogDebug($"  - Time of Day: {currentData.timeOfDay}");
         }
         catch (System.Exception e)
         {
@@ -479,7 +561,7 @@ public class SaveFileManager : MonoBehaviour
         try
         {
             // Create save data from current ScriptableObject
-            SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level);
+            SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level, targetSaveObject.timeOfDay);
             
             // Convert to JSON with pretty formatting
             string jsonContent = JsonUtility.ToJson(currentData, true);
@@ -560,7 +642,7 @@ public class SaveFileManager : MonoBehaviour
             {
                 // Parse JSON data from Resources
                 string jsonContent = jsonFile.text;
-                SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+                SaveData saveData = ParseSaveDataFromJSON(jsonContent);
                 
                 if (saveData != null)
                 {
@@ -568,6 +650,7 @@ public class SaveFileManager : MonoBehaviour
                     LogDebug($"✓ CoreGameSaves loaded from Resources/{resourcePath}.json");
                     LogDebug($"  - Day: {saveData.day}");
                     LogDebug($"  - Mother Stress Level: {saveData.mother_stress_level}");
+                    LogDebug($"  - Time of Day: {saveData.timeOfDay}");
                     return;
                 }
             }
@@ -601,7 +684,7 @@ public class SaveFileManager : MonoBehaviour
             }
             
             string jsonContent = File.ReadAllText(filePath);
-            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            SaveData saveData = ParseSaveDataFromJSON(jsonContent);
             
             if (saveData == null)
             {
@@ -614,6 +697,7 @@ public class SaveFileManager : MonoBehaviour
             LogDebug($"✓ CoreGameSaves loaded from persistent path: {filePath}");
             LogDebug($"  - Day: {saveData.day}");
             LogDebug($"  - Mother Stress Level: {saveData.mother_stress_level}");
+            LogDebug($"  - Time of Day: {saveData.timeOfDay}");
             
         }
         catch (System.Exception e)
@@ -647,7 +731,7 @@ public class SaveFileManager : MonoBehaviour
             }
             
             string jsonContent = File.ReadAllText(filePath);
-            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            SaveData saveData = ParseSaveDataFromJSON(jsonContent);
             
             if (saveData == null)
             {
@@ -660,6 +744,7 @@ public class SaveFileManager : MonoBehaviour
             LogDebug($"✓ Save loaded from persistent path: {filePath}");
             LogDebug($"  - Day: {saveData.day}");
             LogDebug($"  - Mother Stress Level: {saveData.mother_stress_level}");
+            LogDebug($"  - Time of Day: {saveData.timeOfDay}");
         }
         catch (System.Exception e)
         {
@@ -684,6 +769,50 @@ public class SaveFileManager : MonoBehaviour
         
         LogDebug("ScriptableObject reset to default values");
     }
+
+    /// <summary>
+    /// Convert string-based TimeOfDay JSON to integer-based format for Unity compatibility
+    /// </summary>
+    [ContextMenu("Convert String TimeOfDay JSON to Integer Format")]
+    public void ConvertTimeOfDayJSONFormat()
+    {
+        string saveFilePath = GetLocalSaveFilePath();
+        
+        if (!File.Exists(saveFilePath))
+        {
+            LogError($"Save file not found at: {saveFilePath}");
+            return;
+        }
+        
+        try
+        {
+            string jsonContent = File.ReadAllText(saveFilePath);
+            LogDebug($"Original JSON:\n{jsonContent}");
+            
+            // Parse with custom parser that handles string enums
+            SaveData saveData = ParseSaveDataFromJSON(jsonContent);
+            
+            if (saveData != null)
+            {
+                // Convert back to JSON with integer enum values
+                string convertedJson = JsonUtility.ToJson(saveData, true);
+                
+                // Save the converted version
+                File.WriteAllText(saveFilePath, convertedJson);
+                
+                LogDebug($"✓ JSON converted and saved with integer TimeOfDay format:");
+                LogDebug($"Converted JSON:\n{convertedJson}");
+            }
+            else
+            {
+                LogError("Failed to parse the JSON file for conversion");
+            }
+        }
+        catch (System.Exception e)
+        {
+            LogError($"Error converting JSON format: {e.Message}");
+        }
+    }
     
     /// <summary>
     /// Get current save data as JSON string (for debugging)
@@ -696,7 +825,7 @@ public class SaveFileManager : MonoBehaviour
             return "{}";
         }
         
-        SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level);
+        SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level, targetSaveObject.timeOfDay);
         return JsonUtility.ToJson(currentData, true);
     }
     
@@ -738,12 +867,13 @@ public class SaveFileManager : MonoBehaviour
             // Also validate the JSON structure
             try
             {
-                SaveData testData = JsonUtility.FromJson<SaveData>(jsonFile.text);
+                SaveData testData = ParseSaveDataFromJSON(jsonFile.text);
                 if (testData != null)
                 {
                     LogDebug($"✓ JSON structure is valid:");
                     LogDebug($"  - Day: {testData.day}");
                     LogDebug($"  - Mother Stress Level: {testData.mother_stress_level}");
+                    LogDebug($"  - Time of Day: {testData.timeOfDay}");
                 }
                 else
                 {
@@ -909,6 +1039,81 @@ public class SaveFileManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Test JSON serialization format for TimeOfDay enum
+    /// </summary>
+    [ContextMenu("Test JSON Enum Format")]
+    public void TestJSONEnumFormat()
+    {
+        LogDebug("=== Testing JSON Enum Format ===");
+        
+        // Test all TimeOfDay values
+        TimeOfDay[] allTimes = { TimeOfDay.Morning, TimeOfDay.Afternoon, TimeOfDay.Evening, TimeOfDay.Night };
+        
+        for (int i = 0; i < allTimes.Length; i++)
+        {
+            SaveData testData = new SaveData();
+            testData.day = 1;
+            testData.mother_stress_level = 100;
+            testData.timeOfDay = allTimes[i];
+            
+            string json = JsonUtility.ToJson(testData, true);
+            LogDebug($"TimeOfDay.{allTimes[i]} (should be {i}) serializes as:");
+            LogDebug(json);
+            LogDebug("");
+        }
+        
+        LogDebug("=== JSON Enum Format Test Complete ===");
+    }
+
+    /// <summary>
+    /// Force save with integer enum format (ensures no string conversion)
+    /// </summary>
+    [ContextMenu("Force Save with Integer Enum Format")]
+    public void ForceSaveWithIntegerEnumFormat()
+    {
+        if (targetSaveObject == null)
+        {
+            LogError("Target CoreGameSaves ScriptableObject is not assigned!");
+            return;
+        }
+        
+        try
+        {
+            // Create save data with explicit enum values
+            SaveData currentData = new SaveData();
+            currentData.day = targetSaveObject.day;
+            currentData.mother_stress_level = targetSaveObject.mother_stress_level;
+            currentData.timeOfDay = targetSaveObject.timeOfDay;
+            
+            // Use Unity's JsonUtility which should serialize enums as integers
+            string jsonContent = JsonUtility.ToJson(currentData, true);
+            
+            // Get the local My Games save path
+            string saveFilePath = GetLocalSaveFilePath();
+            string saveDirectoryPath = GetLocalMyGamesSavePath();
+            
+            // Create directory if it doesn't exist
+            if (!Directory.Exists(saveDirectoryPath))
+            {
+                Directory.CreateDirectory(saveDirectoryPath);
+                LogDebug($"Created directory: {saveDirectoryPath}");
+            }
+            
+            // Write the JSON file
+            File.WriteAllText(saveFilePath, jsonContent);
+            
+            LogDebug($"✓ Save data written with INTEGER enum format to: {saveFilePath}");
+            LogDebug($"TimeOfDay enum value: {currentData.timeOfDay} = {(int)currentData.timeOfDay}");
+            LogDebug($"JSON Content:\n{jsonContent}");
+            
+        }
+        catch (System.Exception e)
+        {
+            LogError($"Error saving with integer enum format: {e.Message}");
+        }
+    }
+
     #region Logging Helpers
     
     private void LogDebug(string message)
@@ -947,7 +1152,7 @@ public class SaveFileManager : MonoBehaviour
             // A save is considered valid if day > 1 OR mother_stress_level > 0
             bool isValidSave = saveData.day > 1 || saveData.mother_stress_level > 0;
             
-            LogDebug($"Local save file validation - Day: {saveData.day}, Stress: {saveData.mother_stress_level}, Valid: {isValidSave}");
+            LogDebug($"Local save file validation - Day: {saveData.day}, Stress: {saveData.mother_stress_level}, TimeOfDay: {saveData.timeOfDay}, Valid: {isValidSave}");
             
             return isValidSave;
         }

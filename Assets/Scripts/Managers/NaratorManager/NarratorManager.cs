@@ -6,6 +6,7 @@ public class NarratorManager : MonoBehaviour
     public static NarratorManager Instance;
     public NarratorDay currentDay;
     public TimeOfDay currentTime;
+    public CoreGameSaves coreGameSaves;
 
     [Header("Narrators")]
     [SerializeField] private NarratorBase[] dayNarrators;
@@ -49,6 +50,11 @@ public class NarratorManager : MonoBehaviour
     [System.Obsolete]
     public void Start()
     {
+        currentDay = (NarratorDay)coreGameSaves.day;
+        currentTime = (TimeOfDay)coreGameSaves.timeOfDay;
+
+        Debug.Log("its time for" + currentTime);
+
         StartNarration(currentDay, currentTime);
     }
 

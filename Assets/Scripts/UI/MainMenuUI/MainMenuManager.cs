@@ -110,12 +110,105 @@ public class MainMenuManager : MonoBehaviour
     {
         public int day;
         public int mother_stress_level;
+        public TimeOfDay timeOfDay; // Add timeOfDay support
         
         public SaveData()
         {
             day = 0;
             mother_stress_level = 0;
+            timeOfDay = TimeOfDay.Morning; // Default to Morning
         }
+    }
+
+    /// <summary>
+    /// Temporary data structure for custom JSON parsing (handles string enums)
+    /// </summary>
+    [System.Serializable]
+    private class TempSaveData
+    {
+        public int day = 0;
+        public int mother_stress_level = 0;
+        public string timeOfDay = "Morning"; // Parse as string first
+    }
+
+    /// <summary>
+    /// Parse save data from JSON with support for both integer and string enum values
+    /// </summary>
+    private SaveData ParseSaveDataFromJSON(string jsonContent)
+    {
+        if (string.IsNullOrEmpty(jsonContent))
+        {
+            LogDebug("JSON content is null or empty");
+            return null;
+        }
+
+        // Check if the JSON contains string enum values (contains quotes around timeOfDay value)
+        bool hasStringEnum = jsonContent.Contains("\"timeOfDay\": \"");
+        
+        if (hasStringEnum)
+        {
+            LogDebug("Detected string enum format, using custom parser...");
+            return ParseSaveDataWithCustomEnum(jsonContent);
+        }
+
+        try
+        {
+            // Try standard Unity JsonUtility parsing for integer enums
+            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            if (saveData != null)
+            {
+                LogDebug("Successfully parsed with standard JsonUtility");
+                return saveData;
+            }
+        }
+        catch (System.Exception e)
+        {
+            LogDebug($"Standard JsonUtility parsing failed: {e.Message}, trying custom parser...");
+        }
+
+        // Fallback to custom parsing for string enum values
+        return ParseSaveDataWithCustomEnum(jsonContent);
+    }
+
+    /// <summary>
+    /// Parse save data with custom enum handling (supports string enum values)
+    /// </summary>
+    private SaveData ParseSaveDataWithCustomEnum(string jsonContent)
+    {
+        try
+        {
+            // Parse using TempSaveData which treats timeOfDay as string
+            TempSaveData tempData = JsonUtility.FromJson<TempSaveData>(jsonContent);
+            
+            if (tempData != null)
+            {
+                SaveData finalData = new SaveData();
+                finalData.day = tempData.day;
+                finalData.mother_stress_level = tempData.mother_stress_level;
+                
+                // Convert string timeOfDay to enum
+                if (System.Enum.TryParse<TimeOfDay>(tempData.timeOfDay, true, out TimeOfDay parsedTimeOfDay))
+                {
+                    finalData.timeOfDay = parsedTimeOfDay;
+                    LogDebug($"Successfully parsed timeOfDay string '{tempData.timeOfDay}' to enum {parsedTimeOfDay}");
+                }
+                else
+                {
+                    finalData.timeOfDay = TimeOfDay.Morning; // Default fallback
+                    LogDebug($"Failed to parse timeOfDay '{tempData.timeOfDay}', using default: {finalData.timeOfDay}");
+                }
+                
+                LogDebug("Successfully parsed with custom enum parser");
+                return finalData;
+            }
+        }
+        catch (System.Exception e)
+        {
+            LogDebug($"Custom enum parsing also failed: {e.Message}");
+        }
+        
+        LogDebug("All parsing attempts failed, returning null");
+        return null;
     }
 
     void Start()
@@ -134,6 +227,9 @@ public class MainMenuManager : MonoBehaviour
         
         // Initialize keyboard navigation
         InitializeKeyboardNavigation();
+        
+        // Debug: Check ScriptableObject assignment and current values
+        DebugScriptableObjectState();
     }
 
     void Update()
@@ -1551,11 +1647,11 @@ public class MainMenuManager : MonoBehaviour
                 
                 // Read and parse the JSON file
                 string jsonContent = File.ReadAllText(saveFilePath);
-                SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+                SaveData saveData = ParseSaveDataFromJSON(jsonContent);
                 
                 if (saveData != null)
                 {
-                    LogDebug($"Save data loaded - Day: {saveData.day}, Mother Stress: {saveData.mother_stress_level}");
+                    LogDebug($"Save data loaded - Day: {saveData.day}, Mother Stress: {saveData.mother_stress_level}, Time of Day: {saveData.timeOfDay}");
                     
                     // Check if save data has meaningful progress (day > 0 or mother_stress_level > 0)
                     if (saveData.day > 0 || saveData.mother_stress_level > 0)
@@ -1660,6 +1756,7 @@ public class MainMenuManager : MonoBehaviour
             SaveData testSave = new SaveData();
             testSave.day = 3;
             testSave.mother_stress_level = 5;
+            testSave.timeOfDay = TimeOfDay.Night;
             
             string jsonContent = JsonUtility.ToJson(testSave, true);
             File.WriteAllText(saveFilePath, jsonContent);
@@ -1756,14 +1853,14 @@ public class MainMenuManager : MonoBehaviour
             try
             {
                 string jsonContent = File.ReadAllText(saveFilePath);
-                SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+                SaveData saveData = ParseSaveDataFromJSON(jsonContent);
                 
                 LogDebug("✓ Save file exists and is readable");
                 LogDebug($"Content: {jsonContent}");
                 
                 if (saveData != null)
                 {
-                    LogDebug($"Parsed data - Day: {saveData.day}, Mother Stress: {saveData.mother_stress_level}");
+                    LogDebug($"Parsed data - Day: {saveData.day}, Mother Stress: {saveData.mother_stress_level}, Time of Day: {saveData.timeOfDay}");
                     
                     if (saveData.day > 0 || saveData.mother_stress_level > 0)
                     {
@@ -1789,6 +1886,149 @@ public class MainMenuManager : MonoBehaviour
             LogDebug("✗ Save file does not exist");
             LogDebug("→ Would show 'Start Game' button");
         }
+    }
+
+    /// <summary>
+    /// Test JSON parsing with different enum formats
+    /// </summary>
+    [ContextMenu("Test JSON Parsing")]
+    public void TestJSONParsing()
+    {
+        LogDebug("=== Testing JSON Parsing ===");
+        
+        // Test 1: String enum format (your case)
+        string stringEnumJSON = "{\n    \"day\": 4,\n    \"timeOfDay\": \"Night\",\n    \"mother_stress_level\": 250\n}";
+        LogDebug($"Testing string enum JSON:\n{stringEnumJSON}");
+        
+        SaveData stringResult = ParseSaveDataFromJSON(stringEnumJSON);
+        if (stringResult != null)
+        {
+            LogDebug($"✓ String parsing result - Day: {stringResult.day}, Stress: {stringResult.mother_stress_level}, Time: {stringResult.timeOfDay}");
+        }
+        else
+        {
+            LogDebug("✗ String parsing failed");
+        }
+        
+        // Test 2: Integer enum format
+        string intEnumJSON = "{\n    \"day\": 4,\n    \"timeOfDay\": 2,\n    \"mother_stress_level\": 250\n}";
+        LogDebug($"\nTesting integer enum JSON:\n{intEnumJSON}");
+        
+        SaveData intResult = ParseSaveDataFromJSON(intEnumJSON);
+        if (intResult != null)
+        {
+            LogDebug($"✓ Integer parsing result - Day: {intResult.day}, Stress: {intResult.mother_stress_level}, Time: {intResult.timeOfDay}");
+        }
+        else
+        {
+            LogDebug("✗ Integer parsing failed");
+        }
+        
+        LogDebug("=== JSON Parsing Test Complete ===");
+    }
+
+    /// <summary>
+    /// Manually load save data into ScriptableObject for testing
+    /// </summary>
+    [ContextMenu("Load Save Data into ScriptableObject")]
+    public void LoadSaveDataIntoScriptableObject()
+    {
+        LogDebug("=== Loading Save Data into ScriptableObject ===");
+        
+        if (targetScriptableObject == null)
+        {
+            LogDebug("✗ Target ScriptableObject is not assigned!");
+            return;
+        }
+        
+        string saveFilePath = GetSaveFilePath();
+        
+        if (!File.Exists(saveFilePath))
+        {
+            LogDebug($"✗ No save file found at: {saveFilePath}");
+            return;
+        }
+        
+        try
+        {
+            string jsonContent = File.ReadAllText(saveFilePath);
+            SaveData saveData = ParseSaveDataFromJSON(jsonContent);
+            
+            if (saveData != null)
+            {
+                LogDebug($"Before loading - ScriptableObject: Day={targetScriptableObject.day}, Stress={targetScriptableObject.mother_stress_level}, Time={targetScriptableObject.timeOfDay}");
+                
+                // Load save data into ScriptableObject
+                targetScriptableObject.day = saveData.day;
+                targetScriptableObject.mother_stress_level = saveData.mother_stress_level;
+                targetScriptableObject.timeOfDay = saveData.timeOfDay;
+                
+                LogDebug($"After loading - ScriptableObject: Day={targetScriptableObject.day}, Stress={targetScriptableObject.mother_stress_level}, Time={targetScriptableObject.timeOfDay}");
+                
+                // Mark as dirty for Unity to save changes in editor
+                #if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(targetScriptableObject);
+                #endif
+                
+                LogDebug("✓ Save data loaded into ScriptableObject successfully!");
+            }
+            else
+            {
+                LogDebug("✗ Failed to parse save data");
+            }
+        }
+        catch (System.Exception e)
+        {
+            LogDebug($"✗ Error loading save data: {e.Message}");
+        }
+        
+        LogDebug("=== Load Save Data Complete ===");
+    }
+
+    /// <summary>
+    /// Debug ScriptableObject state and assignment
+    /// </summary>
+    private void DebugScriptableObjectState()
+    {
+        LogDebug("=== ScriptableObject Debug Info ===");
+        
+        if (targetScriptableObject == null)
+        {
+            LogDebug("✗ ERROR: targetScriptableObject is NOT assigned in Inspector!");
+            LogDebug("→ Please assign the CoreGameSaves ScriptableObject in the MainMenuManager Inspector");
+            return;
+        }
+        
+        LogDebug($"✓ targetScriptableObject is assigned: {targetScriptableObject.name}");
+        LogDebug($"Current ScriptableObject values:");
+        LogDebug($"  - Day: {targetScriptableObject.day}");
+        LogDebug($"  - Mother Stress: {targetScriptableObject.mother_stress_level}");
+        LogDebug($"  - Time of Day: {targetScriptableObject.timeOfDay}");
+        
+        // Check if save file exists and could be loaded
+        string saveFilePath = GetSaveFilePath();
+        if (File.Exists(saveFilePath))
+        {
+            LogDebug($"✓ Save file exists at: {saveFilePath}");
+            LogDebug("→ You can use the context menu 'Load Save Data into ScriptableObject' to load it");
+            LogDebug("→ Or click the Continue button in-game to load it automatically");
+        }
+        else
+        {
+            LogDebug($"✗ No save file found at: {saveFilePath}");
+        }
+        
+        LogDebug("=== ScriptableObject Debug Complete ===");
+    }
+
+    /// <summary>
+    /// Automatically load save data on start (for testing)
+    /// </summary>
+    [ContextMenu("Auto Load Save Data on Start")]
+    public void AutoLoadSaveDataOnStart()
+    {
+        LogDebug("=== Auto Loading Save Data ===");
+        LoadSaveDataIntoScriptableObject();
     }
 
     /// <summary>
@@ -2119,7 +2359,7 @@ public class MainMenuManager : MonoBehaviour
             try
             {
                 string jsonContent = File.ReadAllText(saveFilePath);
-                SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+                SaveData saveData = ParseSaveDataFromJSON(jsonContent);
                 
                 if (saveData != null && (saveData.day > 0 || saveData.mother_stress_level > 0))
                 {
@@ -2216,15 +2456,16 @@ public class MainMenuManager : MonoBehaviour
         try
         {
             string jsonContent = File.ReadAllText(saveFilePath);
-            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            SaveData saveData = ParseSaveDataFromJSON(jsonContent);
             
             if (saveData != null && targetScriptableObject != null)
             {
-                LogDebug($"Loading save data into ScriptableObject - Day: {saveData.day}, Stress: {saveData.mother_stress_level}");
+                LogDebug($"Loading save data into ScriptableObject - Day: {saveData.day}, Stress: {saveData.mother_stress_level}, Time of Day: {saveData.timeOfDay}");
                 
                 // Load save data into ScriptableObject
                 targetScriptableObject.day = saveData.day;
                 targetScriptableObject.mother_stress_level = saveData.mother_stress_level;
+                targetScriptableObject.timeOfDay = saveData.timeOfDay;
                 
                 // Mark as dirty for Unity to save changes in editor
                 #if UNITY_EDITOR
@@ -2299,7 +2540,8 @@ public class MainMenuManager : MonoBehaviour
         // Reset ScriptableObject data
         if (targetScriptableObject != null)
         {
-            targetScriptableObject.day = 1;
+            targetScriptableObject.day = 0;
+            targetScriptableObject.timeOfDay = TimeOfDay.Night; // Reset to morning
             targetScriptableObject.mother_stress_level = 0;
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(targetScriptableObject);
@@ -2307,12 +2549,12 @@ public class MainMenuManager : MonoBehaviour
         }
 
         // Load the next scene (replace "GameScene" with your actual scene name)
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Builder House 6");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Builder House");
     }
 
     public void StartGameContinue()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Builder House 6");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Builder House");
     }
 
     void OnDestroy()
