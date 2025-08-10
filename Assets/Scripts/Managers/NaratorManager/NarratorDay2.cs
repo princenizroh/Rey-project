@@ -217,6 +217,8 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 3);
         SetCharacterSpawn(CharacterType.Mother, 4);
         SetCharacterSpawn(CharacterType.Father, 4);
+        SetObjectsActive(gameObjects.inActiveObjects, false); 
+        // SetCharacterSpawn(CharacterType.Object, 0);
 
 
         yield return new WaitForSeconds(1f);
@@ -262,7 +264,8 @@ public class NarratorDay2 : NarratorBase
             }
         }
 
-        SetCharacterSpawn(CharacterType.Object, 0);
+        // SetCharacterSpawn(CharacterType.Object, 1);
+        SetObjectsActive(gameObjects.activeObjects, true);
 
         // Disable raycast interaction system after player made correct choice
         this.DisableRaycastInteraction();
@@ -276,13 +279,9 @@ public class NarratorDay2 : NarratorBase
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 4));
         yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Object, 0, 1f));
-        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby, 0.2f));
-        bool seq12Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12BuatinSusu", 
-            () => { seq12Complete = true; });
-        yield return new WaitUntil(() => seq12Complete);
-        
-        yield return new WaitForSeconds(1f);
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby, 0.5f));
+        yield return new WaitForSeconds(2f);
+        SetObjectsActive(gameObjects.activeObjects, false);
         
         
         bool seq13Complete = false;
@@ -301,6 +300,7 @@ public class NarratorDay2 : NarratorBase
     [System.Obsolete]
     protected IEnumerator PlayMidnightSequence()
     {
+        StartCoroutine(ResetHeadTracking());
         CloseEyes();
         DisableNavMeshAgent(CharacterType.Mother);
         DisableNavMeshAgent(CharacterType.Father);
