@@ -109,9 +109,6 @@ public abstract class NarratorBase : MonoBehaviour
 
     protected HeadTrackingManager headTrackingManager;
 
-    [Header("Raycast Interaction")]
-    [SerializeField] protected RaycastObjectCam raycastCamera;
-
     [Header("Characters")]
     [SerializeField] protected CharacterData[] charactersDataArray;
 
@@ -188,24 +185,11 @@ public abstract class NarratorBase : MonoBehaviour
 
     private void InitializeRaycastCamera()
     {
-        if (raycastCamera == null)
-        {
-            raycastCamera = FindFirstObjectByType<RaycastObjectCam>();
-            if (raycastCamera == null)
-            {
-                Debug.LogWarning("[NarratorBase] RaycastObjectCam not found in scene!");
-            }
-            else
-            {
-                Debug.Log("[NarratorBase] RaycastObjectCam initialized successfully");
-            }
-        }
-
-        // Also initialize the legacy rayCastObject if needed
         if (rayCastObject == null)
         {
-            rayCastObject = raycastCamera;
+            rayCastObject = FindFirstObjectByType<RaycastObjectCam>();
         }
+
     }
     #endregion
     #region Sequence Detection
@@ -875,59 +859,133 @@ public abstract class NarratorBase : MonoBehaviour
         yield return null;
     }
 #endregion
-
-#region Raycast Interaction
+#region Raycast Interaction Management
     /// <summary>
-    /// Wait for raycast interaction with E key press
+    /// Wait for player to interact with any raycast object and execute appropriate dialog
     /// </summary>
-    /// <param name="onInteractionStart">Callback when E key is pressed during raycast</param>
-    /// <returns></returns>
-    protected IEnumerator WaitForRaycastInteraction(System.Action onInteractionStart = null)
+    [System.Obsolete]
+    protected IEnumerator WaitForRaycastInteraction(System.Action<string> onInteractionCallback = null)
     {
         bool interactionCompleted = false;
         bool wasStaring = false;
         
-        Debug.Log("[NarratorBase] Starting WaitForRaycastInteraction");
-        Debug.Log($"[NarratorBase] raycastCamera is: {(raycastCamera != null ? "initialized" : "NULL")}");
-        
-        if (raycastCamera == null)
-        {
-            Debug.LogError("[NarratorBase] raycastCamera is null! Make sure RaycastObjectCam exists in scene.");
-            yield break;
-        }
-        
         while (!interactionCompleted)
         {
-            if (raycastCamera != null && raycastCamera.raycastStatus)
+            if (rayCastObject != null && rayCastObject.raycastStatus)
             {
                 if (!wasStaring)
                 {
                     wasStaring = true;
-                    Debug.Log("[NarratorBase] Player is looking at interactable object");
-                    // TODO: Show interaction UI prompt here if needed
+                    Debug.Log("[NarratorBase] Player looking at interactive object");
                 }
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    Debug.Log("[NarratorBase] Interaction E key pressed");
-                    onInteractionStart?.Invoke();
+                    // Get the hit object's RaycastObjectBehaviour component
+                    if (rayCastObject.currentHitObject != null)
+                    {
+                        RaycastObjectBehaviour behaviour = rayCastObject.currentHitObject.GetComponent<RaycastObjectBehaviour>();
+                        if (behaviour != null)
+                        {
+                            string characterIdentity = behaviour.GetCharacterIdentity();
+                            string dialogPath = behaviour.GetInteractionDialogPath();
+                            
+                            Debug.Log($"[NarratorBase] Interacting with character: {characterIdentity}");
+                            
+                            // Execute callback with character identity
+                            onInteractionCallback?.Invoke(characterIdentity);
+                            
+                            // If dialog path is provided, play it automatically
+                            if (!string.IsNullOrEmpty(dialogPath))
+                            {
+                                bool dialogComplete = false;
+                                #pragma warning disable CS0618
+                                dialogGameManager.StartCoreGame(dialogPath, () => { dialogComplete = true; });
+                                #pragma warning restore CS0618
+                                yield return new WaitUntil(() => dialogComplete);
+                            }
+                            
+                            behaviour.OnInteraction();
+                        }
+                    }
+                    
                     interactionCompleted = true;
                 }
             }
             else
             {
-                if (wasStaring)
+                wasStaring = false;
+            }
+            
+            yield return null;
+        }
+    }
+    
+    /// <summary>
+    /// Wait for interaction with specific character identity
+    /// </summary>
+    [System.Obsolete]
+    protected IEnumerator WaitForSpecificCharacterInteraction(string targetIdentity, System.Action onInteractionCallback = null)
+    {
+        bool interactionCompleted = false;
+        
+        while (!interactionCompleted)
+        {
+            if (rayCastObject != null && rayCastObject.raycastStatus)
+            {
+                if (Input.GetKeyDown(KeyCode.E))
                 {
-                    wasStaring = false;
-                    Debug.Log("[NarratorBase] Player stopped looking at interactable object");
-                    // TODO: Hide interaction UI prompt here if needed
+                    if (rayCastObject.currentHitObject != null)
+                    {
+                        RaycastObjectBehaviour behaviour = rayCastObject.currentHitObject.GetComponent<RaycastObjectBehaviour>();
+                        if (behaviour != null && behaviour.GetCharacterIdentity() == targetIdentity)
+                        {
+                            Debug.Log($"[NarratorBase] Specific interaction with: {targetIdentity}");
+                            onInteractionCallback?.Invoke();
+                            interactionCompleted = true;
+                        }
+                        else
+                        {
+                            Debug.Log($"[NarratorBase] Wrong character! Looking for: {targetIdentity}, found: {behaviour?.GetCharacterIdentity()}");
+                        }
+                    }
                 }
             }
             
             yield return null;
         }
-        
-        Debug.Log("[NarratorBase] Raycast interaction completed");
+    }
+
+    /// <summary>
+    /// Enable raycast interaction system
+    /// </summary>
+    protected void EnableRaycastInteraction()
+    {
+        if (rayCastObject != null)
+        {
+            rayCastObject.enabled = true;
+            Debug.Log("[NarratorBase] Raycast interaction system enabled");
+        }
+        else
+        {
+            Debug.LogWarning("[NarratorBase] Cannot enable raycast interaction - rayCastObject is null");
+        }
+    }
+
+    /// <summary>
+    /// Disable raycast interaction system
+    /// </summary>
+    protected void DisableRaycastInteraction()
+    {
+        if (rayCastObject != null)
+        {
+            rayCastObject.enabled = false;
+            Debug.Log("[NarratorBase] Raycast interaction system disabled");
+        }
+        else
+        {
+            Debug.LogWarning("[NarratorBase] Cannot disable raycast interaction - rayCastObject is null");
+        }
     }
 #endregion
 }

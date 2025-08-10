@@ -218,6 +218,45 @@ public class NarratorDay3 : NarratorBase
         yield return new WaitUntil(() => seq11Complete);
 
         yield return new WaitForSeconds(1f);
+        
+        // Enable raycast interaction system for player choice
+        this.EnableRaycastInteraction();
+
+        // Wait for CORRECT parent interaction - loop until player interacts with Father (Mulyono)
+        bool correctInteraction = false;
+        while (!correctInteraction)
+        {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+                Debug.Log($"[Day3] Player interacted with: {characterIdentity}");
+                
+                if (characterIdentity == "Mulyono") // Father - CORRECT interaction
+                {
+                    Debug.Log("[Day3] CORRECT! Father interaction - continuing to next sequence");
+                    correctInteraction = true; // Exit the loop
+                }
+                else if (characterIdentity == "Linda") // Mother - WRONG interaction  
+                {
+                    Debug.Log("[Day3] WRONG! Mother interaction - player must interact with Father instead");
+                    // correctInteraction remains false - loop continues
+                }
+                else
+                {
+                    Debug.Log($"[Day3] Unknown character: {characterIdentity} - loop continues");
+                    // correctInteraction remains false - loop continues
+                }
+            }));
+            
+            // Small delay before allowing next interaction attempt
+            if (!correctInteraction)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+
+        // Disable raycast interaction system after player made correct choice
+        this.DisableRaycastInteraction();
+
+        yield return new WaitForSeconds(1f);
         EnableNavMeshAgent(CharacterType.Father);
         
         // Father looks ahead while moving
@@ -268,6 +307,44 @@ public class NarratorDay3 : NarratorBase
         yield return new WaitUntil(() => seq13Complete);
         yield return new WaitForSeconds(1f);
 
+        // Enable raycast interaction system for player choice
+        this.EnableRaycastInteraction();
+
+        // Wait for CORRECT parent interaction - loop until player interacts with Mother (Linda)
+        bool correctInteraction = false;
+        while (!correctInteraction)
+        {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+                Debug.Log($"[Day3] Player interacted with: {characterIdentity}");
+                
+                if (characterIdentity == "Linda") // Mother - CORRECT interaction for midnight
+                {
+                    Debug.Log("[Day3] CORRECT! Mother interaction - continuing to next sequence");
+                    correctInteraction = true; // Exit the loop
+                }
+                else if (characterIdentity == "Mulyono") // Father - WRONG interaction  
+                {
+                    Debug.Log("[Day3] WRONG! Father interaction - player must interact with Mother instead");
+                    // correctInteraction remains false - loop continues
+                }
+                else
+                {
+                    Debug.Log($"[Day3] Unknown character: {characterIdentity} - loop continues");
+                    // correctInteraction remains false - loop continues
+                }
+            }));
+            
+            // Small delay before allowing next interaction attempt
+            if (!correctInteraction)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+
+        // Disable raycast interaction system after player made correct choice
+        this.DisableRaycastInteraction();
+
+        yield return new WaitForSeconds(1f);
         SetCharacterSpawn(CharacterType.Mother, 6);
         yield return new WaitForSeconds(1f);
         

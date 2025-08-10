@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class RaycastObjectBehaviour : MonoBehaviour
 {
+    [Header("Character Identity")]
+    [SerializeField] private string characterIdentity = ""; // e.g., "Mulyono", "Linda"
+    [SerializeField] private string interactionDialogPath = ""; // e.g., "GameData/Dialog/Day2/Seq12AAyah"
+    
     [Header("Raycast Detection Settings")]
     [SerializeField] private string logMessage = "Raycast hit detected!";
     [SerializeField] private bool showRaycastInfo = true;
@@ -29,7 +33,7 @@ public class RaycastObjectBehaviour : MonoBehaviour
         if (GetComponent<Collider>() == null)
         {
             Debug.LogWarning($"GameObject '{gameObject.name}' doesn't have a Collider component. Adding BoxCollider for raycast detection.");
-            gameObject.AddComponent<BoxCollider>();
+            gameObject.AddComponent<CapsuleCollider>();
         }
         
         // Try to find RaycastUI prefab if not assigned
@@ -271,7 +275,32 @@ public class RaycastObjectBehaviour : MonoBehaviour
     /// </summary>
     public virtual void OnInteraction()
     {
-        Debug.Log($"Player interacted with {gameObject.name}");
+        Debug.Log($"Player interacted with {gameObject.name} (Identity: {characterIdentity})");
         // Override this method in derived classes for custom interaction behavior
+    }
+    
+    /// <summary>
+    /// Get the character identity for this raycast object
+    /// </summary>
+    public string GetCharacterIdentity()
+    {
+        return characterIdentity;
+    }
+    
+    /// <summary>
+    /// Get the dialog path for this character's interaction
+    /// </summary>
+    public string GetInteractionDialogPath()
+    {
+        return interactionDialogPath;
+    }
+    
+    /// <summary>
+    /// Set character identity and dialog path programmatically
+    /// </summary>
+    public void SetCharacterData(string identity, string dialogPath)
+    {
+        characterIdentity = identity;
+        interactionDialogPath = dialogPath;
     }
 }

@@ -71,10 +71,9 @@ public class NarratorDay4 : NarratorBase
     protected override IEnumerator PlayEveningSequence()
     {
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeRight());
+        yield return StartCoroutine(SetCameraPanRangeLeft());
         // AppearObjects();
         TimeManager.instance.TimeOfDay = 18.0f; 
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         yield return new WaitForSeconds(3f);
