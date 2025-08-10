@@ -8,6 +8,10 @@ public class NarratorDay2 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayMorningSequence()
     {
+
+        saveFileManager.UpdateCoreGameSaves(1,0);
+        saveFileManager.SaveToLocalMyGamesFolder();
+
         CloseEyes();
         DisableNavMeshAgent(CharacterType.Father);
         DisableNavMeshAgent(CharacterType.Mother);
@@ -109,6 +113,9 @@ public class NarratorDay2 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
+        saveFileManager.UpdateCoreGameSaves(1, 1);
+        saveFileManager.SaveToLocalMyGamesFolder();
+        
         CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 13.0f; 
@@ -145,6 +152,9 @@ public class NarratorDay2 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayEveningSequence()
     {
+        saveFileManager.UpdateCoreGameSaves(1, 2);
+        saveFileManager.SaveToLocalMyGamesFolder();
+        
         CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 18.0f;

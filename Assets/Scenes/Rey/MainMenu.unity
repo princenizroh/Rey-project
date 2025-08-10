@@ -5852,6 +5852,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cinemachineCamera: {fileID: 0}
+  rayCastObject: {fileID: 0}
   uiElements:
     narratorText: {fileID: 0}
     backgroundImage: {fileID: 0}
@@ -156438,6 +156439,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cinemachineCamera: {fileID: 0}
+  rayCastObject: {fileID: 0}
   uiElements:
     narratorText: {fileID: 0}
     backgroundImage: {fileID: 0}
@@ -229851,6 +229853,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentDay: 15
   currentTime: 3
+  coreGameSaves: {fileID: 11400000, guid: 0130c220d79fad340b5fe5f2a8b70996, type: 2}
   dayNarrators:
   - {fileID: 73878039}
 --- !u!4 &1385838389

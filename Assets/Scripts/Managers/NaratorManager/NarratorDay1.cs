@@ -20,7 +20,9 @@ public class NarratorDay1 : NarratorBase
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");
-        
+
+        saveFileManager.UpdateCoreGameSaves(0,3);
+        saveFileManager.SaveToLocalMyGamesFolder();
 
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 1\nKelahiran";

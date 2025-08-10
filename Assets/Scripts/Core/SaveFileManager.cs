@@ -1214,5 +1214,63 @@ public class SaveFileManager : MonoBehaviour
         LogDebug($"Target ScriptableObject changed to: {(newTarget ? newTarget.name : "null")}");
     }
     
+    /// <summary>
+    /// Update CoreGameSaves ScriptableObject data directly
+    /// </summary>
+    /// <param name="day">The day value to set (e.g., 1, 2, 3, etc.)</param>
+    /// <param name="timeOfDay">The time of day as integer (0=Morning, 1=Afternoon, 2=Evening, 3=Night)</param>
+    /// <param name="mother_stress_level">The mother stress level value</param>
+    public void UpdateCoreGameSaves(int day, int timeOfDay)
+    {
+        if (targetSaveObject == null)
+        {
+            LogError("Target CoreGameSaves ScriptableObject is not assigned!");
+            return;
+        }
+        
+        // Validate timeOfDay parameter (0-3 range)
+        if (timeOfDay < 0 || timeOfDay > 3)
+        {
+            LogError($"Invalid timeOfDay value: {timeOfDay}. Must be 0-3 (0=Morning, 1=Afternoon, 2=Evening, 3=Night)");
+            return;
+        }
+        
+        // Store previous values for logging
+        int prevDay = targetSaveObject.day;
+        TimeOfDay prevTimeOfDay = targetSaveObject.timeOfDay;
+        
+        // Update the ScriptableObject values
+        targetSaveObject.day = day;
+        targetSaveObject.timeOfDay = (TimeOfDay)timeOfDay; // Cast int to TimeOfDay enum
+        
+        // Mark as dirty for Unity Editor
+        #if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(targetSaveObject);
+        #endif
+        
+        LogDebug($"✓ CoreGameSaves updated successfully:");
+        LogDebug($"  Day: {prevDay} → {day}");
+        LogDebug($"  TimeOfDay: {prevTimeOfDay} ({(int)prevTimeOfDay}) → {(TimeOfDay)timeOfDay} ({timeOfDay})");
+    }
+    
+    /// <summary>
+    /// Update CoreGameSaves and automatically save to JSON file
+    /// </summary>
+    /// <param name="day">The day value to set</param>
+    /// <param name="timeOfDay">The time of day as integer (0=Morning, 1=Afternoon, 2=Evening, 3=Night)</param>
+    /// <param name="mother_stress_level">The mother stress level value</param>
+    public void UpdateAndSaveToJSON(int day, int timeOfDay, int mother_stress_level)
+    {
+        // First update the ScriptableObject
+        UpdateCoreGameSaves(day, timeOfDay);
+        
+        // Then save to JSON file
+        if (targetSaveObject != null)
+        {
+            SaveToLocalMyGamesFolder();
+            LogDebug("✓ Data updated and saved to JSON file");
+        }
+    }
+    
     #endregion
 }
