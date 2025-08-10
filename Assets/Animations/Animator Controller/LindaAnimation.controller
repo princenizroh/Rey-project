@@ -203,7 +203,7 @@ AnimatorStateMachine:
     m_Position: {x: 1180, y: -160, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -2122441642390407352}
-    m_Position: {x: 670, y: 720, z: 0}
+    m_Position: {x: 60, y: 810, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4032732181910926174}
     m_Position: {x: 670, y: 780, z: 0}
@@ -717,7 +717,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Sitting Talking
+  m_Name: Sitting_Talking
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []

@@ -6,6 +6,8 @@ public class NarratorDay4 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
+        DisableNavMeshAgent(CharacterType.Ghost);
+        // SetObjectsActive(gameObjects.activeObjects, true);
         CloseEyes();
         StartCoroutine(SwitchLights.Instance.SwitchToDark());
         yield return StartCoroutine(SetCameraPanRangeLeft());
@@ -28,9 +30,16 @@ public class NarratorDay4 : NarratorBase
         yield return new WaitUntil(() => seq1Complete);
         
         yield return new WaitForSeconds(1f);
-        StartCoroutine(SwitchLights.Instance.SwitchToBright());
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+
+
+
+        // PlayCharacterAnimation(CharacterType.Object, "OpenTheDoor");
         
+        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+
+        StartCoroutine(SwitchLights.Instance.SwitchToBright());
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby)); 
 
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq2IbuMarah", 
@@ -45,6 +54,7 @@ public class NarratorDay4 : NarratorBase
         yield return new WaitUntil(() => seq3Complete);
         
         yield return new WaitForSeconds(1f);
+        StartCoroutine(ResetHeadTracking());
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
         
