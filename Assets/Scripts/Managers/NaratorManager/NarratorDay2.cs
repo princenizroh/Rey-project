@@ -31,7 +31,7 @@ public class NarratorDay2 : NarratorBase
         {
             // Player chose Mother (Seq12BIbu) - WRONG choice  
             bool seq12BComplete = false;
-            dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12BIbu", 
+            dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12AIbu", 
                 () => { seq12BComplete = true; });
             yield return new WaitUntil(() => seq12BComplete);
             
