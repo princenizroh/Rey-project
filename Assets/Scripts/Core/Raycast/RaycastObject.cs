@@ -13,12 +13,6 @@ public class RaycastObjectCam : MonoBehaviour
 
     public TextMeshProUGUI narratorText;
     
-    [Header("Visual Settings")]
-    public LineRenderer lineRenderer;
-    public Color hitColor = Color.green;
-    public Color missColor = Color.red;
-    public float lineWidth = 0.1f;
-    
     [Header("Interaction Settings")]
     [SerializeField] private KeyCode interactionKey = KeyCode.E;
     [SerializeField] private string interactionMessage = "Interaction key pressed!";
@@ -35,21 +29,11 @@ public class RaycastObjectCam : MonoBehaviour
         {
             playerCamera = Camera.main;
         }
-        
-        // Setup LineRenderer if not assigned
-        if (lineRenderer == null)
-        {
-            SetupLineRenderer();
-        }
-        
-        // Configure LineRenderer
-        ConfigureLineRenderer();
     }
     
     void Update()
     {
         PerformRaycast();
-        UpdateVisual();
         HandleInteraction();
     }
     
@@ -62,26 +46,12 @@ public class RaycastObjectCam : MonoBehaviour
         // Perform raycast
         if (Physics.Raycast(ray, out hit, rayDistance, layerMask))
         {
-            // Check if hit object has the correct tag
-            if (hit.collider.CompareTag("RaycastObject"))
+            // Check if hit object has the RaycastObjectBehaviour script
+            RaycastObjectBehaviour objectBehaviour = hit.collider.GetComponent<RaycastObjectBehaviour>();
+            
+            if (objectBehaviour != null)
             {
                 isHitting = true;
-                
-                // Try to get RaycastObjectBehaviour component from the hit object
-                RaycastObjectBehaviour objectBehaviour = hit.collider.GetComponent<RaycastObjectBehaviour>();
-                
-                // Handle script injection or use existing script
-                if (objectBehaviour == null)
-                {
-                    // No script found - inject new one
-                    objectBehaviour = hit.collider.gameObject.AddComponent<RaycastObjectBehaviour>();
-                    Debug.Log($"RaycastObjectBehaviour script automatically injected into: {hit.collider.name}");
-                }
-                else
-                {
-                    // Script already exists - use the existing one
-                    Debug.Log($"Using existing RaycastObjectBehaviour script on: {hit.collider.name}");
-                }
                 
                 // Store reference to current hit behaviour for interaction
                 currentHitBehaviour = objectBehaviour;
@@ -89,12 +59,13 @@ public class RaycastObjectCam : MonoBehaviour
                 
                 // Call the behaviour script to handle the hit detection
                 objectBehaviour.OnRaycastHit(hit);
+                Debug.Log($"Using existing RaycastObjectBehaviour script on: {hit.collider.name}");
             }
             else
             {
                 isHitting = false;
-                currentHitBehaviour = null; // Clear reference when not hitting tagged object
-                currentHitObject = null; // Clear reference when not hitting tagged object
+                currentHitBehaviour = null; // Clear reference when not hitting object with script
+                currentHitObject = null; // Clear reference when not hitting object with script
             }
         }
         else
@@ -105,61 +76,10 @@ public class RaycastObjectCam : MonoBehaviour
         }
     }
     
-    void UpdateVisual()
-    {
-        if (lineRenderer != null)
-        {
-            // Set line color based on hit status
-            Color currentColor = isHitting ? hitColor : missColor;
-            lineRenderer.startColor = currentColor;
-            lineRenderer.endColor = currentColor;
-            lineRenderer.material.color = currentColor;
-            
-            // Set line positions
-            Vector3 startPoint = transform.position;
-            Vector3 endPoint = transform.position + (transform.forward * rayDistance);
-            
-            lineRenderer.SetPosition(0, startPoint);
-            lineRenderer.SetPosition(1, endPoint);
-        }
-    }
-    
-    void SetupLineRenderer()
-    {
-        // Create LineRenderer component if it doesn't exist
-        lineRenderer = GetComponent<LineRenderer>();
-        if (lineRenderer == null)
-        {
-            lineRenderer = gameObject.AddComponent<LineRenderer>();
-        }
-    }
-    
-    void ConfigureLineRenderer()
-    {
-        if (lineRenderer != null)
-        {
-            // Configure LineRenderer properties
-            lineRenderer.positionCount = 2;
-            lineRenderer.startWidth = lineWidth;
-            lineRenderer.endWidth = lineWidth;
-            lineRenderer.useWorldSpace = true;
-            
-            // Create a simple material if none exists
-            if (lineRenderer.material == null)
-            {
-                lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-            }
-            
-            // Set initial color
-            lineRenderer.startColor = missColor;
-            lineRenderer.endColor = missColor;
-        }
-    }
-    
     // Draw gizmos in scene view for debugging
     void OnDrawGizmos()
     {
-        Gizmos.color = isHitting ? hitColor : missColor;
+        Gizmos.color = isHitting ? Color.green : Color.red;
         Gizmos.DrawRay(transform.position, transform.forward * rayDistance);
     }
     

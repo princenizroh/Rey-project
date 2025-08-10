@@ -14,6 +14,9 @@ public class SaveFileManager : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool enableDebugLogs = true;
     
+    [Header("Local Save Path")]
+    [SerializeField] private bool useLocalMyGamesPath = true;
+    
     // Serializable class to match JSON structure
     [System.Serializable]
     public class SaveData
@@ -34,6 +37,27 @@ public class SaveFileManager : MonoBehaviour
             this.mother_stress_level = motherStress;
         }
     }
+    
+    /// <summary>
+    /// Get the local My Games save path: Documents/My Games/Rey/saves
+    /// </summary>
+    private string GetLocalMyGamesSavePath()
+    {
+        // Get the user's Documents folder
+        string documentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+        
+        // Build the path: Documents/My Games/Rey/saves
+        return Path.Combine(documentsPath, "My Games", "Rey", "saves");
+    }
+    
+    /// <summary>
+    /// Get the full path to save_data.json in My Games folder
+    /// </summary>
+    private string GetLocalSaveFilePath()
+    {
+        return Path.Combine(GetLocalMyGamesSavePath(), "save_data.json");
+    }
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -44,7 +68,7 @@ public class SaveFileManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Restore save data from JSON file in Resources folder
+    /// Restore save data from JSON file (checks local My Games folder first if enabled, then Resources folder)
     /// </summary>
     [ContextMenu("Restore Save From JSON")]
     public void RestoreSaveFromJSON()
@@ -55,9 +79,27 @@ public class SaveFileManager : MonoBehaviour
             return;
         }
 
+        // Check local My Games folder first if enabled
+        if (useLocalMyGamesPath)
+        {
+            LogDebug("Checking local My Games folder for save data...");
+            SaveData localSaveData = GetLocalSaveData();
+            
+            if (localSaveData != null)
+            {
+                ApplySaveDataToScriptableObject(localSaveData);
+                LogDebug("✓ Save restored from local My Games folder");
+                return;
+            }
+            else
+            {
+                LogDebug("No valid save found in local My Games folder, checking Resources...");
+            }
+        }
+
         try
         {
-            // Construct the full path for Resources.Load
+            // Fallback to Resources folder
             string resourcePath = $"{savesFolderPath}/{saveFileName}";
             
             // Load the JSON file from Resources
@@ -150,11 +192,234 @@ public class SaveFileManager : MonoBehaviour
             LogError($"Failed to create default save file: {e.Message}");
         }
     }
+    
+    /// <summary>
+    /// Check if save_data.json exists in the local My Games folder
+    /// </summary>
+    public bool CheckLocalSaveFileExists()
+    {
+        string saveFilePath = GetLocalSaveFilePath();
+        bool exists = File.Exists(saveFilePath);
+        
+        LogDebug($"Checking local save file at: {saveFilePath}");
+        LogDebug($"File exists: {exists}");
+        
+        return exists;
+    }
+    
+    /// <summary>
+    /// Load save data from local My Games folder
+    /// </summary>
+    [ContextMenu("Load from Local My Games Folder")]
+    public void LoadFromLocalMyGamesFolder()
+    {
+        if (targetSaveObject == null)
+        {
+            LogError("Target CoreGameSaves ScriptableObject is not assigned!");
+            return;
+        }
+        
+        string saveFilePath = GetLocalSaveFilePath();
+        
+        if (!File.Exists(saveFilePath))
+        {
+            LogError($"Save file not found at: {saveFilePath}");
+            return;
+        }
+        
+        try
+        {
+            string jsonContent = File.ReadAllText(saveFilePath);
+            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            
+            if (saveData == null)
+            {
+                LogError("Failed to parse JSON data from local My Games folder.");
+                return;
+            }
+            
+            ApplySaveDataToScriptableObject(saveData);
+            
+            LogDebug($"✓ Save loaded from local My Games folder: {saveFilePath}");
+            LogDebug($"  - Day: {saveData.day}");
+            LogDebug($"  - Mother Stress Level: {saveData.mother_stress_level}");
+        }
+        catch (System.Exception e)
+        {
+            LogError($"Error loading from local My Games folder: {e.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Save current data to local My Games folder
+    /// </summary>
+    [ContextMenu("Save to Local My Games Folder")]
+    public void SaveToLocalMyGamesFolder()
+    {
+        if (targetSaveObject == null)
+        {
+            LogError("Target CoreGameSaves ScriptableObject is not assigned!");
+            return;
+        }
+        
+        try
+        {
+            // Create save data from current ScriptableObject
+            SaveData currentData = new SaveData(targetSaveObject.day, targetSaveObject.mother_stress_level);
+            
+            // Convert to JSON with pretty formatting
+            string jsonContent = JsonUtility.ToJson(currentData, true);
+            
+            // Get the local My Games save path
+            string saveDirectoryPath = GetLocalMyGamesSavePath();
+            string saveFilePath = GetLocalSaveFilePath();
+            
+            // Create directory if it doesn't exist
+            if (!Directory.Exists(saveDirectoryPath))
+            {
+                Directory.CreateDirectory(saveDirectoryPath);
+                LogDebug($"Created directory: {saveDirectoryPath}");
+            }
+            
+            // Write the JSON file
+            File.WriteAllText(saveFilePath, jsonContent);
+            
+            LogDebug($"✓ Save data written to local My Games folder: {saveFilePath}");
+            LogDebug($"JSON Content:\n{jsonContent}");
+        }
+        catch (System.Exception e)
+        {
+            LogError($"Error saving to local My Games folder: {e.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Get save data from local My Games folder (without applying to ScriptableObject)
+    /// Returns null if file doesn't exist or can't be parsed
+    /// </summary>
+    public SaveData GetLocalSaveData()
+    {
+        string saveFilePath = GetLocalSaveFilePath();
+        
+        if (!File.Exists(saveFilePath))
+        {
+            LogDebug($"Save file not found at: {saveFilePath}");
+            return null;
+        }
+        
+        try
+        {
+            string jsonContent = File.ReadAllText(saveFilePath);
+            SaveData saveData = JsonUtility.FromJson<SaveData>(jsonContent);
+            
+            LogDebug($"✓ Save data retrieved from: {saveFilePath}");
+            if (saveData != null)
+            {
+                LogDebug($"  - Day: {saveData.day}");
+                LogDebug($"  - Mother Stress Level: {saveData.mother_stress_level}");
+            }
+            
+            return saveData;
+        }
+        catch (System.Exception e)
+        {
+            LogError($"Error reading local save data: {e.Message}");
+            return null;
+        }
+    }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+    
+    /// <summary>
+    /// Validate that save_data.json exists in local My Games folder
+    /// </summary>
+    [ContextMenu("Validate Local My Games Save File")]
+    public void ValidateLocalMyGamesSaveFile()
+    {
+        string saveFilePath = GetLocalSaveFilePath();
+        string saveDirectoryPath = GetLocalMyGamesSavePath();
+        
+        LogDebug($"Checking local My Games save file at: {saveFilePath}");
+        
+        if (!Directory.Exists(saveDirectoryPath))
+        {
+            LogError($"✗ Save directory not found: {saveDirectoryPath}");
+            LogDebug("Use 'Save to Local My Games Folder' to create the directory and save file.");
+            return;
+        }
+        
+        if (File.Exists(saveFilePath))
+        {
+            LogDebug($"✓ Save file found at: {saveFilePath}");
+            
+            try
+            {
+                string jsonContent = File.ReadAllText(saveFilePath);
+                LogDebug($"Content preview:\n{jsonContent}");
+                
+                // Validate JSON structure
+                SaveData testData = JsonUtility.FromJson<SaveData>(jsonContent);
+                if (testData != null)
+                {
+                    LogDebug($"✓ JSON structure is valid:");
+                    LogDebug($"  - Day: {testData.day}");
+                    LogDebug($"  - Mother Stress Level: {testData.mother_stress_level}");
+                }
+                else
+                {
+                    LogError("✗ JSON structure is invalid - could not parse SaveData");
+                }
+            }
+            catch (System.Exception e)
+            {
+                LogError($"✗ JSON parsing error: {e.Message}");
+            }
+        }
+        else
+        {
+            LogError($"✗ Save file not found at: {saveFilePath}");
+            LogDebug("Use 'Save to Local My Games Folder' to create the save file.");
+        }
+    }
+    
+    /// <summary>
+    /// Show information about local My Games save path
+    /// </summary>
+    [ContextMenu("Show Local My Games Path Info")]
+    public void ShowLocalMyGamesPathInfo()
+    {
+        string saveDirectoryPath = GetLocalMyGamesSavePath();
+        string saveFilePath = GetLocalSaveFilePath();
+        
+        LogDebug($"Local My Games save directory: {saveDirectoryPath}");
+        LogDebug($"Local My Games save file path: {saveFilePath}");
+        LogDebug($"Directory exists: {Directory.Exists(saveDirectoryPath)}");
+        LogDebug($"Save file exists: {File.Exists(saveFilePath)}");
+        
+        if (Directory.Exists(saveDirectoryPath))
+        {
+            try
+            {
+                string[] files = Directory.GetFiles(saveDirectoryPath, "*.json");
+                LogDebug($"JSON files in directory: {files.Length}");
+                
+                foreach (string file in files)
+                {
+                    string fileName = Path.GetFileName(file);
+                    long fileSize = new FileInfo(file).Length;
+                    string lastModified = File.GetLastWriteTime(file).ToString("yyyy-MM-dd HH:mm:ss");
+                    LogDebug($"  - {fileName} ({fileSize} bytes, modified: {lastModified})");
+                }
+            }
+            catch (System.Exception e)
+            {
+                LogError($"Error listing files: {e.Message}");
+            }
+        }
     }
     
     /// <summary>
@@ -662,6 +927,44 @@ public class SaveFileManager : MonoBehaviour
     #endregion
     
     #region Public Getters/Setters
+    
+    /// <summary>
+    /// Check if a valid save file exists in the local My Games folder
+    /// This method is designed to be called by UI systems like MainMenuManager
+    /// </summary>
+    public bool HasValidLocalSaveFile()
+    {
+        try
+        {
+            SaveData saveData = GetLocalSaveData();
+            
+            if (saveData == null)
+            {
+                return false;
+            }
+            
+            // Check if save data has meaningful values (not default/empty save)
+            // A save is considered valid if day > 1 OR mother_stress_level > 0
+            bool isValidSave = saveData.day > 1 || saveData.mother_stress_level > 0;
+            
+            LogDebug($"Local save file validation - Day: {saveData.day}, Stress: {saveData.mother_stress_level}, Valid: {isValidSave}");
+            
+            return isValidSave;
+        }
+        catch (System.Exception e)
+        {
+            LogError($"Error checking local save file validity: {e.Message}");
+            return false;
+        }
+    }
+    
+    /// <summary>
+    /// Get the full path to the local My Games save file (for external use)
+    /// </summary>
+    public string GetLocalSaveFileFullPath()
+    {
+        return GetLocalSaveFilePath();
+    }
     
     /// <summary>
     /// Change the saves folder path at runtime
