@@ -14,8 +14,12 @@ public class CharacterHeadRig
     public CharacterType characterType;
     public MultiAimConstraint headConstraint;
     
-    [Header("Single Target")]
-    public Transform headTarget; // Single target that will be moved to different positions
+    [Header("Target Transforms")]
+    public Transform cameraTarget;
+    public Transform motherTarget;
+    public Transform fatherTarget;
+    public Transform babyTarget;
+    public Transform bidanTarget;
     
     [Header("Settings")]
     public float transitionSpeed = 5f;
@@ -64,6 +68,37 @@ public class HeadTrackingManager : MonoBehaviour
         {
             mainCamera = Camera.main;
         }
+        
+        // Setup target references
+        SetupTargetReferences();
+    }
+    
+    private void SetupTargetReferences()
+    {
+        foreach (var rig in characterRigs)
+        {
+            // Auto-assign global references if individual ones not set
+            if (rig.cameraTarget == null && mainCamera != null)
+            {
+                // Create a target object for camera if not exists
+                GameObject cameraTargetObj = new GameObject($"{rig.characterType}_CameraTarget");
+                rig.cameraTarget = cameraTargetObj.transform;
+                cameraTargetObj.transform.SetParent(mainCamera.transform);
+                cameraTargetObj.transform.localPosition = Vector3.forward * 0.5f;
+            }
+            
+            if (rig.motherTarget == null && motherTransform != null)
+                rig.motherTarget = motherTransform;
+                
+            if (rig.fatherTarget == null && fatherTransform != null)
+                rig.fatherTarget = fatherTransform;
+                
+            if (rig.babyTarget == null && babyTransform != null)
+                rig.babyTarget = babyTransform;
+                
+            if (rig.bidanTarget == null && bidanTransform != null)
+                rig.bidanTarget = bidanTransform;
+        }
     }
 
     private void InitializeHeadRigs()
@@ -72,7 +107,7 @@ public class HeadTrackingManager : MonoBehaviour
         
         foreach (var rig in characterRigs)
         {
-            if (rig.headConstraint != null && rig.headTarget != null)
+            if (rig.headConstraint != null)
             {
                 rigDict[rig.characterType] = rig;
                 rig.isInitialized = true;
@@ -80,11 +115,15 @@ public class HeadTrackingManager : MonoBehaviour
                 // Set initial constraint weight to 0 (disabled)
                 rig.headConstraint.weight = 0f;
                 
+                // Clear existing source objects if any
+                var data = rig.headConstraint.data;
+                data.sourceObjects.Clear();
+                
                 Debug.Log($"[HeadTrackingManager] Initialized {rig.characterType} head rig");
             }
             else
             {
-                Debug.LogWarning($"[HeadTrackingManager] {rig.characterType} head constraint or target not assigned!");
+                Debug.LogWarning($"[HeadTrackingManager] {rig.characterType} head constraint not assigned!");
             }
         }
     }
@@ -96,6 +135,14 @@ public class HeadTrackingManager : MonoBehaviour
     /// </summary>
     public void SetHeadTarget(CharacterType characterType, HeadTarget target)
     {
+        SetHeadTarget(characterType, target, 1f);
+    }
+
+    /// <summary>
+    /// Set head target for specific character with custom weight
+    /// </summary>
+    public void SetHeadTarget(CharacterType characterType, HeadTarget target, float weight)
+    {
         if (!enableHeadTracking)
         {
             Debug.LogWarning("[HeadTrackingManager] Head tracking is globally disabled!");
@@ -104,8 +151,8 @@ public class HeadTrackingManager : MonoBehaviour
 
         if (rigDict.TryGetValue(characterType, out CharacterHeadRig rig))
         {
-            SetConstraintTarget(rig, target);
-            Debug.Log($"[HeadTrackingManager] {characterType} head target set to: {target}");
+            SetConstraintTarget(rig, target, weight);
+            Debug.Log($"[HeadTrackingManager] {characterType} head target set to: {target} with weight: {weight}");
         }
         else
         {
@@ -158,64 +205,75 @@ public class HeadTrackingManager : MonoBehaviour
 
     #region Private Helper Methods
 
-    private void SetConstraintTarget(CharacterHeadRig rig, HeadTarget target)
+    private void SetConstraintTarget(CharacterHeadRig rig, HeadTarget target, float weight = 1f)
     {
-        if (rig.headConstraint == null || rig.headTarget == null) return;
+        if (rig.headConstraint == null) return;
 
+        var data = rig.headConstraint.data;
+        
         if (target == HeadTarget.None)
         {
-            // Disable constraint
+            // Disable constraint entirely
             rig.headConstraint.weight = 0f;
+            data.sourceObjects.Clear();
         }
         else
         {
-            // Enable constraint and move target
+            // Enable constraint
             rig.headConstraint.weight = 1f;
             
-            Vector3 targetPosition = GetTargetPosition(target);
+            // Get target transform
+            Transform targetTransform = GetTargetTransform(rig, target);
             
-            if (targetPosition != Vector3.zero)
+            if (targetTransform != null)
             {
-                // Move the single target to the desired position
-                rig.headTarget.position = targetPosition;
+                // Clear existing source objects
+                data.sourceObjects.Clear();
+                
+                // Add new source object with specified weight
+                var weightedTransform = new WeightedTransform(targetTransform, weight);
+                data.sourceObjects.Add(weightedTransform);
+                
+                Debug.Log($"[HeadTrackingManager] Added target {target} with weight {weight} to {rig.characterType}");
+            }
+            else
+            {
+                Debug.LogWarning($"[HeadTrackingManager] Target transform for {target} not found in {rig.characterType} rig!");
             }
         }
     }
 
-    private Vector3 GetTargetPosition(HeadTarget target)
+    private Transform GetTargetTransform(CharacterHeadRig rig, HeadTarget target)
     {
         switch (target)
         {
             case HeadTarget.Camera:
-                if (mainCamera != null)
-                {
-                    // Slightly offset from camera for natural look
-                    return mainCamera.transform.position + mainCamera.transform.forward * 0.5f;
-                }
+                if (rig.cameraTarget != null) return rig.cameraTarget;
+                if (mainCamera != null) return mainCamera.transform;
                 break;
                 
             case HeadTarget.Mother:
-                if (motherTransform != null)
-                    return motherTransform.position + Vector3.up * 1.6f; // Head height offset
+                if (rig.motherTarget != null) return rig.motherTarget;
+                if (motherTransform != null) return motherTransform;
                 break;
                 
             case HeadTarget.Father:
-                if (fatherTransform != null)
-                    return fatherTransform.position + Vector3.up * 1.7f; // Head height offset
+                if (rig.fatherTarget != null) return rig.fatherTarget;
+                if (fatherTransform != null) return fatherTransform;
                 break;
                 
             case HeadTarget.Baby:
-                if (babyTransform != null)
-                    return babyTransform.position + Vector3.up * 0.3f; // Baby head height
+                if (rig.babyTarget != null) return rig.babyTarget;
+                if (babyTransform != null) return babyTransform;
                 break;
                 
             case HeadTarget.Bidan:
-                if (bidanTransform != null)
-                    return bidanTransform.position + Vector3.up * 1.6f; // Head height offset
+                if (rig.bidanTarget != null) return rig.bidanTarget;
+                if (bidanTransform != null) return bidanTransform;
                 break;
         }
         
-        return Vector3.zero;
+        return null;
     }
 
     #endregion

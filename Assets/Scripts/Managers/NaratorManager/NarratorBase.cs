@@ -21,6 +21,11 @@ public enum CharacterType
     Mother, Father, Bidan, Baby, Object, Ghost
 }
 
+public enum CharacterTarget
+{
+    Mother, Father, Bidan, Baby, Object, Ghost
+}
+
 [System.Serializable]
 public class AudioClipData
 {

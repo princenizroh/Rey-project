@@ -21,9 +21,9 @@ public class NarratorDay1 : NarratorBase
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");
         
         // Enable head tracking - all characters focus on baby (POV camera)
-        SetHeadTargetCamera(CharacterType.Mother);
-        SetHeadTargetCamera(CharacterType.Father);
-        SetHeadTargetCamera(CharacterType.Bidan);
+        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Mother, HeadTarget.Camera, 1f);
+        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Father, HeadTarget.Camera, 1f);
+        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Bidan, HeadTarget.Camera, 1f);
 
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 1\nKelahiran";
@@ -70,14 +70,14 @@ public class NarratorDay1 : NarratorBase
         FadeOpenEyes();
         
         // When baby opens eyes - parents look at each other in amazement
-        SetHeadTargetFather(CharacterType.Mother);
-        SetHeadTargetMother(CharacterType.Father);
+        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Mother, HeadTarget.Father, 1f);
+        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Father, HeadTarget.Mother, 1f);
         
         yield return new WaitForSeconds(2f);
         
         // Then back to looking at baby
-        SetHeadTargetCamera(CharacterType.Mother);
-        SetHeadTargetCamera(CharacterType.Father);
+        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Mother, HeadTarget.Camera, 1f);
+        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Father, HeadTarget.Camera, 1f);
         
         yield return new WaitForSeconds(28f);
         bool seq5Complete = false;
@@ -98,7 +98,7 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         // Disable head tracking during movement for natural look
-        DisableHeadTracking(CharacterType.Bidan);
+        HeadTrackingManager.Instance.DisableHeadTracking(CharacterType.Bidan);
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
         FadeCloseEyes();
@@ -111,7 +111,7 @@ public class NarratorDay1 : NarratorBase
         SetCharacterSpawn(CharacterType.Object, 1);
 
         // Disable all head tracking before transition
-        EnableGlobalHeadTracking(false);
+        HeadTrackingManager.Instance.EnableGlobalHeadTracking(false);
         
         yield return new WaitForSeconds(2f);
         GoToNextDay();
