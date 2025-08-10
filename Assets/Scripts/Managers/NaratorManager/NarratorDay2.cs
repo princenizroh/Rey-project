@@ -19,6 +19,7 @@ public class NarratorDay2 : NarratorBase
         }
     }
 
+    [System.Obsolete]
     private IEnumerator WaitForRaycastInteraction(string code = "")
     {
         bool interactionCompleted = false;
@@ -32,10 +33,15 @@ public class NarratorDay2 : NarratorBase
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    if (code == "")
+                    if (code == "interaksi_ortu")
                     {
-                        
+                        bool seq11Complete = false;
+                        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
+                            () => { seq11Complete = true; });
+                        yield return new WaitUntil(() => seq11Complete);
                     }
+                    // Set interaction as completed after the dialog finishes
+                    interactionCompleted = true;
                 }
             }
             else
@@ -254,13 +260,13 @@ public class NarratorDay2 : NarratorBase
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
 
-        yield return StartCoroutine(WaitForRaycastInteraction("codeinteraksi"));
-
-        bool seq11Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
-            () => { seq11Complete = true; });
-        yield return new WaitUntil(() => seq11Complete);
+        yield return StartCoroutine(WaitForRaycastInteraction("interaksi_ortu"));
         
+        // bool seq11Complete = false;
+        // dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
+        //     () => { seq11Complete = true; });
+        // yield return new WaitUntil(() => seq11Complete);
+
         yield return new WaitForSeconds(1f);
         
         bool seq12Complete = false;
