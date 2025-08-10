@@ -309,6 +309,8 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 5);
         SetCharacterSpawn(CharacterType.Father, 5);
+        PlayCharacterAnimation(CharacterType.Father, "Laying Sleeping");
+        PlayCharacterAnimation(CharacterType.Mother, "Laying Sleeping");
         yield return new WaitForSeconds(3f);
         
         FadeOpenEyes(); 
