@@ -8,6 +8,7 @@ using TMPro;
 public class MainMenuManager : MonoBehaviour
 {
     [Header("Button References")]
+    public GameObject gameLogo;
     public GameObject startButton;
     public GameObject continueButton;
     public GameObject optionsButton;
@@ -30,6 +31,13 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private LeanTweenType easeType = LeanTweenType.easeOutBack;
     [SerializeField] private LeanTweenType hoverEaseType = LeanTweenType.easeOutQuad;
     
+    [Header("Logo Animation Settings")]
+    [SerializeField] private float logoBreathingScale = 1.05f; // Scale multiplier for breathing effect
+    [SerializeField] private float logoBreathingDuration = 2.5f; // Duration of one breathing cycle
+    [SerializeField] private float logoRotationAngle = 2f; // Rotation angle in degrees
+    [SerializeField] private float logoRotationDuration = 4f; // Duration of one rotation cycle
+    [SerializeField] private bool enableLogoAnimation = true;
+    
     [Header("Sprite Animation Settings")]
     [SerializeField] private float spriteAnimationDuration = 0.8f;
     [SerializeField] private float spriteDelayOffset = 0.3f;
@@ -50,6 +58,17 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private int volumeMax = 100;
     [SerializeField] private int volumeStep = 5;
     
+    [Header("Keyboard Navigation")]
+    [SerializeField] private KeyCode upKey = KeyCode.W;
+    [SerializeField] private KeyCode downKey = KeyCode.S;
+    [SerializeField] private KeyCode selectKey = KeyCode.Return; // Enter key to select
+    [SerializeField] private KeyCode spaceSelectKey = KeyCode.Space; // Space key to select
+    [SerializeField] private KeyCode leftKey = KeyCode.A; // A key for left/decrease
+    [SerializeField] private KeyCode rightKey = KeyCode.D; // D key for right/increase
+    [SerializeField] private bool enableKeyboardNavigation = true;
+    [SerializeField] private float navigationInputCooldown = 0.2f;
+    [SerializeField] private bool enableSettingsNavigation = true;
+    
     // Available resolutions
     private Resolution[] availableResolutions;
     private string[] resolutionStrings;
@@ -64,6 +83,26 @@ public class MainMenuManager : MonoBehaviour
     private bool optionsVisible = false;
     private Vector3 creditsOffScreenPos;
     private Vector3 optionsOffScreenPos;
+
+    // Keyboard navigation
+    private int currentSelectedButtonIndex = 0;
+    private float lastNavigationInput = 0f;
+    private bool navigationActive = false;
+
+    // Settings navigation
+    private bool isInOptionsMenu = false;
+    private int currentSettingsIndex = 0; // 0 = resolution, 1 = volume
+    private GameObject[] settingsElements;
+    private Vector3 resolutionOriginalPos;
+    private Vector3 volumeOriginalPos;
+
+    // Submenu navigation (when back button is visible)
+    private bool isInSubmenu = false;
+    private bool isInCreditsMenu = false;
+
+    // Logo animation
+    private Vector3 logoOriginalScale;
+    private Vector3 logoOriginalRotation;
 
     // Save file detection
     [System.Serializable]
@@ -86,8 +125,20 @@ public class MainMenuManager : MonoBehaviour
         SetupButtonEvents();
         InitializeSettings();
         CheckSaveFileAndUpdateContinueButton();
+        
+        // Initialize logo animation
+        InitializeLogoAnimation();
+        
         // Start with buttons visible
         ShowButtons();
+        
+        // Initialize keyboard navigation
+        InitializeKeyboardNavigation();
+    }
+
+    void Update()
+    {
+        HandleKeyboardNavigation();
     }
 
     void InitializeButtons()
@@ -177,6 +228,575 @@ public class MainMenuManager : MonoBehaviour
         
         LogDebug("Settings initialized with interactive controls");
     }
+
+    /// <summary>
+    /// Initialize keyboard navigation
+    /// </summary>
+    void InitializeKeyboardNavigation()
+    {
+        if (!enableKeyboardNavigation) return;
+        
+        currentSelectedButtonIndex = 0;
+        navigationActive = buttonsVisible;
+        
+        // Highlight the first button
+        if (navigationActive && buttons != null && buttons.Length > 0)
+        {
+            HighlightSelectedButton();
+        }
+        
+        LogDebug("Keyboard navigation initialized");
+    }
+
+    /// <summary>
+    /// Initialize logo animation
+    /// </summary>
+    void InitializeLogoAnimation()
+    {
+        if (gameLogo == null || !enableLogoAnimation) return;
+        
+        // Store original transform values
+        logoOriginalScale = gameLogo.transform.localScale;
+        logoOriginalRotation = gameLogo.transform.localEulerAngles;
+        
+        // Start the breathing and rotation animations
+        StartLogoBreathingAnimation();
+        StartLogoRotationAnimation();
+        
+        LogDebug("Logo animation initialized");
+    }
+
+    /// <summary>
+    /// Start the logo breathing animation (scale effect)
+    /// </summary>
+    void StartLogoBreathingAnimation()
+    {
+        if (gameLogo == null) return;
+        
+        // Scale up (inhale)
+        LeanTween.scale(gameLogo, logoOriginalScale * logoBreathingScale, logoBreathingDuration)
+            .setEase(LeanTweenType.easeInOutSine)
+            .setOnComplete(() => {
+                // Scale down (exhale)
+                LeanTween.scale(gameLogo, logoOriginalScale, logoBreathingDuration)
+                    .setEase(LeanTweenType.easeInOutSine)
+                    .setOnComplete(() => {
+                        // Loop the breathing animation
+                        StartLogoBreathingAnimation();
+                    });
+            });
+    }
+
+    /// <summary>
+    /// Start the logo rotation animation (subtle rotation)
+    /// </summary>
+    void StartLogoRotationAnimation()
+    {
+        if (gameLogo == null) return;
+        
+        // Rotate to one side
+        Vector3 rotateRight = logoOriginalRotation + Vector3.forward * logoRotationAngle;
+        LeanTween.rotateLocal(gameLogo, rotateRight, logoRotationDuration)
+            .setEase(LeanTweenType.easeInOutSine)
+            .setOnComplete(() => {
+                // Rotate to the other side
+                Vector3 rotateLeft = logoOriginalRotation + Vector3.forward * -logoRotationAngle;
+                LeanTween.rotateLocal(gameLogo, rotateLeft, logoRotationDuration)
+                    .setEase(LeanTweenType.easeInOutSine)
+                    .setOnComplete(() => {
+                        // Return to center and loop
+                        LeanTween.rotateLocal(gameLogo, logoOriginalRotation, logoRotationDuration)
+                            .setEase(LeanTweenType.easeInOutSine)
+                            .setOnComplete(() => {
+                                // Loop the rotation animation
+                                StartLogoRotationAnimation();
+                            });
+                    });
+            });
+    }
+
+    /// <summary>
+    /// Stop logo animations
+    /// </summary>
+    void StopLogoAnimation()
+    {
+        if (gameLogo == null) return;
+        
+        // Cancel any existing animations
+        LeanTween.cancel(gameLogo);
+        
+        // Reset to original transform
+        gameLogo.transform.localScale = logoOriginalScale;
+        gameLogo.transform.localEulerAngles = logoOriginalRotation;
+        
+        LogDebug("Logo animation stopped");
+    }
+
+    /// <summary>
+    /// Handle keyboard navigation input
+    /// </summary>
+    void HandleKeyboardNavigation()
+    {
+        if (!enableKeyboardNavigation) return;
+        
+        // Check for cooldown
+        if (Time.time - lastNavigationInput < navigationInputCooldown) return;
+        
+        bool inputDetected = false;
+        
+        // Handle settings navigation when in options menu
+        if (isInOptionsMenu && enableSettingsNavigation)
+        {
+            if (Input.GetKeyDown(upKey))
+            {
+                NavigateSettingsUp();
+                inputDetected = true;
+            }
+            else if (Input.GetKeyDown(downKey))
+            {
+                NavigateSettingsDown();
+                inputDetected = true;
+            }
+            else if (Input.GetKeyDown(leftKey))
+            {
+                NavigateSettingsLeft();
+                inputDetected = true;
+            }
+            else if (Input.GetKeyDown(rightKey))
+            {
+                NavigateSettingsRight();
+                inputDetected = true;
+            }
+            // Allow selection of back button in options menu
+            else if (Input.GetKeyDown(selectKey) || Input.GetKeyDown(spaceSelectKey))
+            {
+                SelectBackButton();
+                inputDetected = true;
+            }
+        }
+        // Handle back button navigation when in submenu (credits)
+        else if (isInSubmenu && (isInCreditsMenu || optionsVisible))
+        {
+            if (Input.GetKeyDown(selectKey) || Input.GetKeyDown(spaceSelectKey))
+            {
+                SelectBackButton();
+                inputDetected = true;
+            }
+        }
+        // Handle regular button navigation
+        else if (navigationActive && buttonsVisible && !isAnimating)
+        {
+            // Handle up navigation (W key)
+            if (Input.GetKeyDown(upKey))
+            {
+                NavigateUp();
+                inputDetected = true;
+            }
+            // Handle down navigation (S key)
+            else if (Input.GetKeyDown(downKey))
+            {
+                NavigateDown();
+                inputDetected = true;
+            }
+            // Handle selection (Enter key or Space key)
+            else if (Input.GetKeyDown(selectKey) || Input.GetKeyDown(spaceSelectKey))
+            {
+                SelectCurrentButton();
+                inputDetected = true;
+            }
+        }
+        
+        if (inputDetected)
+        {
+            lastNavigationInput = Time.time;
+        }
+    }
+
+    /// <summary>
+    /// Navigate to the previous button (up)
+    /// </summary>
+    void NavigateUp()
+    {
+        if (buttons == null || buttons.Length == 0) return;
+        
+        // Find previous valid button
+        int originalIndex = currentSelectedButtonIndex;
+        do
+        {
+            currentSelectedButtonIndex--;
+            if (currentSelectedButtonIndex < 0)
+            {
+                currentSelectedButtonIndex = buttons.Length - 1;
+            }
+        } while (!IsButtonInteractable(currentSelectedButtonIndex) && currentSelectedButtonIndex != originalIndex);
+        
+        HighlightSelectedButton();
+        LogDebug($"Navigated up to button {currentSelectedButtonIndex}");
+    }
+
+    /// <summary>
+    /// Navigate to the next button (down)
+    /// </summary>
+    void NavigateDown()
+    {
+        if (buttons == null || buttons.Length == 0) return;
+        
+        // Find next valid button
+        int originalIndex = currentSelectedButtonIndex;
+        do
+        {
+            currentSelectedButtonIndex++;
+            if (currentSelectedButtonIndex >= buttons.Length)
+            {
+                currentSelectedButtonIndex = 0;
+            }
+        } while (!IsButtonInteractable(currentSelectedButtonIndex) && currentSelectedButtonIndex != originalIndex);
+        
+        HighlightSelectedButton();
+        LogDebug($"Navigated down to button {currentSelectedButtonIndex}");
+    }
+
+    /// <summary>
+    /// Check if a button is interactable
+    /// </summary>
+    bool IsButtonInteractable(int buttonIndex)
+    {
+        if (buttons == null || buttonIndex < 0 || buttonIndex >= buttons.Length) return false;
+        if (buttons[buttonIndex] == null) return false;
+        
+        Button buttonComponent = buttons[buttonIndex].GetComponent<Button>();
+        if (buttonComponent == null) return false;
+        
+        return buttonComponent.interactable && buttons[buttonIndex].activeInHierarchy;
+    }
+
+    /// <summary>
+    /// Highlight the currently selected button
+    /// </summary>
+    void HighlightSelectedButton()
+    {
+        if (buttons == null || currentSelectedButtonIndex < 0 || currentSelectedButtonIndex >= buttons.Length) return;
+        
+        // Remove highlight from all buttons first
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            if (buttons[i] != null)
+            {
+                OnButtonHover(i, false); // Remove hover effect
+            }
+        }
+        
+        // Highlight current button
+        if (buttons[currentSelectedButtonIndex] != null && IsButtonInteractable(currentSelectedButtonIndex))
+        {
+            OnButtonHover(currentSelectedButtonIndex, true); // Apply hover effect
+        }
+    }
+
+    /// <summary>
+    /// Select the currently highlighted button
+    /// </summary>
+    void SelectCurrentButton()
+    {
+        if (buttons == null || currentSelectedButtonIndex < 0 || currentSelectedButtonIndex >= buttons.Length) return;
+        
+        GameObject selectedButton = buttons[currentSelectedButtonIndex];
+        if (selectedButton != null && IsButtonInteractable(currentSelectedButtonIndex))
+        {
+            Button buttonComponent = selectedButton.GetComponent<Button>();
+            if (buttonComponent != null)
+            {
+                // Trigger the button click
+                buttonComponent.onClick.Invoke();
+                LogDebug($"Selected button: {selectedButton.name}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Select the back button when in submenus
+    /// </summary>
+    void SelectBackButton()
+    {
+        if (backButton == null) return;
+        
+        Button backButtonComponent = backButton.GetComponent<Button>();
+        if (backButtonComponent != null && backButton.activeInHierarchy)
+        {
+            // Add visual feedback when selecting back button
+            OnBackButtonHover(true);
+            
+            // Small delay before triggering to show selection feedback
+            LeanTween.delayedCall(0.1f, () => {
+                // Trigger the back button click
+                backButtonComponent.onClick.Invoke();
+                LogDebug("Selected back button");
+            });
+        }
+    }
+
+    /// <summary>
+    /// Enable keyboard navigation
+    /// </summary>
+    void EnableKeyboardNavigation()
+    {
+        if (!enableKeyboardNavigation) return;
+        
+        navigationActive = true;
+        currentSelectedButtonIndex = 0;
+        
+        // Find first interactable button
+        if (buttons != null && buttons.Length > 0)
+        {
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (IsButtonInteractable(i))
+                {
+                    currentSelectedButtonIndex = i;
+                    break;
+                }
+            }
+            HighlightSelectedButton();
+        }
+        
+        LogDebug("Keyboard navigation enabled");
+    }
+
+    /// <summary>
+    /// Disable keyboard navigation
+    /// </summary>
+    void DisableKeyboardNavigation()
+    {
+        navigationActive = false;
+        
+        // Remove highlight from all buttons
+        if (buttons != null)
+        {
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (buttons[i] != null)
+                {
+                    OnButtonHover(i, false);
+                }
+            }
+        }
+        
+        LogDebug("Keyboard navigation disabled");
+    }
+
+    /// <summary>
+    /// Toggle keyboard navigation on/off (for testing)
+    /// </summary>
+    [ContextMenu("Toggle Keyboard Navigation")]
+    public void ToggleKeyboardNavigation()
+    {
+        enableKeyboardNavigation = !enableKeyboardNavigation;
+        
+        if (enableKeyboardNavigation && buttonsVisible)
+        {
+            EnableKeyboardNavigation();
+        }
+        else
+        {
+            DisableKeyboardNavigation();
+        }
+        
+        LogDebug($"Keyboard navigation toggled: {enableKeyboardNavigation}");
+    }
+
+    /// <summary>
+    /// Toggle logo animation on/off (for testing)
+    /// </summary>
+    [ContextMenu("Toggle Logo Animation")]
+    public void ToggleLogoAnimation()
+    {
+        enableLogoAnimation = !enableLogoAnimation;
+        
+        if (enableLogoAnimation)
+        {
+            InitializeLogoAnimation();
+        }
+        else
+        {
+            StopLogoAnimation();
+        }
+        
+        LogDebug($"Logo animation toggled: {enableLogoAnimation}");
+    }
+
+    #region Settings Navigation Methods
+
+    /// <summary>
+    /// Initialize settings navigation elements
+    /// </summary>
+    void InitializeSettingsNavigation()
+    {
+        if (resolution != null && volume != null)
+        {
+            settingsElements = new GameObject[] { resolution.gameObject, volume.gameObject };
+            resolutionOriginalPos = resolution.transform.localPosition;
+            volumeOriginalPos = volume.transform.localPosition;
+        }
+    }
+
+    /// <summary>
+    /// Navigate up in settings (previous setting)
+    /// </summary>
+    void NavigateSettingsUp()
+    {
+        currentSettingsIndex--;
+        if (currentSettingsIndex < 0)
+        {
+            currentSettingsIndex = settingsElements != null ? settingsElements.Length - 1 : 0;
+        }
+        HighlightCurrentSetting();
+        LogDebug($"Settings navigation up - index: {currentSettingsIndex}");
+    }
+
+    /// <summary>
+    /// Navigate down in settings (next setting)
+    /// </summary>
+    void NavigateSettingsDown()
+    {
+        currentSettingsIndex++;
+        if (settingsElements != null && currentSettingsIndex >= settingsElements.Length)
+        {
+            currentSettingsIndex = 0;
+        }
+        HighlightCurrentSetting();
+        LogDebug($"Settings navigation down - index: {currentSettingsIndex}");
+    }
+
+    /// <summary>
+    /// Navigate left in settings (decrease value)
+    /// </summary>
+    void NavigateSettingsLeft()
+    {
+        if (currentSettingsIndex == 0) // Resolution
+        {
+            PreviousResolution();
+            AnimateSettingChange(resolution.gameObject);
+        }
+        else if (currentSettingsIndex == 1) // Volume
+        {
+            DecreaseVolume();
+            AnimateSettingChange(volume.gameObject);
+        }
+        LogDebug($"Settings navigation left - decreased value for setting {currentSettingsIndex}");
+    }
+
+    /// <summary>
+    /// Navigate right in settings (increase value)
+    /// </summary>
+    void NavigateSettingsRight()
+    {
+        if (currentSettingsIndex == 0) // Resolution
+        {
+            NextResolution();
+            AnimateSettingChange(resolution.gameObject);
+        }
+        else if (currentSettingsIndex == 1) // Volume
+        {
+            IncreaseVolume();
+            AnimateSettingChange(volume.gameObject);
+        }
+        LogDebug($"Settings navigation right - increased value for setting {currentSettingsIndex}");
+    }
+
+    /// <summary>
+    /// Highlight the currently selected setting
+    /// </summary>
+    void HighlightCurrentSetting()
+    {
+        if (settingsElements == null) return;
+
+        // Remove highlight from all settings
+        for (int i = 0; i < settingsElements.Length; i++)
+        {
+            if (settingsElements[i] != null)
+            {
+                LeanTween.cancel(settingsElements[i]);
+                Vector3 originalPos = (i == 0) ? resolutionOriginalPos : volumeOriginalPos;
+                LeanTween.moveLocal(settingsElements[i], originalPos, hoverDuration * 0.5f)
+                    .setEase(hoverEaseType);
+            }
+        }
+
+        // Highlight current setting
+        if (currentSettingsIndex >= 0 && currentSettingsIndex < settingsElements.Length && 
+            settingsElements[currentSettingsIndex] != null)
+        {
+            Vector3 originalPos = (currentSettingsIndex == 0) ? resolutionOriginalPos : volumeOriginalPos;
+            Vector3 highlightPos = originalPos + Vector3.right * hoverMoveDistance;
+            
+            LeanTween.cancel(settingsElements[currentSettingsIndex]);
+            LeanTween.moveLocal(settingsElements[currentSettingsIndex], highlightPos, hoverDuration)
+                .setEase(hoverEaseType);
+        }
+    }
+
+    /// <summary>
+    /// Animate setting change with a bounce effect
+    /// </summary>
+    void AnimateSettingChange(GameObject settingObject)
+    {
+        if (settingObject == null) return;
+
+        // Small bounce animation to show value change
+        LeanTween.cancel(settingObject);
+        Vector3 currentPos = settingObject.transform.localPosition;
+        Vector3 bouncePos = currentPos + Vector3.up * 10f;
+
+        // Bounce up
+        LeanTween.moveLocal(settingObject, bouncePos, 0.1f)
+            .setEase(LeanTweenType.easeOutQuad)
+            .setOnComplete(() => {
+                // Bounce back down
+                LeanTween.moveLocal(settingObject, currentPos, 0.1f)
+                    .setEase(LeanTweenType.easeInQuad);
+            });
+    }
+
+    /// <summary>
+    /// Enable settings navigation mode
+    /// </summary>
+    void EnableSettingsNavigation()
+    {
+        if (!enableSettingsNavigation) return;
+
+        isInOptionsMenu = true;
+        currentSettingsIndex = 0;
+        InitializeSettingsNavigation();
+        HighlightCurrentSetting();
+        LogDebug("Settings navigation enabled");
+    }
+
+    /// <summary>
+    /// Disable settings navigation mode
+    /// </summary>
+    void DisableSettingsNavigation()
+    {
+        isInOptionsMenu = false;
+
+        // Remove highlights from all settings
+        if (settingsElements != null)
+        {
+            for (int i = 0; i < settingsElements.Length; i++)
+            {
+                if (settingsElements[i] != null)
+                {
+                    LeanTween.cancel(settingsElements[i]);
+                    Vector3 originalPos = (i == 0) ? resolutionOriginalPos : volumeOriginalPos;
+                    LeanTween.moveLocal(settingsElements[i], originalPos, hoverDuration * 0.5f)
+                        .setEase(hoverEaseType);
+                }
+            }
+        }
+
+        LogDebug("Settings navigation disabled");
+    }
+
+    #endregion
 
     void InitializeResolutions()
     {
@@ -358,6 +978,8 @@ public class MainMenuManager : MonoBehaviour
                         if (completedAnimations >= buttons.Length)
                         {
                             isAnimating = false;
+                            // Enable keyboard navigation when buttons are fully shown
+                            EnableKeyboardNavigation();
                         }
                     });
 
@@ -378,6 +1000,7 @@ public class MainMenuManager : MonoBehaviour
         if (completedAnimations >= buttons.Length)
         {
             isAnimating = false;
+            EnableKeyboardNavigation();
         }
     }
 
@@ -387,6 +1010,9 @@ public class MainMenuManager : MonoBehaviour
         
         isAnimating = true;
         buttonsVisible = false;
+
+        // Disable keyboard navigation when hiding buttons
+        DisableKeyboardNavigation();
 
         // Counter to track completed animations
         int completedAnimations = 0;
@@ -480,6 +1106,10 @@ public class MainMenuManager : MonoBehaviour
         
         MoveToSubmenu(); // First move main buttons and show back button
         
+        // Set submenu state
+        isInSubmenu = true;
+        isInCreditsMenu = true;
+        
         // Show credits sprite animation
         if (creditsSprite != null)
         {
@@ -527,6 +1157,16 @@ public class MainMenuManager : MonoBehaviour
         
         MoveToSubmenu(); // First move main buttons and show back button
         
+        // Set submenu state
+        isInSubmenu = true;
+        isInCreditsMenu = false;
+        
+        // Enable settings navigation if keyboard navigation is active
+        if (enableKeyboardNavigation)
+        {
+            EnableSettingsNavigation();
+        }
+        
         // Show options sprite animation
         if (optionsSprite != null)
         {
@@ -573,6 +1213,10 @@ public class MainMenuManager : MonoBehaviour
         if (!creditsVisible || creditsSprite == null) return;
         
         creditsVisible = false;
+        
+        // Clear submenu state
+        isInSubmenu = false;
+        isInCreditsMenu = false;
         
         // Animate credits sprite back to x = 1000 (right side)
         Vector3 exitPos = new Vector3(1000f, creditsSprite.transform.localPosition.y, creditsSprite.transform.localPosition.z);
@@ -623,6 +1267,13 @@ public class MainMenuManager : MonoBehaviour
         
         optionsVisible = false;
         
+        // Clear submenu state
+        isInSubmenu = false;
+        isInCreditsMenu = false;
+        
+        // Disable settings navigation
+        DisableSettingsNavigation();
+        
         // Animate options sprite back to x = 3000 (right side)
         Vector3 exitPos = new Vector3(3000f, optionsSprite.transform.localPosition.y, optionsSprite.transform.localPosition.z);
         
@@ -672,6 +1323,9 @@ public class MainMenuManager : MonoBehaviour
         
         isAnimating = true;
         buttonsVisible = false; // Set buttons as not visible in main menu state
+
+        // Disable keyboard navigation when moving to submenu
+        DisableKeyboardNavigation();
 
         // Move all main buttons to x -900
         for (int i = 0; i < buttons.Length; i++)
@@ -753,6 +1407,8 @@ public class MainMenuManager : MonoBehaviour
                         {
                             isAnimating = false;
                             buttonsVisible = true; // Reset the buttons visible state
+                            // Re-enable keyboard navigation when returning to main menu
+                            EnableKeyboardNavigation();
                         }
                     });
             }
@@ -768,6 +1424,7 @@ public class MainMenuManager : MonoBehaviour
         {
             isAnimating = false;
             buttonsVisible = true;
+            EnableKeyboardNavigation();
         }
     }
 
@@ -855,6 +1512,17 @@ public class MainMenuManager : MonoBehaviour
         {
             LeanTween.cancel(backButton);
             backButton.SetActive(false);
+        }
+        
+        // Reset logo animation
+        if (gameLogo != null)
+        {
+            StopLogoAnimation();
+            if (enableLogoAnimation)
+            {
+                // Restart logo animation
+                InitializeLogoAnimation();
+            }
         }
         
         isAnimating = false;
@@ -1639,7 +2307,12 @@ public class MainMenuManager : MonoBehaviour
         }
 
         // Load the next scene (replace "GameScene" with your actual scene name)
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Builder House");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Builder House 6");
+    }
+
+    public void StartGameContinue()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Builder House 6");
     }
 
     void OnDestroy()

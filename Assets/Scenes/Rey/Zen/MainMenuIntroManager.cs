@@ -24,7 +24,7 @@ public class MainMenuIntroManager : MonoBehaviour
     // Coroutine to handle the 5-second delay and opacity change
     private IEnumerator ActivateDimmerAfterDelay()
     {
-        yield return new WaitForSeconds(3f); // Wait for 5 seconds
+        yield return new WaitForSeconds(1.5f); // Wait for 5 seconds
 
         MainMenuDimmer_Gameobject.SetActive(true);
 
@@ -52,7 +52,7 @@ public class MainMenuIntroManager : MonoBehaviour
         }
 
         infolog.SetActive(true);
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.5f);
 
         Color dimmerColor2 = MainMenuDimmer.color;
         dimmerColor2.a = 1f; // Start with full opacity
@@ -72,7 +72,7 @@ public class MainMenuIntroManager : MonoBehaviour
         dimmerColor2.a = 0f;
         MainMenuDimmer.color = dimmerColor2;
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.5f);
 
         MainMenuDimmer_Gameobject.SetActive(true);
 
