@@ -265,4 +265,13 @@ public class RaycastObjectBehaviour : MonoBehaviour
         
         Debug.LogError($"Target canvas '{targetCanvasName}' not found in the scene! Please make sure a canvas with this name exists.");
     }
+    
+    /// <summary>
+    /// Called when the player interacts with this object (presses E while looking at it)
+    /// </summary>
+    public virtual void OnInteraction()
+    {
+        Debug.Log($"Player interacted with {gameObject.name}");
+        // Override this method in derived classes for custom interaction behavior
+    }
 }

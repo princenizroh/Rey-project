@@ -3,6 +3,51 @@ using System.Collections;
 
 public class NarratorDay2 : NarratorBase
 {
+    public RaycastObjectCam raycastCamera;
+
+    [System.Obsolete]
+    void Start()
+    {
+        // Find the raycast camera if not assigned
+        if (raycastCamera == null)
+        {
+            raycastCamera = FindObjectOfType<RaycastObjectCam>();
+            if (raycastCamera == null)
+            {
+                Debug.LogError("RaycastObjectCam not found! Please assign it in the inspector.");
+            }
+        }
+    }
+
+    private IEnumerator WaitForRaycastInteraction(string code = "")
+    {
+        bool interactionCompleted = false;
+        bool wasStaring = false;
+        
+        while (!interactionCompleted)
+        {
+            if (raycastCamera.raycastStatus)
+            {
+                wasStaring = true;
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    if (code == "")
+                    {
+                        
+                    }
+                }
+            }
+            else
+            {
+                wasStaring = false;
+            }
+            
+            yield return null;
+        }
+    }
+
+
     [System.Obsolete]
     protected override IEnumerator PlayMorningSequence()
     {
@@ -208,6 +253,8 @@ public class NarratorDay2 : NarratorBase
         yield return new WaitForSeconds(1f);
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
+
+        yield return StartCoroutine(WaitForRaycastInteraction("codeinteraksi"));
 
         bool seq11Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
