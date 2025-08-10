@@ -5,6 +5,8 @@ using UnityEngine;
 public class RaycastObjectCam : MonoBehaviour
 {
     [Header("Raycast Settings")]
+    public bool raycastStatus = false;
+    public GameObject currentHitObject;
     public float rayDistance = 10f;
     public LayerMask layerMask = -1; // All layers by default
     public CoreGameManager coreGameManager;
@@ -48,7 +50,7 @@ public class RaycastObjectCam : MonoBehaviour
     {
         PerformRaycast();
         UpdateVisual();
-        CheckInteractionInput();
+        HandleInteraction();
     }
     
     void PerformRaycast()
@@ -83,6 +85,7 @@ public class RaycastObjectCam : MonoBehaviour
                 
                 // Store reference to current hit behaviour for interaction
                 currentHitBehaviour = objectBehaviour;
+                currentHitObject = hit.collider.gameObject;
                 
                 // Call the behaviour script to handle the hit detection
                 objectBehaviour.OnRaycastHit(hit);
@@ -91,12 +94,14 @@ public class RaycastObjectCam : MonoBehaviour
             {
                 isHitting = false;
                 currentHitBehaviour = null; // Clear reference when not hitting tagged object
+                currentHitObject = null; // Clear reference when not hitting tagged object
             }
         }
         else
         {
             isHitting = false;
             currentHitBehaviour = null; // Clear reference when not hitting anything
+            currentHitObject = null; // Clear reference when not hitting anything
         }
     }
     
@@ -161,40 +166,17 @@ public class RaycastObjectCam : MonoBehaviour
     /// <summary>
     /// Check for interaction input when an object is detected
     /// </summary>
-    void CheckInteractionInput()
+    void HandleInteraction()
     {
-        // Only check for input if we're currently hitting a raycast object
-        if (isHitting && currentHitBehaviour != null)
+        // Update raycastStatus based on current hit state
+        raycastStatus = isHitting;
+        
+        // Check for interaction input when hitting a raycast object
+        if (isHitting && currentHitBehaviour != null && Input.GetKeyDown(interactionKey))
         {
-            // Check if the interaction key is pressed
-            if (Input.GetKeyDown(interactionKey))
-            {
-                Debug.Log($"{interactionMessage} - Object: {currentHitBehaviour.gameObject.name}");
-                
-                // Optional: Call a method on the hit behaviour for additional interaction logic
-                StartCoroutine(OnInteractionKeyPressed(currentHitBehaviour));
-            }
+            // Trigger interaction on the hit object
+            currentHitBehaviour.OnInteraction();
+            Debug.Log($"Interaction triggered on: {currentHitBehaviour.gameObject.name}");
         }
-    }
-    
-    /// <summary>
-    /// Called when interaction key is pressed while detecting an object
-    /// </summary>
-    private IEnumerator OnInteractionKeyPressed(RaycastObjectBehaviour hitBehaviour)
-    {
-        // You can add additional interaction logic here
-        // For example: trigger animations, play sounds, open UI, etc.
-
-        // Check the GameObject name
-        if (hitBehaviour.gameObject.name == "Linda_Model")
-        {
-            narratorText.text = "ggagag";
-            yield return null;
-            // bool seq14Complete = false;
-            // coreGameManager.StartCoreGame("GameData/Dialog/Day2/Seq14Terbangun", 
-            //     () => { seq14Complete = true; });
-            // yield return new WaitUntil(() => seq14Complete);
-        }
-        Debug.Log($"Interacting with object: {hitBehaviour.gameObject.name}");
     }
 }
