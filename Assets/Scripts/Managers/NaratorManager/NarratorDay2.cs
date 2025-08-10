@@ -3,21 +3,6 @@ using System.Collections;
 
 public class NarratorDay2 : NarratorBase
 {
-    public RaycastObjectCam raycastCamera;
-
-    [System.Obsolete]
-    void Start()
-    {
-        // Find the raycast camera if not assigned
-        if (raycastCamera == null)
-        {
-            raycastCamera = FindObjectOfType<RaycastObjectCam>();
-            if (raycastCamera == null)
-            {
-                Debug.LogError("RaycastObjectCam not found! Please assign it in the inspector.");
-            }
-        }
-    }
 
     [System.Obsolete]
     private IEnumerator WaitForRaycastInteraction(string code = "")
@@ -27,7 +12,7 @@ public class NarratorDay2 : NarratorBase
         
         while (!interactionCompleted)
         {
-            if (raycastCamera.raycastStatus)
+            if (rayCastObject.raycastStatus)
             {
                 wasStaring = true;
 
@@ -35,10 +20,19 @@ public class NarratorDay2 : NarratorBase
                 {
                     if (code == "interaksi_ortu")
                     {
-                        bool seq11Complete = false;
-                        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
-                            () => { seq11Complete = true; });
-                        yield return new WaitUntil(() => seq11Complete);
+                        
+                        // Akan terus berulang jika interaksinya belum benar
+                        // True jika interaksinya adalah Seq12AAyah maka perulangan selesai
+                        // akan false jika interaksinya adalah Seq12BIbu
+                        // bool seq12AComplete = false;
+                        // dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12AAyah", 
+                        //     () => { seq12AComplete = true; });
+                        // yield return new WaitUntil(() => seq12AComplete);
+                        //
+                        // bool seq12BComplete = false;
+                        // dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12BIbu", 
+                        //     () => { seq12BComplete = true; });
+                        // yield return new WaitUntil(() => seq12BComplete);
                     }
                     // Set interaction as completed after the dialog finishes
                     interactionCompleted = true;

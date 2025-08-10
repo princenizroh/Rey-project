@@ -95,6 +95,7 @@ public abstract class NarratorBase : MonoBehaviour
 {
     [Header("Camera Control")]
     [SerializeField] protected CinemachineCamera cinemachineCamera;
+    [SerializeField] protected RaycastObjectCam rayCastObject;
     [Header("UI Elements")]
     [SerializeField] protected UIElements uiElements;
 
@@ -179,6 +180,15 @@ public abstract class NarratorBase : MonoBehaviour
         {
             characterData.Initialize();
         }
+    }
+
+    private void InitializeRaycastCamera()
+    {
+        if (rayCastObject == null)
+        {
+            rayCastObject = FindFirstObjectByType<RaycastObjectCam>();
+        }
+
     }
     #endregion
     #region Sequence Detection
@@ -822,9 +832,9 @@ public abstract class NarratorBase : MonoBehaviour
             Debug.LogError($"[NarratorBase] Custom save failed: {e.Message}");
         }
     }
-    #endregion
+#endregion
 
-    #region Head Tracking Management
+#region Head Tracking Management
     protected IEnumerator SetHeadTarget(CharacterType characterType, CharacterTarget targetType)
     {
         headTrackingManager.SetHeadTarget(characterType, targetType);
@@ -845,6 +855,13 @@ public abstract class NarratorBase : MonoBehaviour
     }
     protected IEnumerator ResetBidanTrack()
     {
+        yield return null;
+    }
+#endregion
+#region RaycastObjectCam
+    private IEnumerator WaitForRaycastObjectInitialization(string code = "")
+    {
+        
         yield return null;
     }
 #endregion
