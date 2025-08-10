@@ -109,6 +109,9 @@ public abstract class NarratorBase : MonoBehaviour
 
     protected HeadTrackingManager headTrackingManager;
 
+    [Header("Raycast Interaction")]
+    [SerializeField] protected RaycastObjectCam raycastCamera;
+
     [Header("Characters")]
     [SerializeField] protected CharacterData[] charactersDataArray;
 
@@ -126,6 +129,7 @@ public abstract class NarratorBase : MonoBehaviour
         InitializeCharacterSystem();
         InitializeSaveFileManager();
         InitializeHeadTrackingManager();
+        InitializeRaycastCamera();
     }
 
     protected virtual void Start()
@@ -184,11 +188,24 @@ public abstract class NarratorBase : MonoBehaviour
 
     private void InitializeRaycastCamera()
     {
-        if (rayCastObject == null)
+        if (raycastCamera == null)
         {
-            rayCastObject = FindFirstObjectByType<RaycastObjectCam>();
+            raycastCamera = FindFirstObjectByType<RaycastObjectCam>();
+            if (raycastCamera == null)
+            {
+                Debug.LogWarning("[NarratorBase] RaycastObjectCam not found in scene!");
+            }
+            else
+            {
+                Debug.Log("[NarratorBase] RaycastObjectCam initialized successfully");
+            }
         }
 
+        // Also initialize the legacy rayCastObject if needed
+        if (rayCastObject == null)
+        {
+            rayCastObject = raycastCamera;
+        }
     }
     #endregion
     #region Sequence Detection
@@ -858,11 +875,59 @@ public abstract class NarratorBase : MonoBehaviour
         yield return null;
     }
 #endregion
-#region RaycastObjectCam
-    private IEnumerator WaitForRaycastObjectInitialization(string code = "")
+
+#region Raycast Interaction
+    /// <summary>
+    /// Wait for raycast interaction with E key press
+    /// </summary>
+    /// <param name="onInteractionStart">Callback when E key is pressed during raycast</param>
+    /// <returns></returns>
+    protected IEnumerator WaitForRaycastInteraction(System.Action onInteractionStart = null)
     {
+        bool interactionCompleted = false;
+        bool wasStaring = false;
         
-        yield return null;
+        Debug.Log("[NarratorBase] Starting WaitForRaycastInteraction");
+        Debug.Log($"[NarratorBase] raycastCamera is: {(raycastCamera != null ? "initialized" : "NULL")}");
+        
+        if (raycastCamera == null)
+        {
+            Debug.LogError("[NarratorBase] raycastCamera is null! Make sure RaycastObjectCam exists in scene.");
+            yield break;
+        }
+        
+        while (!interactionCompleted)
+        {
+            if (raycastCamera != null && raycastCamera.raycastStatus)
+            {
+                if (!wasStaring)
+                {
+                    wasStaring = true;
+                    Debug.Log("[NarratorBase] Player is looking at interactable object");
+                    // TODO: Show interaction UI prompt here if needed
+                }
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    Debug.Log("[NarratorBase] Interaction E key pressed");
+                    onInteractionStart?.Invoke();
+                    interactionCompleted = true;
+                }
+            }
+            else
+            {
+                if (wasStaring)
+                {
+                    wasStaring = false;
+                    Debug.Log("[NarratorBase] Player stopped looking at interactable object");
+                    // TODO: Hide interaction UI prompt here if needed
+                }
+            }
+            
+            yield return null;
+        }
+        
+        Debug.Log("[NarratorBase] Raycast interaction completed");
     }
 #endregion
 }

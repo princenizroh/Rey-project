@@ -3,49 +3,45 @@ using System.Collections;
 
 public class NarratorDay2 : NarratorBase
 {
-
-    [System.Obsolete]
-    private IEnumerator WaitForRaycastInteraction(string code = "")
+    /// <summary>
+    /// Handle dialog interaction with parents - specific to Day2
+    /// Returns true if correct interaction (Seq12AAyah), false if wrong (Seq12BIbu)
+    /// </summary>
+    private IEnumerator HandleOrangTuaDialog()
     {
-        bool interactionCompleted = false;
-        bool wasStaring = false;
+        // TODO: Implement proper choice detection logic
+        // For now, simulate random choice for testing
         
-        while (!interactionCompleted)
+        // Simulate player choice - in real implementation this would be based on
+        // which character/object player is looking at when pressing E
+        bool isCorrectChoice = UnityEngine.Random.value > 0.5f; // Temporary random for demo
+        
+        if (isCorrectChoice)
         {
-            if (rayCastObject.raycastStatus)
-            {
-                wasStaring = true;
-
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    if (code == "interaksi_ortu")
-                    {
-                        
-                        // Akan terus berulang jika interaksinya belum benar
-                        // True jika interaksinya adalah Seq12AAyah maka perulangan selesai
-                        // akan false jika interaksinya adalah Seq12BIbu
-                        // bool seq12AComplete = false;
-                        // dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12AAyah", 
-                        //     () => { seq12AComplete = true; });
-                        // yield return new WaitUntil(() => seq12AComplete);
-                        //
-                        // bool seq12BComplete = false;
-                        // dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12BIbu", 
-                        //     () => { seq12BComplete = true; });
-                        // yield return new WaitUntil(() => seq12BComplete);
-                    }
-                    // Set interaction as completed after the dialog finishes
-                    interactionCompleted = true;
-                }
-            }
-            else
-            {
-                wasStaring = false;
-            }
+            // Player chose Father (Seq12AAyah) - CORRECT choice
+            bool seq12AComplete = false;
+            dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12AAyah", 
+                () => { seq12AComplete = true; });
+            yield return new WaitUntil(() => seq12AComplete);
             
-            yield return null;
+            Debug.Log("[NarratorDay2] Correct choice - Seq12AAyah played");
+            lastInteractionResult = true; // Set flag for correct choice
+        }
+        else
+        {
+            // Player chose Mother (Seq12BIbu) - WRONG choice  
+            bool seq12BComplete = false;
+            dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12BIbu", 
+                () => { seq12BComplete = true; });
+            yield return new WaitUntil(() => seq12BComplete);
+            
+            Debug.Log("[NarratorDay2] Wrong choice - Seq12BIbu played, will repeat");
+            lastInteractionResult = false; // Set flag for wrong choice
         }
     }
+    
+    private bool lastInteractionResult = false;
+    
 
 
     [System.Obsolete]
@@ -265,12 +261,31 @@ public class NarratorDay2 : NarratorBase
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
 
-        yield return StartCoroutine(WaitForRaycastInteraction("interaksi_ortu"));
-        
-        // bool seq11Complete = false;
-        // dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq11Memasak", 
-        //     () => { seq11Complete = true; });
-        // yield return new WaitUntil(() => seq11Complete);
+        // Repeat interaction until player makes correct choice (Seq12AAyah)
+        bool interactionComplete = false;
+        while (!interactionComplete)
+        {
+            // Wait for player to interact with parents using raycast
+            yield return StartCoroutine(WaitForRaycastInteraction(() => {
+                // This will be called when player presses E while looking at interactable object
+                StartCoroutine(HandleOrangTuaDialog());
+            }));
+            
+            // Wait for dialog to complete
+            yield return new WaitForSeconds(0.5f);
+            
+            // Check result - if correct choice (Seq12AAyah), exit loop
+            if (lastInteractionResult)
+            {
+                interactionComplete = true;
+                Debug.Log("[NarratorDay2] Correct interaction completed, continuing story");
+            }
+            else
+            {
+                Debug.Log("[NarratorDay2] Wrong choice, repeating interaction");
+                yield return new WaitForSeconds(1f); // Small delay before allowing next interaction
+            }
+        }
 
         yield return new WaitForSeconds(1f);
         

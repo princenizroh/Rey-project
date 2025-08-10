@@ -19,21 +19,9 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 0
-      dialogEntry: Lapar
+      npcName: 1
+      dialogEntry: Minta susu ke ayah saja
       audioDialogEntry: {fileID: 0}
-      choices:
-      - playerChoice: '*Unghh* (Interaksi Ayah)'
-        correctChoice: 1
-        dialogResponses:
-        - npcName: 2
-          npcResponse: Iya sebentar ya sayang
-        audioDialogResponse: {fileID: 0}
-      - playerChoice: '*Unghh* (Interaksi Ibu)'
-        correctChoice: 0
-        dialogResponses:
-        - npcName: 1
-          npcResponse: Minta susu ke ayah saja
-        audioDialogResponse: {fileID: 0}
+      choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
