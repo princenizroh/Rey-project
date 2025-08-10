@@ -15,8 +15,10 @@ public class NarratorDay3 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 0);  
         SetCharacterSpawn(CharacterType.Father, 0);    
         SetCharacterSpawn(CharacterType.Baby, 0);
-        PlayCharacterAnimation(CharacterType.Father, "Sit");
+        PlayCharacterAnimation(CharacterType.Father, "Idle");
         PlayCharacterAnimation(CharacterType.Mother, "Idle");
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.gameObject.SetActive(true);
@@ -53,6 +55,11 @@ public class NarratorDay3 : NarratorBase
         yield return StartCoroutine(SetCameraPanRangeFront());
         FadeOpenEyes(); 
 
+        StartCoroutine(ResetHeadTracking());
+        yield return new WaitForSeconds(1f);
+        SetCharacterSpawn(CharacterType.Baby, 1); 
+        SetCharacterSpawn(CharacterType.Father, 1);
+        SetCharacterSpawn(CharacterType.Mother, 1);
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 0));
         SetCharacterSpawn(CharacterType.Father, 2); 
@@ -61,6 +68,8 @@ public class NarratorDay3 : NarratorBase
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 1));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
 
+        PlayCharacterAnimation(CharacterType.Father, "Left Turn");
+        PlayCharacterAnimation(CharacterType.Mother, "Right Turn");
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day3/Seq2KepergianAyah", 
             () => { seq2Complete = true; });
@@ -70,9 +79,9 @@ public class NarratorDay3 : NarratorBase
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 2));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 2));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
 
-        // Seq3 Mandi
         bool seq3Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day3/Seq3Mandi", 
             () => { seq3Complete = true; });
@@ -104,6 +113,7 @@ public class NarratorDay3 : NarratorBase
         yield return new WaitUntil(() => seq4Complete);
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         yield return new WaitForSeconds(1f);
         
         bool seq5Complete = false;
@@ -141,6 +151,7 @@ public class NarratorDay3 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         bool seq7Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day3/Seq7Kesal", 
             () => { seq7Complete = true; });
@@ -157,7 +168,9 @@ public class NarratorDay3 : NarratorBase
         yield return new WaitForSeconds(2f);
         FadeOpenEyes(); 
 
+        StartCoroutine(ResetHeadTracking());
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 3));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
         
         bool seq8Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day3/Seq8AyahPulang", 
@@ -167,6 +180,8 @@ public class NarratorDay3 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 4));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Father, 0.2f));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Mother, 0.2f));
         
         bool seq9Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day3/Seq9MenyambutAyah", 
@@ -184,6 +199,7 @@ public class NarratorDay3 : NarratorBase
     [System.Obsolete]
     protected override IEnumerator PlayNightSequence()
     {
+        StartCoroutine(ResetHeadTracking());
         CloseEyes();
         DisableNavMeshAgent(CharacterType.Mother);
         DisableNavMeshAgent(CharacterType.Father);
@@ -192,10 +208,10 @@ public class NarratorDay3 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 1);
         SetCharacterSpawn(CharacterType.Mother, 4);
         SetCharacterSpawn(CharacterType.Father, 4);
-
-        // Parents focus on baby during dinner
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
-        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
+        PlayCharacterAnimation(CharacterType.Mother, "Sitting_Talking");
+        PlayCharacterAnimation(CharacterType.Father, "Sitting_Kaki_Gerak");
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Father, 0.2f));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Mother, 0.2f));
 
         yield return new WaitForSeconds(1f);
         FadeOpenEyes();
@@ -208,7 +224,6 @@ public class NarratorDay3 : NarratorBase
 
         yield return new WaitForSeconds(1f);
 
-        // Parents look at each other discussing baby needs
         StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Father));
         StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Mother));
 
@@ -219,42 +234,42 @@ public class NarratorDay3 : NarratorBase
 
         yield return new WaitForSeconds(1f);
         
-        // Enable raycast interaction system for player choice
-        this.EnableRaycastInteraction();
+        // // Enable raycast interaction system for player choice
+        // this.EnableRaycastInteraction();
+        //
+        // // Wait for CORRECT parent interaction - loop until player interacts with Father (Mulyono)
+        // bool correctInteraction = false;
+        // while (!correctInteraction)
+        // {
+        //     yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+        //         Debug.Log($"[Day3] Player interacted with: {characterIdentity}");
+        //         
+        //         if (characterIdentity == "Mulyono") // Father - CORRECT interaction
+        //         {
+        //             Debug.Log("[Day3] CORRECT! Father interaction - continuing to next sequence");
+        //             correctInteraction = true; // Exit the loop
+        //         }
+        //         else if (characterIdentity == "Linda") // Mother - WRONG interaction  
+        //         {
+        //             Debug.Log("[Day3] WRONG! Mother interaction - player must interact with Father instead");
+        //             // correctInteraction remains false - loop continues
+        //         }
+        //         else
+        //         {
+        //             Debug.Log($"[Day3] Unknown character: {characterIdentity} - loop continues");
+        //             // correctInteraction remains false - loop continues
+        //         }
+        //     }));
+        //     
+        //     // Small delay before allowing next interaction attempt
+        //     if (!correctInteraction)
+        //     {
+        //         yield return new WaitForSeconds(0.5f);
+        //     }
+        // }
 
-        // Wait for CORRECT parent interaction - loop until player interacts with Father (Mulyono)
-        bool correctInteraction = false;
-        while (!correctInteraction)
-        {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
-                Debug.Log($"[Day3] Player interacted with: {characterIdentity}");
-                
-                if (characterIdentity == "Mulyono") // Father - CORRECT interaction
-                {
-                    Debug.Log("[Day3] CORRECT! Father interaction - continuing to next sequence");
-                    correctInteraction = true; // Exit the loop
-                }
-                else if (characterIdentity == "Linda") // Mother - WRONG interaction  
-                {
-                    Debug.Log("[Day3] WRONG! Mother interaction - player must interact with Father instead");
-                    // correctInteraction remains false - loop continues
-                }
-                else
-                {
-                    Debug.Log($"[Day3] Unknown character: {characterIdentity} - loop continues");
-                    // correctInteraction remains false - loop continues
-                }
-            }));
-            
-            // Small delay before allowing next interaction attempt
-            if (!correctInteraction)
-            {
-                yield return new WaitForSeconds(0.5f);
-            }
-        }
-
-        // Disable raycast interaction system after player made correct choice
-        this.DisableRaycastInteraction();
+        // // Disable raycast interaction system after player made correct choice
+        // this.DisableRaycastInteraction();
 
         yield return new WaitForSeconds(1f);
         EnableNavMeshAgent(CharacterType.Father);
@@ -283,20 +298,19 @@ public class NarratorDay3 : NarratorBase
     [System.Obsolete]
     protected IEnumerator PlayMidnightSequence()
     {
+        StartCoroutine(ResetHeadTracking());
         CloseEyes();
-        EnableNavMeshAgent(CharacterType.Mother);
-        EnableNavMeshAgent(CharacterType.Father);
+        DisableNavMeshAgent(CharacterType.Mother);
+        DisableNavMeshAgent(CharacterType.Father);
         
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 1.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 5);
-        SetCharacterSpawn(CharacterType.Father, 5);
-        
-        // Parents wake up and focus on baby
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
-        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
-        
+        SetCharacterSpawn(CharacterType.Father, 5);        
+        PlayCharacterAnimation(CharacterType.Mother, "Laying Sleeping");
+        PlayCharacterAnimation(CharacterType.Father, "Laying Sleeping");
+ 
         yield return new WaitForSeconds(3f);
         FadeOpenEyes(); 
         yield return new WaitForSeconds(3f);
@@ -308,50 +322,14 @@ public class NarratorDay3 : NarratorBase
         yield return new WaitForSeconds(1f);
 
         // Enable raycast interaction system for player choice
-        this.EnableRaycastInteraction();
-
-        // Wait for CORRECT parent interaction - loop until player interacts with Mother (Linda)
-        bool correctInteraction = false;
-        while (!correctInteraction)
-        {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
-                Debug.Log($"[Day3] Player interacted with: {characterIdentity}");
-                
-                if (characterIdentity == "Linda") // Mother - CORRECT interaction for midnight
-                {
-                    Debug.Log("[Day3] CORRECT! Mother interaction - continuing to next sequence");
-                    correctInteraction = true; // Exit the loop
-                }
-                else if (characterIdentity == "Mulyono") // Father - WRONG interaction  
-                {
-                    Debug.Log("[Day3] WRONG! Father interaction - player must interact with Mother instead");
-                    // correctInteraction remains false - loop continues
-                }
-                else
-                {
-                    Debug.Log($"[Day3] Unknown character: {characterIdentity} - loop continues");
-                    // correctInteraction remains false - loop continues
-                }
-            }));
-            
-            // Small delay before allowing next interaction attempt
-            if (!correctInteraction)
-            {
-                yield return new WaitForSeconds(0.5f);
-            }
-        }
-
-        // Disable raycast interaction system after player made correct choice
-        this.DisableRaycastInteraction();
-
         yield return new WaitForSeconds(1f);
         SetCharacterSpawn(CharacterType.Mother, 6);
+        EnableNavMeshAgent(CharacterType.Mother);
         yield return new WaitForSeconds(1f);
         
-        // Mother looks forward while moving
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         GoToNextDay();
