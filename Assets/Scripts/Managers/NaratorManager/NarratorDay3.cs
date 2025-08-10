@@ -193,6 +193,10 @@ public class NarratorDay3 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 4);
         SetCharacterSpawn(CharacterType.Father, 4);
 
+        // Parents focus on baby during dinner
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
+
         yield return new WaitForSeconds(1f);
         FadeOpenEyes();
         yield return new WaitForSeconds(1f);
@@ -204,6 +208,10 @@ public class NarratorDay3 : NarratorBase
 
         yield return new WaitForSeconds(1f);
 
+        // Parents look at each other discussing baby needs
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Father));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Mother));
+
         bool seq11Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day3/Seq11ButuhSusu",
             () => { seq11Complete = true; });
@@ -211,7 +219,14 @@ public class NarratorDay3 : NarratorBase
 
         yield return new WaitForSeconds(1f);
         EnableNavMeshAgent(CharacterType.Father);
+        
+        // Father looks ahead while moving
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Object));
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 3));
+
+        // After movement, Father focuses on baby
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
 
         bool seq12Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day3/Seq12SusuBotol",
@@ -239,6 +254,10 @@ public class NarratorDay3 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 5);
         SetCharacterSpawn(CharacterType.Father, 5);
         
+        // Parents wake up and focus on baby
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
+        
         yield return new WaitForSeconds(3f);
         FadeOpenEyes(); 
         yield return new WaitForSeconds(3f);
@@ -251,6 +270,10 @@ public class NarratorDay3 : NarratorBase
 
         SetCharacterSpawn(CharacterType.Mother, 6);
         yield return new WaitForSeconds(1f);
+        
+        // Mother looks forward while moving
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);

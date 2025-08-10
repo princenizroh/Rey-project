@@ -58,11 +58,17 @@ public class NarratorDay8 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Ghost, 0);
 
+        // Mother initially looks at baby but senses intense supernatural presence
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+
         yield return new WaitForSeconds(1f);
         // PlayAudio("supernatural_intense");
         
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
+        
+        // Mother is terrified, looks at the threatening ghost presence
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
         
         bool seq4Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq4GangguanSetanSangatParah", 
@@ -70,7 +76,14 @@ public class NarratorDay8 : NarratorBase
         yield return new WaitUntil(() => seq4Complete);
         
         yield return new WaitForSeconds(1f);
+        
+        // Mother looks forward while moving, desperate to escape
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+        
+        // After movement, Mother looks back at baby in desperation
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq5Keputusasaan", 

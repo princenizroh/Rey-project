@@ -63,6 +63,9 @@ public class NarratorDay6 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Ghost, 0);
         
+        // Mother initially watches over baby peacefully
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        
         yield return new WaitForSeconds(1f);
         
         FadeOpenEyes();
@@ -74,6 +77,9 @@ public class NarratorDay6 : NarratorBase
         yield return new WaitUntil(() => seq3Complete);
         
         yield return new WaitForSeconds(1f);
+        
+        // Mother starts noticing supernatural presence, looks around
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
         
         bool seq4Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day6/Seq4Sosok", 
@@ -89,7 +95,13 @@ public class NarratorDay6 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
+        // Mother looks forward while moving, protecting baby
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+        
+        // After movement, Mother looks back at baby with concern
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
         bool seq6Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day6/Seq6Khawatir", 

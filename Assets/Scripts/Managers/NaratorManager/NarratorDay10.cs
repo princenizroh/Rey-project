@@ -50,6 +50,9 @@ public class NarratorDay10 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         
+        // Mother looks at baby while sharing her heart and concerns
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        
         yield return new WaitForSeconds(1f);
         
         bool seq3Complete = false;

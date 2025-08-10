@@ -63,6 +63,7 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Object, 1);
         PlayCharacterAnimation(CharacterType.Father, "Sitting_Talking");
         PlayCharacterAnimation(CharacterType.Mother, "Idle");
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 2\nHari Pertamaku";
@@ -87,6 +88,7 @@ public class NarratorDay2 : NarratorBase
 
         FadeCloseEyes();
         
+        StartCoroutine(ResetHeadTracking());
         yield return new WaitForSeconds(2f);
         SetCharacterSpawn(CharacterType.Baby, 1); 
         SetCharacterSpawn(CharacterType.Father, 1);
@@ -115,6 +117,7 @@ public class NarratorDay2 : NarratorBase
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 2));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 2));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
         bool seq3Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq3Mandi", 
@@ -123,6 +126,8 @@ public class NarratorDay2 : NarratorBase
         
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
+        StartCoroutine(ResetHeadTracking());
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         yield return StartCoroutine(SetCameraPanRangeRight());
         SetCharacterSpawn(CharacterType.Baby, 2); 
         SetCharacterSpawn(CharacterType.Mother, 2);
@@ -166,6 +171,7 @@ public class NarratorDay2 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
         bool seq6Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq6Rewel", 
@@ -199,6 +205,7 @@ public class NarratorDay2 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         bool seq8Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq8Kesal", 
             () => { seq8Complete = true; });
@@ -215,6 +222,7 @@ public class NarratorDay2 : NarratorBase
         FadeOpenEyes();
 
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 3));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
         
         bool seq9Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq9AyahPulang", 
@@ -224,6 +232,8 @@ public class NarratorDay2 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 4));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Father, 0.2f));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Mother, 0.2f));
         
         bool seq10Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq10MenyambutAyah", 
@@ -250,6 +260,7 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 4);
         SetCharacterSpawn(CharacterType.Father, 4);
 
+
         yield return new WaitForSeconds(1f);
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
@@ -263,13 +274,17 @@ public class NarratorDay2 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
+        
         bool seq12Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12BuatinSusu", 
             () => { seq12Complete = true; });
         yield return new WaitUntil(() => seq12Complete);
         
         yield return new WaitForSeconds(1f);
+        
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 4));
+        
         
         bool seq13Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq13SusuBotol", 
@@ -295,7 +310,6 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 5);
         SetCharacterSpawn(CharacterType.Father, 5);
-        
         yield return new WaitForSeconds(3f);
         
         FadeOpenEyes(); 
@@ -309,7 +323,10 @@ public class NarratorDay2 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 6);
         EnableNavMeshAgent(CharacterType.Mother);
         yield return new WaitForSeconds(1f);
+        
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 3));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         

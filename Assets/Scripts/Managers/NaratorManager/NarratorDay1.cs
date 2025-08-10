@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
+// Head tracking with custom weight support
 public class NarratorDay1 : NarratorBase
 {
     [System.Obsolete]
@@ -20,16 +21,14 @@ public class NarratorDay1 : NarratorBase
         PlayCharacterAnimation(CharacterType.Father, "Sit");
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");
         
-        // Enable head tracking - all characters focus on baby (POV camera)
-        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Mother, HeadTarget.Camera, 1f);
-        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Father, HeadTarget.Camera, 1f);
-        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Bidan, HeadTarget.Camera, 1f);
 
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.text = "Day 1\nKelahiran";
         yield return new WaitForSeconds(5f); 
         uiElements.narratorText.gameObject.SetActive(false);
 
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        StartCoroutine(SetHeadTarget(CharacterType.Bidan, CharacterTarget.Baby, 0.5f));
         bool seq1Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq1DalamPerut", 
             () => { seq1Complete = true; });
@@ -69,17 +68,11 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitForSeconds(0.5f);
         FadeOpenEyes();
         
-        // When baby opens eyes - parents look at each other in amazement
-        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Mother, HeadTarget.Father, 1f);
-        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Father, HeadTarget.Mother, 1f);
-        
+
         yield return new WaitForSeconds(2f);
         
-        // Then back to looking at baby
-        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Mother, HeadTarget.Camera, 1f);
-        HeadTrackingManager.Instance.SetHeadTarget(CharacterType.Father, HeadTarget.Camera, 1f);
         
-        yield return new WaitForSeconds(28f);
+        yield return new WaitForSeconds(2f);
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq5MembukaMata", 
             () => { seq5Complete = true; });
@@ -90,6 +83,7 @@ public class NarratorDay1 : NarratorBase
         
         yield return new WaitForSeconds(2f);
 
+        StartCoroutine(SetHeadTarget(CharacterType.Bidan, CharacterTarget.Mother, 0.5f));
         bool seq6Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq6Makanan", 
             () => { seq6Complete = true; });
@@ -97,9 +91,7 @@ public class NarratorDay1 : NarratorBase
 
         yield return new WaitForSeconds(1f);
         
-        // Disable head tracking during movement for natural look
-        HeadTrackingManager.Instance.DisableHeadTracking(CharacterType.Bidan);
-        
+        StartCoroutine(ResetBidanTrack());
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Bidan, 0));
         FadeCloseEyes();
 
@@ -109,9 +101,6 @@ public class NarratorDay1 : NarratorBase
             () => { seq7Complete = true; });
         yield return new WaitUntil(() => seq7Complete);
         SetCharacterSpawn(CharacterType.Object, 1);
-
-        // Disable all head tracking before transition
-        HeadTrackingManager.Instance.EnableGlobalHeadTracking(false);
         
         yield return new WaitForSeconds(2f);
         GoToNextDay();

@@ -49,6 +49,10 @@ public class NarratorDay11 : NarratorBase
         TimeManager.instance.TimeOfDay = 1.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
+        
+        // Mother looks at baby with concern about hunger and survival
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        
         bool seq3Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day11/Seq3Kelaparan", 
             () => { seq3Complete = true; });

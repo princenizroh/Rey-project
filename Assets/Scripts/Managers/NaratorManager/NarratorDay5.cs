@@ -81,12 +81,18 @@ public class NarratorDay5 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Ghost, 0);
         
+        // Mother initially focuses on baby during storm
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        
         yield return new WaitForSeconds(1f);
         // PlayAudio("rain_heavy");
         // PlayAudio("wind_strong");
         
         yield return new WaitForSeconds(2f);
         FadeOpenEyes(); 
+        
+        // Mother senses ghostly presence, looks around nervously
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
         
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq5GangguanSetanHujan", 
@@ -95,7 +101,13 @@ public class NarratorDay5 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
+        // Mother looks forward while moving, feeling disturbed
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+
+        // After movement, Mother looks back at baby protectively
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
 
         bool seq6Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq6Muak", 

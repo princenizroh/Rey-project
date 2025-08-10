@@ -23,6 +23,10 @@ public class NarratorDay12 : NarratorBase
         SetCharacterSpawn(CharacterType.Father, 0);
         AppearObjects();
         
+        // Initial setup - Mother focuses on baby, Father looks around at chaos
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Object));
+        
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 12\nKekacauan";
@@ -32,12 +36,20 @@ public class NarratorDay12 : NarratorBase
         FadeOpenEyes(); 
         yield return new WaitForSeconds(1f);
 
+        // Father returns, parents look at each other
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Father));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Mother));
+
         bool seq1Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq1KepulanganAyah", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
         
         yield return new WaitForSeconds(1f);
+        
+        // Both parents look around at the chaos
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Object));
         
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq2Berantakan", 

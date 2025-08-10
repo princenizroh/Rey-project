@@ -99,13 +99,14 @@ public abstract class NarratorBase : MonoBehaviour
     [SerializeField] protected UIElements uiElements;
 
     [Header("Game Objects")]
-    [SerializeField] protected GameObjects gameObjects;   
+    [SerializeField] protected GameObjects gameObjects;
 
     [Header("Core Manager")]
     [SerializeField] protected CoreGameManager dialogGameManager;
-    
-    // SaveFileManager will be auto-found, no need for Inspector assignment
+
     protected SaveFileManager saveFileManager;
+
+    protected HeadTrackingManager headTrackingManager;
 
     [Header("Characters")]
     [SerializeField] protected CharacterData[] charactersDataArray;
@@ -117,20 +118,21 @@ public abstract class NarratorBase : MonoBehaviour
     private Dictionary<string, AudioClipData> audioDict;
     private Dictionary<CharacterType, CharacterData> characterDict;
 
-#region Unity Lifecycle 
+    #region Unity Lifecycle 
     protected virtual void Awake()
     {
         InitializeAudioSystem();
         InitializeCharacterSystem();
         InitializeSaveFileManager();
+        InitializeHeadTrackingManager();
     }
 
     protected virtual void Start()
     {
         InitializeCharacterComponents();
     }
-#endregion
-#region Initialization
+    #endregion
+    #region Initialization
     private void InitializeAudioSystem()
     {
         audioDict = new Dictionary<string, AudioClipData>();
@@ -154,25 +156,23 @@ public abstract class NarratorBase : MonoBehaviour
             }
         }
     }
-    
+
     private void InitializeSaveFileManager()
     {
-        // Auto-find SaveFileManager in scene
         if (saveFileManager == null)
         {
             saveFileManager = FindFirstObjectByType<SaveFileManager>();
         }
-        
-        if (saveFileManager == null)
+    }
+
+    private void InitializeHeadTrackingManager()
+    {
+        if (headTrackingManager == null)
         {
-            Debug.LogWarning("[NarratorBase] SaveFileManager not found in scene. Auto-save will be disabled.");
-        }
-        else
-        {
-            Debug.Log("[NarratorBase] SaveFileManager auto-found and initialized.");
+            headTrackingManager = FindFirstObjectByType<HeadTrackingManager>();
         }
     }
-    
+
     private void InitializeCharacterComponents()
     {
         foreach (var characterData in charactersDataArray)
@@ -180,84 +180,86 @@ public abstract class NarratorBase : MonoBehaviour
             characterData.Initialize();
         }
     }
-#endregion
-#region Sequence Detection
+    #endregion
+    #region Sequence Detection
     public virtual TimeOfDay GetFirstAvailableTimeOfDay()
     {
         System.Type thisType = this.GetType();
-        
-        var morningMethod = thisType.GetMethod("PlayMorningSequence", 
+
+        var morningMethod = thisType.GetMethod("PlayMorningSequence",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (morningMethod != null && morningMethod.DeclaringType != typeof(NarratorBase))
         {
             return TimeOfDay.Morning;
         }
-        
-        var afternoonMethod = thisType.GetMethod("PlayAfternoonSequence", 
+
+        var afternoonMethod = thisType.GetMethod("PlayAfternoonSequence",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (afternoonMethod != null && afternoonMethod.DeclaringType != typeof(NarratorBase))
         {
             return TimeOfDay.Afternoon;
         }
-        
-        var eveningMethod = thisType.GetMethod("PlayEveningSequence", 
+
+        var eveningMethod = thisType.GetMethod("PlayEveningSequence",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (eveningMethod != null && eveningMethod.DeclaringType != typeof(NarratorBase))
         {
             return TimeOfDay.Evening;
         }
-        
+
         return TimeOfDay.Night;
     }
-    
+
     public virtual TimeOfDay GetNextAvailableTimeOfDay(TimeOfDay currentTime)
     {
         System.Type thisType = this.GetType();
-        
+
         for (int i = (int)currentTime + 1; i <= (int)TimeOfDay.Night; i++)
         {
             TimeOfDay checkTime = (TimeOfDay)i;
             string methodName = $"Play{checkTime}Sequence";
-            
-            var method = thisType.GetMethod(methodName, 
+
+            var method = thisType.GetMethod(methodName,
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (method != null && method.DeclaringType != typeof(NarratorBase))
             {
                 return checkTime;
             }
         }
-        
+
         return TimeOfDay.Morning;
     }
-    
+
     public virtual bool HasTimeOfDaySequence(TimeOfDay timeOfDay)
     {
         System.Type thisType = this.GetType();
         string methodName = $"Play{timeOfDay}Sequence";
-        
-        var method = thisType.GetMethod(methodName, 
+
+        var method = thisType.GetMethod(methodName,
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         return method != null && method.DeclaringType != typeof(NarratorBase);
     }
-#endregion
-#region Abstract Methods
+    #endregion
+    #region Abstract Methods
     [System.Obsolete]
     public IEnumerator StartNarration()
     {
         yield return StartCoroutine(Narrate());
     }
-    
+
     [System.Obsolete]
     protected virtual IEnumerator Narrate()
     {
         ResetUIState();
         
+        yield return StartCoroutine(ResetHeadTracking());
+
         TimeOfDay targetTime = NarratorManager.Instance.currentTime;
-        
+
         if (!HasTimeOfDaySequence(targetTime))
         {
             Debug.LogWarning($"{this.GetType().Name} does not have {targetTime}Sequence implemented. Finding next available sequence...");
-            
+
             TimeOfDay nextAvailable = GetNextAvailableTimeOfDay(targetTime);
             if (nextAvailable != TimeOfDay.Morning || HasTimeOfDaySequence(TimeOfDay.Morning))
             {
@@ -270,7 +272,7 @@ public abstract class NarratorBase : MonoBehaviour
                 yield break;
             }
         }
-        
+
         switch (targetTime)
         {
             case TimeOfDay.Morning:
@@ -292,74 +294,74 @@ public abstract class NarratorBase : MonoBehaviour
     {
         yield return null;
     }
-    
+
     [System.Obsolete]
     protected virtual IEnumerator PlayAfternoonSequence()
     {
         yield return null;
     }
-    
+
     [System.Obsolete]
     protected virtual IEnumerator PlayEveningSequence()
     {
         yield return null;
     }
-    
+
     [System.Obsolete]
     protected virtual IEnumerator PlayNightSequence()
     {
         yield return null;
     }
-#endregion
+    #endregion
 
-#region UI Management
+    #region UI Management
     protected void ResetUIState()
     {
     }
     protected void CloseEyes()
-    { 
+    {
         Color newColor = Color.black;
-        newColor.a = 1f; 
+        newColor.a = 1f;
         uiElements.backgroundImage.color = newColor;
-        uiElements.canvasGroup.alpha = 1f; 
+        uiElements.canvasGroup.alpha = 1f;
     }
 
     protected void FadeOpenEyes()
     {
-        StartCoroutine(FadeEyesCoroutine(1f, 0f, 2f)); 
+        StartCoroutine(FadeEyesCoroutine(1f, 0f, 2f));
     }
 
     protected void FadeCloseEyes()
     {
-        StartCoroutine(FadeEyesCoroutine(0f, 1f, 2f)); 
+        StartCoroutine(FadeEyesCoroutine(0f, 1f, 2f));
     }
 
     private IEnumerator FadeEyesCoroutine(float startAlpha, float endAlpha, float duration)
     {
         float elapsed = 0f;
         Color currentColor = uiElements.backgroundImage.color;
-        
+
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float normalizedTime = elapsed / duration;
-            
+
             float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, normalizedTime);
-            
+
             currentColor.a = currentAlpha;
             uiElements.backgroundImage.color = currentColor;
-            
+
             uiElements.canvasGroup.alpha = Mathf.Lerp(1f, 1f, normalizedTime);
-            
-            yield return null; 
+
+            yield return null;
         }
-        
+
         currentColor.a = endAlpha;
         uiElements.backgroundImage.color = currentColor;
-       
+
     }
-#endregion
-#region Audio Management
+    #endregion
+    #region Audio Management
     protected void PlayAudio(string clipName)
     {
         if (audioDict.ContainsKey(clipName))
@@ -375,7 +377,7 @@ public abstract class NarratorBase : MonoBehaviour
             Debug.LogWarning($"Audio clip '{clipName}' not found!");
         }
     }
-    
+
     private void StopAudio()
     {
         if (audioSource.isPlaying)
@@ -400,11 +402,11 @@ public abstract class NarratorBase : MonoBehaviour
             yield return null;
         }
         audioSource.Stop();
-        audioSource.volume = startVolume; 
+        audioSource.volume = startVolume;
     }
-#endregion
+    #endregion
 
-#region Character Management
+    #region Character Management
     protected void SetCharacterSpawn(CharacterType characterType, int spawnIndex)
     {
         if (characterDict.TryGetValue(characterType, out CharacterData characterData))
@@ -432,7 +434,7 @@ public abstract class NarratorBase : MonoBehaviour
             Debug.LogError($"Failed to initialize {characterType} for animation!");
             return;
         }
-        
+
         if (characterDict.TryGetValue(characterType, out CharacterData characterData))
         {
             if (characterData.animator != null)
@@ -442,22 +444,22 @@ public abstract class NarratorBase : MonoBehaviour
                     Debug.LogWarning($"{characterType} GameObject is not active!");
                     return;
                 }
-                
+
                 if (!characterData.animator.enabled)
                 {
                     Debug.LogWarning($"{characterType} Animator is not enabled!");
                     return;
                 }
-                
+
                 Debug.Log($"Playing animation '{animationName}' for {characterType}");
-                
+
                 if (characterType == CharacterType.Bidan)
                 {
                     characterData.animator.Play(animationName);
                 }
                 if (characterType == CharacterType.Mother)
                 {
-                    characterData.animator.Play(animationName); 
+                    characterData.animator.Play(animationName);
                 }
                 if (characterType == CharacterType.Father)
                 {
@@ -490,24 +492,24 @@ public abstract class NarratorBase : MonoBehaviour
             if (characterData.animator == null || characterData.agent == null)
             {
                 Debug.Log($"Re-initializing {characterType}");
-                
+
                 bool wasActive = characterData.characterObject.activeInHierarchy;
                 if (!wasActive)
                 {
                     characterData.characterObject.SetActive(true);
                 }
-                
+
                 characterData.Initialize();
-                
+
                 if (!wasActive)
                 {
                     characterData.characterObject.SetActive(wasActive);
                 }
             }
-            
+
             return characterData.animator != null;
         }
-        
+
         return false;
     }
 
@@ -556,8 +558,8 @@ public abstract class NarratorBase : MonoBehaviour
         obj.position = targetPos;
         obj.rotation = targetRot;
     }
-#endregion
-#region Movement Management
+    #endregion
+    #region Movement Management
     protected IEnumerator MoveCharacterToPosition(CharacterType characterType, int positionIndex, float duration = 1f)
     {
         if (characterDict.TryGetValue(characterType, out CharacterData character))
@@ -607,8 +609,8 @@ public abstract class NarratorBase : MonoBehaviour
             }
         }
     }
-#endregion
-#region GameObject Management
+    #endregion
+    #region GameObject Management
     protected void AppearObjects()
     {
         SetObjectsActive(gameObjects.activeObjects, true);
@@ -629,25 +631,25 @@ public abstract class NarratorBase : MonoBehaviour
     protected GameObject SpawnChargeMeter(Canvas targetCanvas = null)
     {
         GameObject chargeMeterPrefab = Resources.Load<GameObject>("ChargeMeter");
-        
+
         if (chargeMeterPrefab == null)
         {
             return null;
         }
 
         GameObject chargeMeterInstance;
-        
+
         if (targetCanvas != null)
         {
             chargeMeterInstance = Instantiate(chargeMeterPrefab, targetCanvas.transform);
-            
+
             RectTransform rectTransform = chargeMeterInstance.GetComponent<RectTransform>();
             if (rectTransform != null)
             {
                 rectTransform.anchoredPosition = Vector2.zero;
                 rectTransform.localScale = Vector3.one;
             }
-            
+
         }
         else
         {
@@ -660,20 +662,20 @@ public abstract class NarratorBase : MonoBehaviour
     protected GameObject SpawnChargeMeterByCanvasName(string canvasName)
     {
         Canvas targetCanvas = FindCanvasByName(canvasName);
-        
+
         if (targetCanvas == null)
         {
             Debug.LogWarning($"Canvas with name '{canvasName}' not found! Spawning in world space instead.");
             return SpawnChargeMeter(null);
         }
-        
+
         return SpawnChargeMeter(targetCanvas);
     }
 
     private Canvas FindCanvasByName(string canvasName)
     {
         Canvas[] allCanvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
-        
+
         foreach (Canvas canvas in allCanvases)
         {
             if (canvas.name.Equals(canvasName, System.StringComparison.OrdinalIgnoreCase))
@@ -681,16 +683,16 @@ public abstract class NarratorBase : MonoBehaviour
                 return canvas;
             }
         }
-        
+
         return null;
     }
 
     [System.Obsolete]
     protected void GoToNextTimeOfDay()
     {
-        // Auto-save before transitioning to next time of day
+        StartCoroutine(ResetHeadTracking());
         AutoSaveProgress();
-        
+
         if (NarratorManager.Instance != null)
         {
             NarratorManager.Instance.NextTimeOfDay();
@@ -700,9 +702,10 @@ public abstract class NarratorBase : MonoBehaviour
     [System.Obsolete]
     protected void GoToNextDay()
     {
-        // Auto-save before transitioning to next day
+        StartCoroutine(ResetHeadTracking());
+
         AutoSaveProgress();
-        
+
         if (NarratorManager.Instance != null)
         {
             NarratorManager.Instance.NextDay();
@@ -718,8 +721,8 @@ public abstract class NarratorBase : MonoBehaviour
         }
     }
 
-#endregion
-#region CameraManagement
+    #endregion
+    #region CameraManagement
     protected IEnumerator SetCameraPanRangeFront()
     {
         var panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
@@ -747,12 +750,9 @@ public abstract class NarratorBase : MonoBehaviour
         panTilt.PanAxis.Range = new Vector2(-90f, 90f);
         yield return null;
     }
-#endregion
+    #endregion
 
-#region Save Management
-    /// <summary>
-    /// Auto-save game progress after completing a sequence
-    /// </summary>
+    #region Save Management
     protected void AutoSaveProgress()
     {
         if (saveFileManager == null)
@@ -767,13 +767,13 @@ public abstract class NarratorBase : MonoBehaviour
             if (NarratorManager.Instance != null)
             {
                 int currentDayNumber = (int)NarratorManager.Instance.currentDay + 1; // Convert enum to 1-based day number
-                
+
                 // Update ScriptableObject day value before saving
                 UpdateSaveDataDay(currentDayNumber);
-                
+
                 // Save current progress to JSON
                 saveFileManager.SaveToCoreGameSavesJSON();
-                
+
                 Debug.Log($"[NarratorBase] Auto-saved progress: Day {currentDayNumber}, Time: {NarratorManager.Instance.currentTime}");
             }
         }
@@ -782,17 +782,12 @@ public abstract class NarratorBase : MonoBehaviour
             Debug.LogError($"[NarratorBase] Auto-save failed: {e.Message}");
         }
     }
-    
-    /// <summary>
-    /// Update the day value in SaveFileManager's target ScriptableObject
-    /// </summary>
+
     private void UpdateSaveDataDay(int dayNumber)
     {
-        // Access the SaveFileManager's target ScriptableObject through reflection or direct access
-        // This assumes SaveFileManager has a public getter or we add one
-        var saveDataField = saveFileManager.GetType().GetField("targetSaveObject", 
+        var saveDataField = saveFileManager.GetType().GetField("targetSaveObject",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        
+
         if (saveDataField != null)
         {
             var coreGameSaves = saveDataField.GetValue(saveFileManager);
@@ -808,26 +803,14 @@ public abstract class NarratorBase : MonoBehaviour
             }
         }
     }
-    
-    /// <summary>
-    /// Manual save method that can be called from child classes
-    /// </summary>
+
     protected void ManualSave()
     {
         AutoSaveProgress();
     }
-    
-    /// <summary>
-    /// Save with custom day number (useful for special cases)
-    /// </summary>
+
     protected void SaveWithDay(int dayNumber)
     {
-        if (saveFileManager == null)
-        {
-            Debug.LogWarning("[NarratorBase] SaveFileManager not assigned, skipping save.");
-            return;
-        }
-
         try
         {
             UpdateSaveDataDay(dayNumber);
@@ -839,96 +822,30 @@ public abstract class NarratorBase : MonoBehaviour
             Debug.LogError($"[NarratorBase] Custom save failed: {e.Message}");
         }
     }
-#endregion
+    #endregion
 
-#region Head Tracking Management
-    /// <summary>
-    /// Set head target for specific character using HeadTarget enum
-    /// </summary>
-    protected void SetHeadTarget(CharacterType characterType, string targetName)
+    #region Head Tracking Management
+    protected IEnumerator SetHeadTarget(CharacterType characterType, CharacterTarget targetType)
     {
-        var headTrackingManager = FindFirstObjectByType(System.Type.GetType("HeadTrackingManager"));
-        if (headTrackingManager != null)
-        {
-            // Get HeadTarget enum type
-            var headTargetType = System.Type.GetType("HeadTarget");
-            if (headTargetType != null)
-            {
-                var targetEnum = System.Enum.Parse(headTargetType, targetName);
-                var method = headTrackingManager.GetType().GetMethod("SetHeadTarget", new System.Type[] { typeof(CharacterType), headTargetType });
-                if (method != null)
-                {
-                    method.Invoke(headTrackingManager, new object[] { characterType, targetEnum });
-                }
-            }
-        }
-        else
-        {
-            Debug.LogWarning("[NarratorBase] HeadTrackingManager not found in scene!");
-        }
+        headTrackingManager.SetHeadTarget(characterType, targetType);
+        yield return null;
     }
-    
-    /// <summary>
-    /// Helper methods for easier calling
-    /// </summary>
-    protected void SetHeadTargetCamera(CharacterType characterType)
+
+    protected IEnumerator SetHeadTarget(CharacterType characterType, CharacterTarget targetType, float weight)
     {
-        SetHeadTarget(characterType, "Camera");
+        headTrackingManager.SetHeadTarget(characterType, targetType, weight);
+        yield return null;
     }
-    
-    protected void SetHeadTargetMother(CharacterType characterType)
+
+    protected IEnumerator ResetHeadTracking()
     {
-        SetHeadTarget(characterType, "Mother");
+        headTrackingManager.ResetAllHeadTracking();
+        
+        yield return null;
     }
-    
-    protected void SetHeadTargetFather(CharacterType characterType)
+    protected IEnumerator ResetBidanTrack()
     {
-        SetHeadTarget(characterType, "Father");
-    }
-    
-    protected void SetHeadTargetBaby(CharacterType characterType)
-    {
-        SetHeadTarget(characterType, "Baby");
-    }
-    
-    protected void SetHeadTargetBidan(CharacterType characterType)
-    {
-        SetHeadTarget(characterType, "Bidan");
-    }
-    
-    /// <summary>
-    /// Disable head tracking for specific character
-    /// </summary>
-    protected void DisableHeadTracking(CharacterType characterType)
-    {
-        SetHeadTarget(characterType, "None");
-    }
-    
-    /// <summary>
-    /// Enable/disable head tracking for all characters
-    /// </summary>
-    protected void EnableGlobalHeadTracking(bool enable)
-    {
-        var headTrackingManager = FindFirstObjectByType(System.Type.GetType("HeadTrackingManager"));
-        if (headTrackingManager != null)
-        {
-            var method = headTrackingManager.GetType().GetMethod("EnableGlobalHeadTracking");
-            if (method != null)
-            {
-                method.Invoke(headTrackingManager, new object[] { enable });
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Set multiple characters to look at same target
-    /// </summary>
-    protected void SetMultipleHeadTargetsCamera(CharacterType[] characters)
-    {
-        foreach (var character in characters)
-        {
-            SetHeadTargetCamera(character);
-        }
+        yield return null;
     }
 #endregion
 }

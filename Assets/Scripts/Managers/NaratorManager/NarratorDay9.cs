@@ -51,6 +51,9 @@ public class NarratorDay9 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         
+        // Mother looks at baby with mixed emotions - frustration and love
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        
         yield return new WaitForSeconds(1f);
         bool seq3Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day9/Seq3PelampiasanEmosi", 

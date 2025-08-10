@@ -125,6 +125,9 @@ public class NarratorDay4 : NarratorBase
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Ghost, 0);
 
+        // Mother focuses on baby, Ghost appears mysteriously
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+
         yield return new WaitForSeconds(1f);
         
         // PlayAudio("wind_light");
@@ -133,6 +136,10 @@ public class NarratorDay4 : NarratorBase
         FadeOpenEyes(); 
         
         yield return new WaitForSeconds(1f);
+        
+        // Mother notices Ghost movement
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
+        
         yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 0, 0.5f));
         bool seq9Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq9GangguanSetanRingan", 
@@ -141,7 +148,13 @@ public class NarratorDay4 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
+        // Mother looks forward while moving to respond
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
+        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+        
+        // Mother looks back at Ghost after moving
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
         
         bool seq10Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq10Maaf", 
