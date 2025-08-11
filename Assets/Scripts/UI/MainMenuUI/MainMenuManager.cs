@@ -2254,7 +2254,7 @@ public class MainMenuManager : MonoBehaviour
     /// Handle resolution text clicks to simulate arrow buttons
     /// </summary>
     private void OnResolutionClick(PointerEventData pointerData)
-    {
+    { 
         if (resolution == null) return;
 
         // Get the local position of the click relative to the text

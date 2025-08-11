@@ -861,10 +861,10 @@ public abstract class NarratorBase : MonoBehaviour
 #endregion
 #region Raycast Interaction Management
     /// <summary>
-    /// Wait for player to interact with any raycast object and execute appropriate dialog
+    /// Wait for player to interact with any raycast object and execute appropriate dialog with context
     /// </summary>
     [System.Obsolete]
-    protected IEnumerator WaitForRaycastInteraction(System.Action<string> onInteractionCallback = null)
+    protected IEnumerator WaitForRaycastInteraction(System.Action<string> onInteractionCallback = null, string dayContext = "", string sequenceContext = "")
     {
         bool interactionCompleted = false;
         bool wasStaring = false;
@@ -888,9 +888,9 @@ public abstract class NarratorBase : MonoBehaviour
                         if (behaviour != null)
                         {
                             string characterIdentity = behaviour.GetCharacterIdentity();
-                            string dialogPath = behaviour.GetInteractionDialogPath();
+                            string dialogPath = behaviour.GetInteractionDialogPath(dayContext, sequenceContext);
                             
-                            Debug.Log($"[NarratorBase] Interacting with character: {characterIdentity}");
+                            Debug.Log($"[NarratorBase] Interacting with character: {characterIdentity} (Context: {dayContext}/{sequenceContext})");
                             
                             // Execute callback with character identity
                             onInteractionCallback?.Invoke(characterIdentity);
@@ -919,6 +919,15 @@ public abstract class NarratorBase : MonoBehaviour
             
             yield return null;
         }
+    }
+    
+    /// <summary>
+    /// Wait for player to interact with any raycast object and execute appropriate dialog (backward compatibility)
+    /// </summary>
+    [System.Obsolete]
+    protected IEnumerator WaitForRaycastInteraction(System.Action<string> onInteractionCallback = null)
+    {
+        return WaitForRaycastInteraction(onInteractionCallback, "", "");
     }
     
     /// <summary>
@@ -986,6 +995,19 @@ public abstract class NarratorBase : MonoBehaviour
         {
             Debug.LogWarning("[NarratorBase] Cannot disable raycast interaction - rayCastObject is null");
         }
+    }
+    
+    /// <summary>
+    /// Set context for all RaycastObjectBehaviour components in the scene
+    /// </summary>
+    protected void SetRaycastContext(string dayContext, string sequenceContext)
+    {
+        RaycastObjectBehaviour[] allRaycastObjects = FindObjectsByType<RaycastObjectBehaviour>(FindObjectsSortMode.None);
+        foreach (var raycastObject in allRaycastObjects)
+        {
+            raycastObject.SetCurrentContext(dayContext, sequenceContext);
+        }
+        Debug.Log($"[NarratorBase] Context set for {allRaycastObjects.Length} raycast objects: Day={dayContext}, Sequence={sequenceContext}");
     }
 #endregion
 }

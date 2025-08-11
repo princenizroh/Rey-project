@@ -59,10 +59,13 @@ public class NarratorDay2 : NarratorBase
         yield return StartCoroutine(SetCameraPanRangeFront());
         FadeOpenEyes(); 
 
+        EnableNavMeshAgent(CharacterType.Father);
+        EnableNavMeshAgent(CharacterType.Mother);
         yield return new WaitForSeconds(2f);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 0));
         SetCharacterSpawn(CharacterType.Father, 2); 
         yield return new WaitForSeconds(1f);
+        
 
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 1));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
@@ -240,6 +243,9 @@ public class NarratorDay2 : NarratorBase
             () => { seq11Complete = true; });
         yield return new WaitUntil(() => seq11Complete);
 
+        // Set context for all raycast objects before enabling interaction
+        SetRaycastContext("Day2", "Night");
+
         // Enable raycast interaction system for player choice
         this.EnableRaycastInteraction();
 
@@ -265,7 +271,7 @@ public class NarratorDay2 : NarratorBase
                     Debug.Log($"[Day2] Unknown character: {characterIdentity} - loop continues");
                     // correctInteraction remains false - loop continues
                 }
-            }));
+            }, "Day2", "Night"));
             
             // Small delay before allowing next interaction attempt
             if (!correctInteraction)
@@ -290,8 +296,8 @@ public class NarratorDay2 : NarratorBase
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 4));
         yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Object, 0, 1f));
         StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby, 0.5f));
-        yield return new WaitForSeconds(2f);
-        SetObjectsActive(gameObjects.activeObjects, false);
+        yield return new WaitForSeconds(1f);
+        SetObjectsActive(gameObjects.inActiveObjects, false);
         
         
         bool seq13Complete = false;

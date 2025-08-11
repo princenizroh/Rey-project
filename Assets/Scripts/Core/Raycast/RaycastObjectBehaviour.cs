@@ -1,10 +1,82 @@
 using UnityEngine;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class InteractionContextData
+{
+    [Header("Context")]
+    public string dayContext = ""; // e.g., "Day2", "Day3"
+    public string sequenceContext = ""; // e.g., "Night", "Midnight", "Morning"
+    
+    [Header("Dialog Settings")]
+    public string dialogPath = ""; // e.g., "GameData/Dialog/Day2/Seq12AAyah"
+    
+    [Header("UI Spawn Settings")]
+    public Vector3 spawnOffset = new Vector3(1f, 1f, 1f);
+    public bool useWorldSpaceOffset = false;
+    
+    public InteractionContextData()
+    {
+        // Default constructor
+    }
+    
+    public InteractionContextData(string day, string sequence, string path, Vector3 offset, bool worldSpace = false)
+    {
+        dayContext = day;
+        sequenceContext = sequence;
+        dialogPath = path;
+        spawnOffset = offset;
+        useWorldSpaceOffset = worldSpace;
+    }
+}
+
+// Backward compatibility classes - marked as obsolete
+[System.Serializable]
+[System.Obsolete("Use InteractionContextData instead")]
+public class DialogPathData
+{
+    public string dayContext = "";
+    public string sequenceContext = "";
+    public string dialogPath = "";
+    
+    public DialogPathData(string day, string sequence, string path)
+    {
+        dayContext = day;
+        sequenceContext = sequence;
+        dialogPath = path;
+    }
+}
+
+[System.Serializable]
+[System.Obsolete("Use InteractionContextData instead")]
+public class SpawnOffsetData
+{
+    public string dayContext = "";
+    public string sequenceContext = "";
+    public Vector3 spawnOffset = new Vector3(1f, 1f, 1f);
+    public bool useWorldSpaceOffset = false;
+    
+    public SpawnOffsetData(string day, string sequence, Vector3 offset, bool worldSpace = false)
+    {
+        dayContext = day;
+        sequenceContext = sequence;
+        spawnOffset = offset;
+        useWorldSpaceOffset = worldSpace;
+    }
+}
 
 public class RaycastObjectBehaviour : MonoBehaviour
 {
     [Header("Character Identity")]
     [SerializeField] private string characterIdentity = ""; // e.g., "Mulyono", "Linda"
-    [SerializeField] private string interactionDialogPath = ""; // e.g., "GameData/Dialog/Day2/Seq12AAyah"
+    
+    [Header("Interaction Context Settings")]
+    [SerializeField] private List<InteractionContextData> interactionContexts = new List<InteractionContextData>();
+    
+    [Header("Fallback Settings (Backward Compatibility)")]
+    [SerializeField] private string fallbackDialogPath = ""; // Fallback for backward compatibility
+    [SerializeField] private Vector3 fallbackSpawnOffset = new Vector3(1f, 1f, 1f); // Fallback for backward compatibility
+    [SerializeField] private bool fallbackUseWorldSpaceOffset = false;
     
     [Header("Raycast Detection Settings")]
     [SerializeField] private string logMessage = "Raycast hit detected!";
@@ -16,15 +88,17 @@ public class RaycastObjectBehaviour : MonoBehaviour
     [SerializeField] private string targetCanvasName = "Canvas3D";
     [SerializeField] private float contactLostDelay = 0.1f; // Delay before destroying UI when contact is lost
     
-    [Header("Spawn Position Settings")]
-    public Vector3 spawnOffset = new Vector3(1f, 1f, 1f); // Public - editable spawn offset from the object
-    [SerializeField] private bool useWorldSpaceOffset = false; // Toggle between local and world space offset
+    // Current context for automatic context detection
+    private string currentDayContext = "";
+    private string currentSequenceContext = "";
     
+    // Runtime state
     private GameObject spawnedUI;
     private Canvas targetCanvas;
     private bool isCurrentlyBeingRaycast = false;
     private bool wasBeingRaycast = false;
     private float lastRaycastTime = 0f;
+    private static bool hasShownMissingPrefabWarning = false; // Static to prevent spam across all instances
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -122,13 +196,52 @@ public class RaycastObjectBehaviour : MonoBehaviour
     }
     
     /// <summary>
-    /// Spawns the RaycastUI prefab slightly to the right of this object
+    /// Get the appropriate interaction context based on current context
     /// </summary>
-    private void SpawnRaycastUI()
+    public InteractionContextData GetInteractionContext(string dayContext = "", string sequenceContext = "")
     {
+        // If specific context provided, try to find matching context
+        if (!string.IsNullOrEmpty(dayContext) || !string.IsNullOrEmpty(sequenceContext))
+        {
+            foreach (var contextData in interactionContexts)
+            {
+                bool dayMatch = string.IsNullOrEmpty(dayContext) || contextData.dayContext == dayContext;
+                bool sequenceMatch = string.IsNullOrEmpty(sequenceContext) || contextData.sequenceContext == sequenceContext;
+                
+                if (dayMatch && sequenceMatch)
+                {
+                    Debug.Log($"[RaycastObjectBehaviour] Found interaction context for {characterIdentity}: {contextData.dialogPath} | {contextData.spawnOffset} (Day: {contextData.dayContext}, Sequence: {contextData.sequenceContext})");
+                    return contextData;
+                }
+            }
+        }
+        
+        // If no specific context found, return first available or create fallback
+        if (interactionContexts.Count > 0)
+        {
+            Debug.Log($"[RaycastObjectBehaviour] Using default interaction context for {characterIdentity}: {interactionContexts[0].dialogPath} | {interactionContexts[0].spawnOffset}");
+            return interactionContexts[0];
+        }
+        
+        // Create fallback InteractionContextData for backward compatibility
+        Debug.Log($"[RaycastObjectBehaviour] Using fallback interaction context for {characterIdentity}: {fallbackDialogPath} | {fallbackSpawnOffset}");
+        return new InteractionContextData("", "", fallbackDialogPath, fallbackSpawnOffset, fallbackUseWorldSpaceOffset);
+    }
+    
+    /// <summary>
+    /// Spawns the RaycastUI prefab with context-aware positioning
+    /// </summary>
+    private void SpawnRaycastUI(string dayContext = "", string sequenceContext = "")
+    {
+        // Try to find prefab one more time if it's still null
         if (raycastUIPrefab == null)
         {
-            Debug.LogError("RaycastUI prefab is not assigned! Please assign it in the inspector or place it in Resources folder.");
+            FindRaycastUIPrefabInAssets();
+        }
+        
+        // If still null after trying to find it, silently return (don't spam console)
+        if (raycastUIPrefab == null)
+        {
             return;
         }
         
@@ -144,17 +257,20 @@ public class RaycastObjectBehaviour : MonoBehaviour
             return;
         }
         
-        // Calculate spawn position with configurable offset
+        // Get context-appropriate interaction data
+        InteractionContextData contextData = GetInteractionContext(dayContext, sequenceContext);
+        
+        // Calculate spawn position with context-aware offset
         Vector3 spawnPosition;
-        if (useWorldSpaceOffset)
+        if (contextData.useWorldSpaceOffset)
         {
             // World space offset - absolute position adjustment
-            spawnPosition = transform.position + spawnOffset;
+            spawnPosition = transform.position + contextData.spawnOffset;
         }
         else
         {
             // Local space offset - relative to object's rotation (default)
-            spawnPosition = transform.position + transform.TransformDirection(spawnOffset);
+            spawnPosition = transform.position + transform.TransformDirection(contextData.spawnOffset);
         }
         
         // Spawn the UI prefab as a child of the target canvas
@@ -164,7 +280,16 @@ public class RaycastObjectBehaviour : MonoBehaviour
         spawnedUI.transform.position = spawnPosition;
         spawnedUI.transform.rotation = transform.rotation;
         
-        Debug.Log($"RaycastUI spawned at position: {spawnPosition} for object: {gameObject.name} under canvas: {targetCanvasName}");
+        Debug.Log($"RaycastUI spawned at position: {spawnPosition} for object: {gameObject.name} under canvas: {targetCanvasName} (Context: {dayContext}/{sequenceContext})");
+    }
+    
+    /// <summary>
+    /// Spawns the RaycastUI prefab with current context or backward compatibility
+    /// </summary>
+    private void SpawnRaycastUI()
+    {
+        // Use current context if available, otherwise fallback to empty context
+        SpawnRaycastUI(currentDayContext, currentSequenceContext);
     }
     
     /// <summary>
@@ -227,7 +352,7 @@ public class RaycastObjectBehaviour : MonoBehaviour
     private void FindRaycastUIPrefabInAssets()
     {
 #if UNITY_EDITOR
-        // Search for RaycastUI prefab in the project assets
+        // In Editor: Search for RaycastUI prefab in the project assets
         string[] guids = UnityEditor.AssetDatabase.FindAssets("RaycastUI t:GameObject");
         
         foreach (string guid in guids)
@@ -245,7 +370,36 @@ public class RaycastObjectBehaviour : MonoBehaviour
         
         Debug.LogWarning("RaycastUI prefab not found in project assets. Please assign it manually in the inspector.");
 #else
-        Debug.LogWarning("RaycastUI prefab not assigned. Please assign it manually in the inspector.");
+        // In Build: Try to load from Resources folder
+        GameObject resourcePrefab = Resources.Load<GameObject>("RaycastUI");
+        if (resourcePrefab != null)
+        {
+            raycastUIPrefab = resourcePrefab;
+            Debug.Log("RaycastUI prefab loaded from Resources folder.");
+            return;
+        }
+        
+        // If not found in Resources, try alternative names
+        string[] possibleNames = { "RaycastUI", "Raycast UI", "RaycastInteractionUI", "InteractionUI" };
+        foreach (string name in possibleNames)
+        {
+            resourcePrefab = Resources.Load<GameObject>(name);
+            if (resourcePrefab != null)
+            {
+                raycastUIPrefab = resourcePrefab;
+                Debug.Log($"RaycastUI prefab loaded from Resources folder with name: {name}");
+                return;
+            }
+        }
+        
+        // Only show warning if we really can't find anything, but don't spam the console
+        if (!hasShownMissingPrefabWarning)
+        {
+            Debug.LogWarning($"RaycastUI prefab not found in Resources folder. Please either:\n" +
+                           "1. Assign the prefab manually in the inspector, or\n" +
+                           "2. Place the RaycastUI prefab in a 'Resources' folder", this);
+            hasShownMissingPrefabWarning = true;
+        }
 #endif
     }
     
@@ -288,19 +442,167 @@ public class RaycastObjectBehaviour : MonoBehaviour
     }
     
     /// <summary>
-    /// Get the dialog path for this character's interaction
+    /// Get the dialog path for this character's interaction based on current context
     /// </summary>
-    public string GetInteractionDialogPath()
+    public string GetInteractionDialogPath(string dayContext = "", string sequenceContext = "")
     {
-        return interactionDialogPath;
+        // If specific context provided, try to find matching path
+        if (!string.IsNullOrEmpty(dayContext) || !string.IsNullOrEmpty(sequenceContext))
+        {
+            foreach (var contextData in interactionContexts)
+            {
+                bool dayMatch = string.IsNullOrEmpty(dayContext) || contextData.dayContext == dayContext;
+                bool sequenceMatch = string.IsNullOrEmpty(sequenceContext) || contextData.sequenceContext == sequenceContext;
+                
+                if (dayMatch && sequenceMatch)
+                {
+                    Debug.Log($"[RaycastObjectBehaviour] Found dialog path for {characterIdentity}: {contextData.dialogPath} (Day: {contextData.dayContext}, Sequence: {contextData.sequenceContext})");
+                    return contextData.dialogPath;
+                }
+            }
+        }
+        
+        // If no specific path found, return first available or fallback
+        if (interactionContexts.Count > 0)
+        {
+            Debug.Log($"[RaycastObjectBehaviour] Using default dialog path for {characterIdentity}: {interactionContexts[0].dialogPath}");
+            return interactionContexts[0].dialogPath;
+        }
+        
+        // Use fallback for backward compatibility
+        Debug.Log($"[RaycastObjectBehaviour] Using fallback dialog path for {characterIdentity}: {fallbackDialogPath}");
+        return fallbackDialogPath;
     }
     
     /// <summary>
-    /// Set character identity and dialog path programmatically
+    /// Get the dialog path for this character's interaction (backward compatibility)
+    /// </summary>
+    public string GetInteractionDialogPath()
+    {
+        return GetInteractionDialogPath("", "");
+    }
+    
+    /// <summary>
+    /// Add a new interaction context for specific day/sequence
+    /// </summary>
+    public void AddInteractionContext(string dayContext, string sequenceContext, string dialogPath, Vector3 spawnOffset, bool useWorldSpace = false)
+    {
+        var newContext = new InteractionContextData(dayContext, sequenceContext, dialogPath, spawnOffset, useWorldSpace);
+        interactionContexts.Add(newContext);
+        Debug.Log($"[RaycastObjectBehaviour] Added interaction context for {characterIdentity}: {dialogPath} | {spawnOffset} (Day: {dayContext}, Sequence: {sequenceContext}, WorldSpace: {useWorldSpace})");
+    }
+    
+    /// <summary>
+    /// Add a new dialog path for specific day/sequence context (backward compatibility)
+    /// </summary>
+    public void AddDialogPath(string dayContext, string sequenceContext, string dialogPath)
+    {
+        // Find existing context or create new one
+        var existingContext = interactionContexts.Find(c => c.dayContext == dayContext && c.sequenceContext == sequenceContext);
+        if (existingContext != null)
+        {
+            existingContext.dialogPath = dialogPath;
+            Debug.Log($"[RaycastObjectBehaviour] Updated dialog path for existing context {characterIdentity}: {dialogPath} (Day: {dayContext}, Sequence: {sequenceContext})");
+        }
+        else
+        {
+            AddInteractionContext(dayContext, sequenceContext, dialogPath, fallbackSpawnOffset, fallbackUseWorldSpaceOffset);
+        }
+    }
+    
+    /// <summary>
+    /// Add a new spawn offset for specific day/sequence context (backward compatibility)
+    /// </summary>
+    public void AddSpawnOffset(string dayContext, string sequenceContext, Vector3 spawnOffset, bool useWorldSpace = false)
+    {
+        // Find existing context or create new one
+        var existingContext = interactionContexts.Find(c => c.dayContext == dayContext && c.sequenceContext == sequenceContext);
+        if (existingContext != null)
+        {
+            existingContext.spawnOffset = spawnOffset;
+            existingContext.useWorldSpaceOffset = useWorldSpace;
+            Debug.Log($"[RaycastObjectBehaviour] Updated spawn offset for existing context {characterIdentity}: {spawnOffset} (Day: {dayContext}, Sequence: {sequenceContext}, WorldSpace: {useWorldSpace})");
+        }
+        else
+        {
+            AddInteractionContext(dayContext, sequenceContext, fallbackDialogPath, spawnOffset, useWorldSpace);
+        }
+    }
+    
+    /// <summary>
+    /// Set the current context for automatic UI positioning
+    /// </summary>
+    public void SetCurrentContext(string dayContext, string sequenceContext)
+    {
+        currentDayContext = dayContext;
+        currentSequenceContext = sequenceContext;
+        Debug.Log($"[RaycastObjectBehaviour] Context set for {characterIdentity}: Day={dayContext}, Sequence={sequenceContext}");
+    }
+    
+    /// <summary>
+    /// Get the current context
+    /// </summary>
+    public (string day, string sequence) GetCurrentContext()
+    {
+        return (currentDayContext, currentSequenceContext);
+    }
+    
+    /// <summary>
+    /// Set the raycast UI prefab programmatically (useful for runtime setup)
+    /// </summary>
+    public void SetRaycastUIPrefab(GameObject prefab)
+    {
+        raycastUIPrefab = prefab;
+        Debug.Log($"[RaycastObjectBehaviour] Raycast UI prefab set programmatically for {characterIdentity}: {prefab?.name}");
+    }
+    
+    /// <summary>
+    /// Static method to set raycast UI prefab for all RaycastObjectBehaviour instances
+    /// </summary>
+    public static void SetGlobalRaycastUIPrefab(GameObject prefab)
+    {
+        RaycastObjectBehaviour[] allInstances = FindObjectsByType<RaycastObjectBehaviour>(FindObjectsSortMode.None);
+        foreach (var instance in allInstances)
+        {
+            if (instance.raycastUIPrefab == null)
+            {
+                instance.SetRaycastUIPrefab(prefab);
+            }
+        }
+        Debug.Log($"[RaycastObjectBehaviour] Global raycast UI prefab set for {allInstances.Length} instances: {prefab?.name}");
+    }
+    
+    /// <summary>
+    /// Set character identity and dialog path programmatically (backward compatibility)
     /// </summary>
     public void SetCharacterData(string identity, string dialogPath)
     {
         characterIdentity = identity;
-        interactionDialogPath = dialogPath;
+        fallbackDialogPath = dialogPath;
+    }
+    
+    /// <summary>
+    /// Set character identity and multiple interaction contexts
+    /// </summary>
+    public void SetCharacterData(string identity, List<InteractionContextData> contexts)
+    {
+        characterIdentity = identity;
+        interactionContexts = new List<InteractionContextData>(contexts);
+    }
+    
+    /// <summary>
+    /// Set character identity and multiple dialog paths (backward compatibility - deprecated)
+    /// </summary>
+    [System.Obsolete("Use SetCharacterData with InteractionContextData instead")]
+    public void SetCharacterData(string identity, List<DialogPathData> paths)
+    {
+        characterIdentity = identity;
+        // Convert old DialogPathData to new InteractionContextData
+        interactionContexts.Clear();
+        foreach (var path in paths)
+        {
+            var contextData = new InteractionContextData(path.dayContext, path.sequenceContext, path.dialogPath, fallbackSpawnOffset, fallbackUseWorldSpaceOffset);
+            interactionContexts.Add(contextData);
+        }
     }
 }
