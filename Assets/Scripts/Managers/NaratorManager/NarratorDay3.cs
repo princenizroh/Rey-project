@@ -268,19 +268,21 @@ public class NarratorDay3 : NarratorBase
         }
 
         // Disable raycast interaction system after player made correct choice
+        //
+        SetObjectsActive(gameObjects.activeObjects, true);
         this.DisableRaycastInteraction();
-        // this.DisableRaycastInteraction();
 
         yield return new WaitForSeconds(1f);
         EnableNavMeshAgent(CharacterType.Father);
         
-        // Father looks ahead while moving
         StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Object));
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 3));
 
-        // After movement, Father focuses on baby
         StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));
+        yield return new WaitForSeconds(1f);
+
+        SetObjectsActive(gameObjects.inActiveObjects, false);
 
         bool seq12Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day3/Seq12SusuBotol",

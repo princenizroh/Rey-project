@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-// Head tracking with custom weight support
 public class NarratorDay1 : NarratorBase
 {
     [System.Obsolete]
@@ -52,21 +51,6 @@ public class NarratorDay1 : NarratorBase
             StartCoroutine(FadeOutAudio(audioSource, 4f)); 
         }
         yield return new WaitForSeconds(3f);
-        // Logika untuk menghandle perulangan dialog
-        // Akan terus berulang jika interaksinya belum benar
-
-        // True jika interaksinya adalah Seq12AAyah maka perulangan selesai
-        // akan false jika interaksinya adalah Seq12BIbu
-        // bool seq12AAyahComplete = false;
-        // dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12AAyah", 
-        //     () => { seq12AAyagComplete = true; });
-        // yield return new WaitUntil(() => seq12AAyahComplete);
-        //
-        // bool seq12AIbuComplete = false;
-        // dialogGameManager.StartCoreGame("GameData/Dialog/Day2/Seq12AIbu", 
-        //     () => { seq12AIbuComplete = true; });
-        // yield return new WaitUntil(() => seq12AIbuComplete);
-
         bool seq3Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq3Kesehatan", 
             () => { seq3Complete = true; });
