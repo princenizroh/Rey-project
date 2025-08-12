@@ -128487,7 +128487,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -269832,7 +269832,7 @@ MonoBehaviour:
   startGameButtonText: {fileID: 425843783}
   resolution: {fileID: 837594039}
   volume: {fileID: 1962553637}
-  targetScriptableObject: {fileID: 0}
+  targetScriptableObject: {fileID: 11400000, guid: 0130c220d79fad340b5fe5f2a8b70996, type: 2}
   animationDuration: 0.5
   stairDelay: 0.1
   hoverMoveDistance: 20
