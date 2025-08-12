@@ -2402,10 +2402,11 @@ public class MainMenuManager : MonoBehaviour
             return;
         }
         
-        LogDebug($"Resetting ScriptableObject data - Before: Day={targetScriptableObject.day}, Stress={targetScriptableObject.mother_stress_level}");
+        LogDebug($"Resetting ScriptableObject data - Before: Day={targetScriptableObject.day}, Stress={targetScriptableObject.mother_stress_level}, TimeOfDay={targetScriptableObject.timeOfDay}");
         
-        // Reset all values to 0
+        // Reset all values as requested
         targetScriptableObject.day = 0;
+        targetScriptableObject.timeOfDay = (TimeOfDay)3; // Index 3 = Night
         targetScriptableObject.mother_stress_level = 0;
         
         // Mark as dirty for Unity to save changes in editor
@@ -2413,7 +2414,7 @@ public class MainMenuManager : MonoBehaviour
         UnityEditor.EditorUtility.SetDirty(targetScriptableObject);
         #endif
         
-        LogDebug($"ScriptableObject data reset - After: Day={targetScriptableObject.day}, Stress={targetScriptableObject.mother_stress_level}");
+        LogDebug($"ScriptableObject data reset - After: Day={targetScriptableObject.day}, TimeOfDay={targetScriptableObject.timeOfDay}, Stress={targetScriptableObject.mother_stress_level}");
     }
 
     /// <summary>
