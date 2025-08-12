@@ -281,10 +281,10 @@ public class NarratorDay2 : NarratorBase
         }
 
         // SetCharacterSpawn(CharacterType.Object, 1);
-        SetObjectsActive(gameObjects.activeObjects, true);
 
         // Disable raycast interaction system after player made correct choice
         this.DisableRaycastInteraction();
+        SetObjectsActive(gameObjects.activeObjects, true);
 
         yield return new WaitForSeconds(1f);
         

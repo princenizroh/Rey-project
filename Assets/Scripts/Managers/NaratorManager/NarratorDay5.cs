@@ -11,6 +11,7 @@ public class NarratorDay5 : NarratorBase
         
         CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
+        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         TimeManager.instance.TimeOfDay = 13.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);   
         SetCharacterSpawn(CharacterType.Mother, 0); 
@@ -33,6 +34,9 @@ public class NarratorDay5 : NarratorBase
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
+        StartCoroutine(SwitchLights.Instance.SwitchToBright());
+
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby)); 
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq2IbuMarah", 
             () => { seq2Complete = true; });
@@ -46,6 +50,9 @@ public class NarratorDay5 : NarratorBase
         yield return new WaitUntil(() => seq3Complete);
         
         yield return new WaitForSeconds(1f);
+
+        FadeCloseEyes();
+        yield return new WaitForSeconds(2f);
         
         
         GoToNextTimeOfDay();
@@ -59,10 +66,13 @@ public class NarratorDay5 : NarratorBase
         
         CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
+        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         TimeManager.instance.TimeOfDay = 18.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 1);
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
+        StartCoroutine(SwitchLights.Instance.SwitchToBright());
         bool seq4Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq4Penyesalan", 
             () => { seq4Complete = true; });
@@ -84,14 +94,12 @@ public class NarratorDay5 : NarratorBase
         saveFileManager.SaveToLocalMyGamesFolder();
         
         CloseEyes();
+        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 1.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);
-        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Mother, 2);
         SetCharacterSpawn(CharacterType.Ghost, 0);
-        
-        // Mother initially focuses on baby during storm
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
         yield return new WaitForSeconds(1f);
         // PlayAudio("rain_heavy");
@@ -100,22 +108,49 @@ public class NarratorDay5 : NarratorBase
         yield return new WaitForSeconds(2f);
         FadeOpenEyes(); 
         
-        // Mother senses ghostly presence, looks around nervously
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
+        SetRaycastContext("Day5", "Night");
+        
+        this.EnableRaycastInteraction();
+
+        bool correctInteraction = false;
+        while (!correctInteraction)
+        {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+                
+                if (characterIdentity == "Window") 
+                {
+                    correctInteraction = true;
+                }
+                else if (characterIdentity == "Environment")
+                {
+                    correctInteraction = false;
+                }
+            }, "Day5", "Night"));
+            
+            if (!correctInteraction)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+        this.DisableRaycastInteraction();
+        yield return new WaitForSeconds(1f);
+         
+        SetCharacterSpawn(CharacterType.Ghost, 1);
+
+        yield return new WaitForSeconds(1f);
+
+        SetCharacterSpawn(CharacterType.Ghost, 0);
         
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day5/Seq5GangguanSetanHujan", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
-        
+
         yield return new WaitForSeconds(1f);
-        
-        // Mother looks forward while moving, feeling disturbed
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
-        
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
 
-        // After movement, Mother looks back at baby protectively
+        StartCoroutine(SwitchLights.Instance.SwitchToBright());
+
         StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
 
         bool seq6Complete = false;

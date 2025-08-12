@@ -266,17 +266,13 @@ public class NarratorDay3 : NarratorBase
                 yield return new WaitForSeconds(0.5f);
             }
         }
-
-        // Disable raycast interaction system after player made correct choice
-        //
-        SetObjectsActive(gameObjects.activeObjects, true);
         this.DisableRaycastInteraction();
+        SetObjectsActive(gameObjects.activeObjects, true);
 
         yield return new WaitForSeconds(1f);
+        PlayCharacterAnimation(CharacterType.Father, "Sit To Stand");
         EnableNavMeshAgent(CharacterType.Father);
-        
-        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Object));
-        
+         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Father, 3));
 
         StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby));

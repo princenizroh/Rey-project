@@ -155,7 +155,7 @@ public class NarratorMainMenu : NarratorBase
         
         SetObjectsActive(gameObjects.activeObjects, true); 
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        PlayCharacterAnimation(CharacterType.Father, "Sit");
+        PlayCharacterAnimation(CharacterType.Father, "Sitting");
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");
         
         SetCharacterSpawn(CharacterType.Object, 0); 

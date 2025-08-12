@@ -34,9 +34,7 @@ public class NarratorDay4 : NarratorBase
         
         yield return new WaitForSeconds(1f);
 
-
-
-        // PlayCharacterAnimation(CharacterType.Object, "OpenTheDoor");
+       // PlayCharacterAnimation(CharacterType.Object, "OpenTheDoor");
         
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
@@ -60,6 +58,7 @@ public class NarratorDay4 : NarratorBase
         StartCoroutine(ResetHeadTracking());
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
+        PlayCharacterAnimation(CharacterType.Mother, "Talking On Phone");
         
         bool seq4Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq4Telephone", 
@@ -87,7 +86,8 @@ public class NarratorDay4 : NarratorBase
         saveFileManager.SaveToLocalMyGamesFolder();
         
         CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeRight());
+        StartCoroutine(SwitchLights.Instance.SwitchToDark());
+        yield return StartCoroutine(SetCameraPanRangeLeft());
         // AppearObjects();
         TimeManager.instance.TimeOfDay = 18.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -105,6 +105,9 @@ public class NarratorDay4 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+
+        StartCoroutine(SwitchLights.Instance.SwitchToBright());
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby)); 
         
         bool seq7Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq7IbuMarahLagi", 
@@ -117,6 +120,8 @@ public class NarratorDay4 : NarratorBase
         yield return new WaitForSeconds(2f);
         SetCharacterSpawn(CharacterType.Baby, 1);
         SetCharacterSpawn(CharacterType.Mother, 1);
+
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby)); 
         yield return new WaitForSeconds(2f);
         FadeOpenEyes(); 
         
@@ -139,25 +144,48 @@ public class NarratorDay4 : NarratorBase
         
         CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
+        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         TimeManager.instance.TimeOfDay = 1.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);
-        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Mother, 2);
         SetCharacterSpawn(CharacterType.Ghost, 0);
-
-        // Mother focuses on baby, Ghost appears mysteriously
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
 
         yield return new WaitForSeconds(1f);
         
         // PlayAudio("wind_light");
+
+        yield return new WaitForSeconds(1f);
+        // PlayAudio("Ketukan Jendela");
         
         yield return new WaitForSeconds(2f);
         FadeOpenEyes(); 
+ 
+        SetRaycastContext("Day4", "Night");
         
+        this.EnableRaycastInteraction();
+
+        bool correctInteraction = false;
+        while (!correctInteraction)
+        {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+                
+                if (characterIdentity == "Window") 
+                {
+                    correctInteraction = true;
+                }
+                else if (characterIdentity == "Environment")
+                {
+                    correctInteraction = false;
+                }
+            }, "Day4", "Night"));
+            
+            if (!correctInteraction)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+        this.DisableRaycastInteraction();
         yield return new WaitForSeconds(1f);
-        
-        // Mother notices Ghost movement
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
         
         yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 0, 0.5f));
         bool seq9Complete = false;
@@ -167,13 +195,12 @@ public class NarratorDay4 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
-        // Mother looks forward while moving to respond
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+
+        StartCoroutine(SwitchLights.Instance.SwitchToBright());
         
-        // Mother looks back at Ghost after moving
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
         bool seq10Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq10Maaf", 

@@ -17,8 +17,11 @@ public class NarratorDay1 : NarratorBase
         SetCharacterSpawn(CharacterType.Object, 0);
         CloseEyes(); 
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        PlayCharacterAnimation(CharacterType.Father, "Sit");
+        PlayCharacterAnimation(CharacterType.Father, "Sitting");
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        StartCoroutine(SetHeadTarget(CharacterType.Bidan, CharacterTarget.Baby, 0.5f));
+        StartCoroutine(SetHeadTarget(CharacterType.Father, CharacterTarget.Baby, 0.4f));
 
         saveFileManager.UpdateCoreGameSaves(0,3);
         saveFileManager.SaveToLocalMyGamesFolder();
@@ -28,8 +31,6 @@ public class NarratorDay1 : NarratorBase
         yield return new WaitForSeconds(5f); 
         uiElements.narratorText.gameObject.SetActive(false);
 
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
-        StartCoroutine(SetHeadTarget(CharacterType.Bidan, CharacterTarget.Baby, 0.5f));
         bool seq1Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day1/Seq1DalamPerut", 
             () => { seq1Complete = true; });
