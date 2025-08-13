@@ -19,7 +19,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ' '
+      npcName: 5
       dialogEntry: '*Click Clock Click Clock*'
       audioDialogEntry: {fileID: 8300000, guid: f849bd72e5256c44b827389360e754ae, type: 3}
       choices: []
@@ -31,7 +31,7 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: ' '
+      npcName: 5
       dialogEntry: '*Chrek*'
       audioDialogEntry: {fileID: 8300000, guid: fedc7171d42cb414a82bc8629fd7fbfd, type: 3}
       choices: []

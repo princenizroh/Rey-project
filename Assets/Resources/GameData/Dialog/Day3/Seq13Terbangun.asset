@@ -46,7 +46,7 @@ MonoBehaviour:
           npcResponse: Sayang Rey minta susu
         - npcName: 1
           npcResponse: '{+2stress} Iya sayang'
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 34fc5efa1b0dcce4c8ec06157917fae7, type: 3}
       - playerChoice: '*Oek* (Menangis)'
         correctChoice: 1
         dialogResponses:
@@ -60,7 +60,7 @@ MonoBehaviour:
           npcResponse: Besok mama kerja tau
         - npcName: 2
           npcResponse: Udah kasih makan aja
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: b5c30f5149243184b9479b5ab6cf0fec, type: 3}
       - playerChoice: '*Oek* (Menangis)'
         correctChoice: 1
         dialogResponses:
@@ -74,6 +74,6 @@ MonoBehaviour:
           npcResponse: '{+2stress} Mau meledak rasanya denger tangisannya'
         - npcName: 1
           npcResponse: Udah kasih makan Besok aku dah kerja begadang yang ada hih
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 2a4117d36ad24414b96b9b5a9a5e9e5f, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

@@ -41,7 +41,7 @@ MonoBehaviour:
         - npcName: 2
           npcResponse: Eh kenapa sayang ini gak papa. Ini susu formula enak juga
             kok seperti punya ibu tapi rasanya agak berbeda
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 02e694c9a9639b945b5e9cf8bcf97c9c, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0

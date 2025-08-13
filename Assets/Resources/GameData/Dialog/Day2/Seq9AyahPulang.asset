@@ -68,6 +68,6 @@ MonoBehaviour:
           npcResponse: Anakku memang hebat
         - npcName: 2
           npcResponse: Jangan ngerepotin ibu ya nak
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 58c51a9fc58fbad449d0f512c33c5d5e, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

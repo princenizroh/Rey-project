@@ -115,13 +115,14 @@ MonoBehaviour:
         - npcName: 1
           npcResponse: Kenapa anak ini menangis? Berisik sekali
         - npcName: 3
-          npcResponse: Kalau anaknya menangis terus itu tandanya dia butuh sesuatu ibu
+          npcResponse: Kalau anaknya menangis terus itu tandanya dia butuh sesuatu
+            ibu
         - npcName: 3
           npcResponse: Karena bayinya baru lahir sepertinya anaknya sedang lapar
         - npcName: 3
           npcResponse: Ibu bisa beri ASI untuk kebutuhan bayinya
         - npcName: 1
           npcResponse: Iya deh daripada berisik terus
-        audioDialogResponse: {fileID: 8300000, guid: 117a016d2cb1f9446b8b68e56a57a9f7, type: 3}
+        audioDialogResponse: {fileID: 8300000, guid: b5c30f5149243184b9479b5ab6cf0fec, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

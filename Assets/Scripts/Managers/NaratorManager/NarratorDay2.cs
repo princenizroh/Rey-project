@@ -3,8 +3,6 @@ using System.Collections;
 
 public class NarratorDay2 : NarratorBase
 {
-
-
     [System.Obsolete]
     protected override IEnumerator PlayMorningSequence()
     {
@@ -50,6 +48,7 @@ public class NarratorDay2 : NarratorBase
         
         StartCoroutine(ResetHeadTracking());
         yield return new WaitForSeconds(2f);
+        
         SetCharacterSpawn(CharacterType.Baby, 1); 
         SetCharacterSpawn(CharacterType.Father, 1);
         SetCharacterSpawn(CharacterType.Mother, 1);
@@ -89,6 +88,11 @@ public class NarratorDay2 : NarratorBase
         
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
+        bool seq1_1Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day2/SFX/Seq3Shower", 
+            () => { seq1_1Complete = true; });
+        yield return new WaitForSeconds(2f);
+        yield return new WaitUntil(() => seq1_1Complete);
         StartCoroutine(ResetHeadTracking());
         StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         yield return StartCoroutine(SetCameraPanRangeRight());

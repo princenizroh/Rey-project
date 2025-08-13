@@ -19,6 +19,18 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 5
+      dialogEntry: '*Click Clock Click Clock*'
+      audioDialogEntry: {fileID: 8300000, guid: f849bd72e5256c44b827389360e754ae, type: 3}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
       npcName: 0
       dialogEntry: Gelap...
       audioDialogEntry: {fileID: 0}
@@ -46,7 +58,7 @@ MonoBehaviour:
           npcResponse: Sayang Rey terbangun, bisa kasih makan bentar gak
         - npcName: 1
           npcResponse: Iya sayang
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 34fc5efa1b0dcce4c8ec06157917fae7, type: 3}
       - playerChoice: '*Oek* (Menangis)'
         correctChoice: 1
         dialogResponses:
@@ -60,6 +72,6 @@ MonoBehaviour:
           npcResponse: Berisik banget sih
         - npcName: 2
           npcResponse: Sudah.. kasih makan aja adek daripada nangis terus
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: b5c30f5149243184b9479b5ab6cf0fec, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

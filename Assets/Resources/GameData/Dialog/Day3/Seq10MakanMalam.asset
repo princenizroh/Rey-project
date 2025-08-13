@@ -19,6 +19,18 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 5
+      dialogEntry: '*Krak krak*'
+      audioDialogEntry: {fileID: 8300000, guid: 95231faaf4f790e42b6c59baafe4500d, type: 3}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
       npcName: 2
       dialogEntry: Masakan istriku memang enak seperti biasa
       audioDialogEntry: {fileID: 0}

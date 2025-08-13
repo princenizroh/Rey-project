@@ -52,18 +52,18 @@ MonoBehaviour:
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 02e694c9a9639b945b5e9cf8bcf97c9c, type: 3}
       - playerChoice: '*Oek* (Menangis)'
         correctChoice: 0
         dialogResponses:
         - npcName: 0
           npcResponse: Gak nyaman
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: b5c30f5149243184b9479b5ab6cf0fec, type: 3}
       - playerChoice: '*Oeekk* (Menangis Keras)'
         correctChoice: 1
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu.. Basah
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 2a4117d36ad24414b96b9b5a9a5e9e5f, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
