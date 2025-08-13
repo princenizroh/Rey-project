@@ -169,6 +169,9 @@ public class CoreGameManager : MonoBehaviour
     
     // Choice set tracking - to determine if we're dealing with the same choice set
     private CoreGameDialogChoices[] lastProcessedChoices = null; // Last choice set we processed
+    
+    // Choice notification events
+    public static System.Action<string> OnPlayerChoiceSelected; // Event for notifying about player choice selection
     private int lastProcessedBlockIndex = -1; // Track which dialog block we last processed choices for
 
     private System.Action currentCompletionCallback;
@@ -5678,6 +5681,13 @@ public class CoreGameManager : MonoBehaviour
         
         var selectedChoice = choicesToUse[choiceIndex];
         Debug.Log($"[CHOICE SELECTION] Selected choice: '{selectedChoice.playerChoice}' (correctChoice: {selectedChoice.correctChoice})");
+        
+        // NOTIFY EXTERNAL SYSTEMS ABOUT PLAYER CHOICE
+        if (OnPlayerChoiceSelected != null)
+        {
+            OnPlayerChoiceSelected.Invoke(selectedChoice.playerChoice);
+            Debug.Log($"[CHOICE NOTIFICATION] Notified external systems about choice: '{selectedChoice.playerChoice}'");
+        }
         
         // Hide choices first
         HideChoices();

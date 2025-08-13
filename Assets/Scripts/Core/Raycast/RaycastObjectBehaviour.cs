@@ -103,20 +103,21 @@ public class RaycastObjectBehaviour : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Ensure the GameObject has a collider for raycast detection
+        // Check if GameObject has a collider for raycast detection
         Collider existingCollider = GetComponent<Collider>();
         if (existingCollider == null)
         {
-            Debug.LogWarning($"GameObject '{gameObject.name}' doesn't have a Collider component. Adding BoxCollider for raycast detection.");
-            existingCollider = gameObject.AddComponent<BoxCollider>();
+            Debug.LogError($"GameObject '{gameObject.name}' doesn't have a Collider component. Please add a Collider manually for raycast detection to work.");
+            enabled = false; // Disable this component if no collider
+            return;
         }
         else
         {
-            Debug.Log($"GameObject '{gameObject.name}' already has a {existingCollider.GetType().Name}. Raycast detection ready.");
+            Debug.Log($"GameObject '{gameObject.name}' has {existingCollider.GetType().Name}. Raycast detection ready.");
         }
         
         // Ensure the GameObject has the correct tag
-        if (!gameObject.CompareTag("raycast object"))
+        if (!gameObject.CompareTag("RaycastObject"))
         {
             Debug.LogWarning($"GameObject '{gameObject.name}' doesn't have 'raycast object' tag. Raycast detection may not work properly.");
         }
@@ -649,4 +650,45 @@ public class RaycastObjectBehaviour : MonoBehaviour
         Debug.Log($"Target Canvas: {(targetCanvas != null ? targetCanvas.name : "NULL")}");
         Debug.Log("========================");
     }
+    
+    [ContextMenu("Clean Up Unwanted Colliders")]
+    public void CleanUpUnwantedColliders()
+    {
+        Collider[] allColliders = GetComponents<Collider>();
+        if (allColliders.Length <= 1)
+        {
+            Debug.Log("Only one or no colliders found. No cleanup needed.");
+            return;
+        }
+        
+        Debug.Log($"Found {allColliders.Length} colliders. Cleaning up...");
+        
+        // Keep only the first BoxCollider if multiple colliders exist
+        BoxCollider keepBoxCollider = null;
+        List<Collider> toRemove = new List<Collider>();
+        
+        foreach (Collider col in allColliders)
+        {
+            if (col is BoxCollider && keepBoxCollider == null)
+            {
+                keepBoxCollider = col as BoxCollider;
+                Debug.Log($"Keeping BoxCollider: {keepBoxCollider}");
+            }
+            else
+            {
+                toRemove.Add(col);
+                Debug.Log($"Marking for removal: {col.GetType().Name}");
+            }
+        }
+        
+        // Remove unwanted colliders
+        foreach (Collider col in toRemove)
+        {
+            Debug.Log($"Removing {col.GetType().Name}");
+            DestroyImmediate(col);
+        }
+        
+        Debug.Log("Collider cleanup completed!");
+    }
 }
+
