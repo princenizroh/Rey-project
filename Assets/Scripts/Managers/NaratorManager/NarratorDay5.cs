@@ -9,9 +9,7 @@ public class NarratorDay5 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(4, 1);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
-        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         TimeManager.instance.TimeOfDay = 13.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);   
         SetCharacterSpawn(CharacterType.Mother, 0); 
@@ -64,9 +62,7 @@ public class NarratorDay5 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(4, 2);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
-        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         TimeManager.instance.TimeOfDay = 18.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 1);
@@ -93,8 +89,6 @@ public class NarratorDay5 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(4, 3);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
-        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 1.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);

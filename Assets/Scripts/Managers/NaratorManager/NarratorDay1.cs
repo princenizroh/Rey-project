@@ -15,7 +15,6 @@ public class NarratorDay1 : NarratorBase
         SetCharacterSpawn(CharacterType.Bidan, 0);   
         SetCharacterSpawn(CharacterType.Baby, 0);    
         SetCharacterSpawn(CharacterType.Object, 0);
-        CloseEyes(); 
         PlayCharacterAnimation(CharacterType.Mother, "Sit");
         PlayCharacterAnimation(CharacterType.Father, "Sitting");
         PlayCharacterAnimation(CharacterType.Bidan, "Idle");

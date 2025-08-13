@@ -11,8 +11,6 @@ public class NarratorDay4 : NarratorBase
         
         DisableNavMeshAgent(CharacterType.Ghost);
         // SetObjectsActive(gameObjects.activeObjects, true);
-        CloseEyes();
-        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 13.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);   
@@ -37,10 +35,10 @@ public class NarratorDay4 : NarratorBase
        // PlayCharacterAnimation(CharacterType.Object, "OpenTheDoor");
         
         yield return new WaitForSeconds(1f);
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
 
         StartCoroutine(SwitchLights.Instance.SwitchToBright());
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby)); 
 
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq2IbuMarah", 
@@ -85,8 +83,6 @@ public class NarratorDay4 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(3, 2);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
-        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         yield return StartCoroutine(SetCameraPanRangeLeft());
         // AppearObjects();
         TimeManager.instance.TimeOfDay = 18.0f; 
@@ -103,11 +99,11 @@ public class NarratorDay4 : NarratorBase
         yield return new WaitUntil(() => seq6Complete);
         
         yield return new WaitForSeconds(1f);
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby)); 
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
 
         StartCoroutine(SwitchLights.Instance.SwitchToBright());
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby)); 
         
         bool seq7Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq7IbuMarahLagi", 
@@ -118,6 +114,7 @@ public class NarratorDay4 : NarratorBase
         
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
+        yield return StartCoroutine(SetCameraPanRangeBack());
         SetCharacterSpawn(CharacterType.Baby, 1);
         SetCharacterSpawn(CharacterType.Mother, 1);
 
@@ -142,9 +139,7 @@ public class NarratorDay4 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(3, 3);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
-        StartCoroutine(SwitchLights.Instance.SwitchToDark());
         TimeManager.instance.TimeOfDay = 1.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 2);
@@ -196,12 +191,11 @@ public class NarratorDay4 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
 
         StartCoroutine(SwitchLights.Instance.SwitchToBright());
-        
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
-        
+         
         bool seq10Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq10Maaf", 
             () => { seq10Complete = true; });

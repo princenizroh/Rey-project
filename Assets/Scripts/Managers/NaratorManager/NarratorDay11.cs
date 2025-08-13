@@ -3,18 +3,29 @@ using System.Collections;
 
 public class NarratorDay11 : NarratorBase
 {
+    [SerializeField] protected Rigidbody rigidbodyIbu;
+
+    // protected override void Awake()
+    // {
+    //     rigidbodyIbu = GetComponent<Rigidbody>();
+    //     if (rigidbodyIbu == null)
+    //     {
+    //         Debug.LogError("Rigidbody Ibu is not assigned in the inspector.");
+    //     }
+    // }
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
         saveFileManager.UpdateCoreGameSaves(10, 1);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
+        // SetFreezePosition(true);
         
+        PlayCharacterAnimation(CharacterType.Mother, "Sitting_Sexy");
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 11\nKehilangan";
@@ -31,6 +42,8 @@ public class NarratorDay11 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
+        EnableNavMeshAgent(CharacterType.Mother);
+        // SetFreezePosition(false);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         bool seq2Complete = false;
@@ -50,7 +63,6 @@ public class NarratorDay11 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(10, 3);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 1.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -67,5 +79,23 @@ public class NarratorDay11 : NarratorBase
         yield return new WaitForSeconds(2f);
         
         GoToNextDay();
+    }
+
+    public void SetFreezePosition(bool freeze)
+    {
+        if (rigidbodyIbu == null) return;
+
+        if (freeze)
+        {
+            rigidbodyIbu.constraints |= RigidbodyConstraints.FreezePositionX |
+                              RigidbodyConstraints.FreezePositionY |
+                              RigidbodyConstraints.FreezePositionZ;
+        }
+        else
+        {
+            rigidbodyIbu.constraints &= ~RigidbodyConstraints.FreezePositionX;
+            rigidbodyIbu.constraints &= ~RigidbodyConstraints.FreezePositionY;
+            rigidbodyIbu.constraints &= ~RigidbodyConstraints.FreezePositionZ;
+        }
     }
 }

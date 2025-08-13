@@ -81,6 +81,7 @@ public class UIElements
     public TextMeshProUGUI narratorText;
     public Image backgroundImage;
     public CanvasGroup canvasGroup;
+    public GameObject cursor;
 }
 
 [System.Serializable]
@@ -264,6 +265,7 @@ public abstract class NarratorBase : MonoBehaviour
         ResetUIState();
         
         yield return StartCoroutine(ResetHeadTracking());
+        yield return StartCoroutine(TransitionScene());
 
         TimeOfDay targetTime = NarratorManager.Instance.currentTime;
 
@@ -340,11 +342,13 @@ public abstract class NarratorBase : MonoBehaviour
     protected void FadeOpenEyes()
     {
         StartCoroutine(FadeEyesCoroutine(1f, 0f, 2f));
+        uiElements.cursor.SetActive(true);
     }
 
     protected void FadeCloseEyes()
     {
         StartCoroutine(FadeEyesCoroutine(0f, 1f, 2f));
+        uiElements.cursor.SetActive(false);
     }
 
     private IEnumerator FadeEyesCoroutine(float startAlpha, float endAlpha, float duration)
@@ -482,7 +486,7 @@ public abstract class NarratorBase : MonoBehaviour
                 }
                 else
                 {
-                    characterData.animator.SetTrigger(animationName);
+                    Debug.LogError($"Animator for {characterType} doesn't play {animationName}");
                 }
             }
             else
@@ -1008,6 +1012,15 @@ public abstract class NarratorBase : MonoBehaviour
             raycastObject.SetCurrentContext(dayContext, sequenceContext);
         }
         Debug.Log($"[NarratorBase] Context set for {allRaycastObjects.Length} raycast objects: Day={dayContext}, Sequence={sequenceContext}");
+    }
+#endregion
+
+#region Common Sequence Operations
+    protected IEnumerator TransitionScene()
+    {
+        CloseEyes();
+        StartCoroutine(SwitchLights.Instance.SwitchToDark());
+        yield return null;
     }
 #endregion
 }

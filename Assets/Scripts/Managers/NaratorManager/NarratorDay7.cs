@@ -9,7 +9,6 @@ public class NarratorDay7 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(6, 1);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -48,7 +47,6 @@ public class NarratorDay7 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(6, 2);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 18.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -72,18 +70,17 @@ public class NarratorDay7 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(6, 3);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 1.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Ghost, 0);
+        PlayCharacterAnimation(CharacterType.Mother, "Sit To Stand");
         
-        // Mother focuses on baby, feeling hungry and worried
         StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
         yield return new WaitForSeconds(1f);
-        
-        
+         
         bool seq4Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day7/Seq4Kelaparan", 
             () => { seq4Complete = true; });
@@ -91,22 +88,22 @@ public class NarratorDay7 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         FadeOpenEyes(); 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(6f);
         
-        // Mother senses scary presence, looks around fearfully
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
-        
+        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 0, 0.5f));
+        StartCoroutine(SetHeadTarget(CharacterType.Ghost, CharacterTarget.Baby));
+         
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day7/Seq5SosokMenyeramkan", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
-        
-        // Mother looks ahead while moving, trying to protect baby
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
+        SetObjectsActive(gameObjects.activeObjects, true);
+        yield return new WaitForSeconds(3f);
+        SetCharacterSpawn(CharacterType.Ghost, 1);
+        SetObjectsActive(gameObjects.inActiveObjects, false);
         
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
 
-        // After movement, Mother looks back at baby protectively
         StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
 
         yield return new WaitForSeconds(1f);

@@ -9,7 +9,6 @@ public class NarratorDay8 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(7, 1);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -37,7 +36,7 @@ public class NarratorDay8 : NarratorBase
         yield return new WaitUntil(() => seq2Complete);
         
         yield return new WaitForSeconds(1f);
-        
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         bool seq3Complete = false;
@@ -57,50 +56,64 @@ public class NarratorDay8 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(7, 3);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 1.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Ghost, 0);
-
-        // Mother initially looks at baby but senses intense supernatural presence
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        SetObjectsActive(gameObjects.activeObjects, true);
 
         yield return new WaitForSeconds(1f);
         // PlayAudio("supernatural_intense");
         
         FadeOpenEyes(); 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         
-        // Mother is terrified, looks at the threatening ghost presence
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Ghost));
         
         bool seq4Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq4GangguanSetanSangatParah", 
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
         
+        yield return new WaitForSeconds(4f);
+
+        StartCoroutine(SetHeadTarget(CharacterType.Ghost, CharacterTarget.Baby));
         yield return new WaitForSeconds(1f);
-        
-        // Mother looks forward while moving, desperate to escape
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Object));
-        
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
-        
-        // After movement, Mother looks back at baby in desperation
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
-        
+        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 0));
+        yield return new WaitForSeconds(3f);
+        SetCharacterSpawn(CharacterType.Ghost, 1);
+        yield return new WaitForSeconds(3f);
+        SetCharacterSpawn(CharacterType.Ghost, 2);
+        yield return new WaitForSeconds(3f);
+        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 1, 0.5f));
+        yield return new WaitForSeconds(1f);
+        SetCharacterSpawn(CharacterType.Ghost, 0);
+        yield return new WaitForSeconds(2f);
+        SetCharacterSpawn(CharacterType.Ghost, 1);
+        yield return new WaitForSeconds(2f);
+        yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 2, 0.5f));
         bool seq5Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq5Keputusasaan", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/seq5DiaDisini", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
+
+        yield return new WaitForSeconds(1f);
+        SetCharacterSpawn(CharacterType.Ghost, 0);
+        
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+        
+        bool seq6Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq6Keputusasaan", 
+            () => { seq6Complete = true; });
+        yield return new WaitUntil(() => seq6Complete);
         
         // if (audioSource != null && audioSource.isPlaying)
         // {
         //     StartCoroutine(FadeOutAudio(audioSource, 3f)); 
         // }
         
+        SetObjectsActive(gameObjects.inActiveObjects, false);
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
         

@@ -44,7 +44,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+10stress} Hidup mama kosong...'
+      dialogEntry: '{+10stress} Hidupku kosong...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

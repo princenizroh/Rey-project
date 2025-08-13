@@ -20,151 +20,19 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
+      dialogEntry: Suara itu...
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 0
       dialogEntry: Sepertinya aku diganggu lagi
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Suara itu lagi
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Apa karena Ibu jelek ya
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Hahaha
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Keadaan setelah melahirkan sangat membuatku menjadi jelek
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Aku melihat dicermin sangat buruk sekali rupaku
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Baju ku lusuh
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Aku menjadi gendut
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Wajahku jelek
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Itu kenapa dia selalu langsung tidur kalau pulang
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: Karena sudah gak selera melihatku
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 1
-      dialogEntry: KARENA AKU JELEK
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ibu aku kesakitan
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

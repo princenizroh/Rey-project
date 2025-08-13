@@ -3,14 +3,17 @@ using System.Collections;
 
 public class NarratorDay10 : NarratorBase
 {
+
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
         saveFileManager.UpdateCoreGameSaves(9, 1);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeLeft());
+        yield return StartCoroutine(SetCameraPanRangeBack());
+        
+
+        DisableNavMeshAgent(CharacterType.Mother);
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
@@ -30,7 +33,9 @@ public class NarratorDay10 : NarratorBase
         yield return new WaitUntil(() => seq1Complete);
         
         yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
+        EnableNavMeshAgent(CharacterType.Mother);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         bool seq2Complete = false;
@@ -50,15 +55,11 @@ public class NarratorDay10 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(9, 3);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
-        yield return StartCoroutine(SetCameraPanRangeLeft());
+        yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 1.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        
-        // Mother looks at baby while sharing her heart and concerns
-        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
-        
+         
         yield return new WaitForSeconds(1f);
         
         bool seq3Complete = false;
@@ -69,4 +70,6 @@ public class NarratorDay10 : NarratorBase
         
         GoToNextDay();
     }
+
+
 }

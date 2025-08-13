@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Ibu makin aneh
+      dialogEntry: Ibu tidak seperti biasanya
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -57,54 +57,6 @@ MonoBehaviour:
       camChoice: 0
       npcName: 0
       dialogEntry: Aku gak mau merepotkan ibu
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Ada bayangan gelap di sudut ruangan
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: Sosok itu menatapku dengan mata kosong
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 4
-      dialogEntry: Kamu tidak layak menjadi ibu
-      audioDialogEntry: {fileID: 0}
-      choices: []
-    Animation:
-      Coordinates: {x: 0, y: 0, z: 0}
-  - Type: 0
-    Dialog:
-      cutsceneType: 0
-      dialogType: 1
-      dialog3DLocation: 0
-      camChoice: 0
-      npcName: 0
-      dialogEntry: TIDAK! Pergi dari sini!
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

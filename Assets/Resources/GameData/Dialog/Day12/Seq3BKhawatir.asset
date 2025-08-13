@@ -16,7 +16,7 @@ MonoBehaviour:
   - Type: 0
     Dialog:
       cutsceneType: 0
-      dialogType: 0
+      dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
@@ -28,7 +28,7 @@ MonoBehaviour:
   - Type: 0
     Dialog:
       cutsceneType: 0
-      dialogType: 0
+      dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
@@ -40,7 +40,7 @@ MonoBehaviour:
   - Type: 0
     Dialog:
       cutsceneType: 0
-      dialogType: 0
+      dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2
@@ -52,7 +52,7 @@ MonoBehaviour:
   - Type: 0
     Dialog:
       cutsceneType: 0
-      dialogType: 0
+      dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
       npcName: 2

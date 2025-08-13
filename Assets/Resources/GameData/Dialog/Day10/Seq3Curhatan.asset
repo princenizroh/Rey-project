@@ -44,7 +44,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+5stres} Kenapa hidupku jadi kayak gini...'
+      dialogEntry: '{+5stress} Kenapa hidupku jadi kayak gini...'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -56,7 +56,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+20stres} AKU CAPEK TAU GAK! AKU CAPEK!'
+      dialogEntry: '{+20stress} AKU CAPEK TAU GAK! AKU CAPEK!'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -68,7 +68,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+10stres} Semua berantakan!'
+      dialogEntry: '{+10stress} Semua berantakan!'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -80,7 +80,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+10stres} Hidupku berantakan!'
+      dialogEntry: '{+10stress} Hidupku berantakan!'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

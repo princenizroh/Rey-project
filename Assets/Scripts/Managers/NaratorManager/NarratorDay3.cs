@@ -9,7 +9,6 @@ public class NarratorDay3 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(2, 0);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         DisableNavMeshAgent(CharacterType.Mother);
         DisableNavMeshAgent(CharacterType.Father);
         yield return StartCoroutine(SetCameraPanRangeBack());
@@ -102,7 +101,6 @@ public class NarratorDay3 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(2, 1);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -142,7 +140,6 @@ public class NarratorDay3 : NarratorBase
         saveFileManager.UpdateCoreGameSaves(2, 2);
         saveFileManager.SaveToLocalMyGamesFolder();
         
-        CloseEyes();
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 18.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -209,7 +206,6 @@ public class NarratorDay3 : NarratorBase
     protected override IEnumerator PlayNightSequence()
     {
         StartCoroutine(ResetHeadTracking());
-        CloseEyes();
         DisableNavMeshAgent(CharacterType.Mother);
         DisableNavMeshAgent(CharacterType.Father);
         yield return StartCoroutine(SetCameraPanRangeFront());
@@ -297,7 +293,6 @@ public class NarratorDay3 : NarratorBase
     protected IEnumerator PlayMidnightSequence()
     {
         StartCoroutine(ResetHeadTracking());
-        CloseEyes();
         DisableNavMeshAgent(CharacterType.Mother);
         DisableNavMeshAgent(CharacterType.Father);
         

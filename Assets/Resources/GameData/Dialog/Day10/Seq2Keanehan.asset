@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: Terbangun ya
+      dialogEntry: Ibu lagi gak enak perasaan ini
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:
@@ -43,8 +43,32 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
-      npcName: 1
-      dialogEntry: Ibu lagi gak enak perasaan ini
+      npcName: 0
+      dialogEntry: Ibu kembali seperti biasa
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 0
+      dialogEntry: Tapi kok ada yang aneh
+      audioDialogEntry: {fileID: 0}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
+      npcName: 0
+      dialogEntry: Sepertinya ibu tidak kenapa napa
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

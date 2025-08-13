@@ -104,10 +104,21 @@ public class RaycastObjectBehaviour : MonoBehaviour
     void Start()
     {
         // Ensure the GameObject has a collider for raycast detection
-        if (GetComponent<Collider>() == null)
+        Collider existingCollider = GetComponent<Collider>();
+        if (existingCollider == null)
         {
             Debug.LogWarning($"GameObject '{gameObject.name}' doesn't have a Collider component. Adding BoxCollider for raycast detection.");
-            gameObject.AddComponent<CapsuleCollider>();
+            existingCollider = gameObject.AddComponent<BoxCollider>();
+        }
+        else
+        {
+            Debug.Log($"GameObject '{gameObject.name}' already has a {existingCollider.GetType().Name}. Raycast detection ready.");
+        }
+        
+        // Ensure the GameObject has the correct tag
+        if (!gameObject.CompareTag("raycast object"))
+        {
+            Debug.LogWarning($"GameObject '{gameObject.name}' doesn't have 'raycast object' tag. Raycast detection may not work properly.");
         }
         
         // Try to find RaycastUI prefab if not assigned
@@ -604,5 +615,38 @@ public class RaycastObjectBehaviour : MonoBehaviour
             var contextData = new InteractionContextData(path.dayContext, path.sequenceContext, path.dialogPath, fallbackSpawnOffset, fallbackUseWorldSpaceOffset);
             interactionContexts.Add(contextData);
         }
+    }
+    
+    /// <summary>
+    /// Debug method to validate setup - can be called from context menu
+    /// </summary>
+    [ContextMenu("Debug Raycast Setup")]
+    private void DebugRaycastSetup()
+    {
+        Debug.Log("=== RAYCAST SETUP DEBUG ===");
+        Debug.Log($"GameObject: {gameObject.name}");
+        Debug.Log($"Tag: {gameObject.tag}");
+        Debug.Log($"Layer: {LayerMask.LayerToName(gameObject.layer)}");
+        
+        // Check colliders
+        Collider[] colliders = GetComponents<Collider>();
+        Debug.Log($"Colliders found: {colliders.Length}");
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Debug.Log($"  - {colliders[i].GetType().Name} (IsTrigger: {colliders[i].isTrigger}, Enabled: {colliders[i].enabled})");
+        }
+        
+        // Check character identity
+        Debug.Log($"Character Identity: {characterIdentity}");
+        Debug.Log($"Interaction Contexts: {interactionContexts.Count}");
+        foreach (var context in interactionContexts)
+        {
+            Debug.Log($"  - {context.dayContext}/{context.sequenceContext}: {context.dialogPath}");
+        }
+        
+        // Check UI setup
+        Debug.Log($"UI Prefab: {(raycastUIPrefab != null ? raycastUIPrefab.name : "NULL")}");
+        Debug.Log($"Target Canvas: {(targetCanvas != null ? targetCanvas.name : "NULL")}");
+        Debug.Log("========================");
     }
 }
