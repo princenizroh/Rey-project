@@ -33,7 +33,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: 5
       dialogEntry: '{+20stress} *Debugg'
-      audioDialogEntry: {fileID: 8300000, guid: 04f100354587a9e4e88b41aa7eb28f78, type: 3}
+      audioDialogEntry: {fileID: 8300000, guid: b072796ebb4289c4c93f4a3784ddb787, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

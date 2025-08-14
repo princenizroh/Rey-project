@@ -136,7 +136,7 @@ MonoBehaviour:
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu...
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 2a4117d36ad24414b96b9b5a9a5e9e5f, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0
@@ -154,6 +154,6 @@ MonoBehaviour:
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu... Jangan jatuh
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: ceb1c840f2699f9438518da4b6f65a46, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

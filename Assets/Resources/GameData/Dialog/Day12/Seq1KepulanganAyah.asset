@@ -21,7 +21,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: 5
       dialogEntry: '{+10stress} *Ckrk'
-      audioDialogEntry: {fileID: 0}
+      audioDialogEntry: {fileID: 8300000, guid: 6ae1c362d959bed44abf2a8cd8235d9a, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
@@ -33,7 +33,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: 2
       dialogEntry: '*DugDug'
-      audioDialogEntry: {fileID: 0}
+      audioDialogEntry: {fileID: 8300000, guid: 3dadb25c7c3ec2d4aba2197de888c840, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

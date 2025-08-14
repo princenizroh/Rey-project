@@ -21,7 +21,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: 5
       dialogEntry: '*Tulalit'
-      audioDialogEntry: {fileID: 0}
+      audioDialogEntry: {fileID: 8300000, guid: bd7231ddbbeafd649834d0d7bd901be2, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
