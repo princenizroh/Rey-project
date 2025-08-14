@@ -68,6 +68,10 @@ public class NarratorDay6 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Ghost, 0);
+        bool seq3_1Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day6/SFXSeq3Teriakan", 
+            () => { seq3_1Complete = true; });
+        yield return new WaitUntil(() => seq3_1Complete);
         
         bool seq3Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day6/Seq3Gangguan", 

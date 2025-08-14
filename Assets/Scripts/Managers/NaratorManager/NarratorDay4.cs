@@ -148,6 +148,11 @@ public class NarratorDay4 : NarratorBase
         yield return new WaitForSeconds(1f);
         
         // PlayAudio("wind_light");
+        bool seq9_1Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day4/SFX/Seq9GangguanJendela", 
+            () => { seq9_1Complete = true; });
+        yield return new WaitUntil(() => seq9_1Complete);
+
 
         yield return new WaitForSeconds(1f);
         // PlayAudio("Ketukan Jendela");

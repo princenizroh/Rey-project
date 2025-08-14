@@ -98,6 +98,10 @@ public class NarratorDay5 : NarratorBase
         yield return new WaitForSeconds(1f);
         // PlayAudio("rain_heavy");
         // PlayAudio("wind_strong");
+        bool seq5_1Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day5/SFX/Seq5KetukanJendela", 
+            () => { seq5_1Complete = true; });
+        yield return new WaitUntil(() => seq5_1Complete);
         
         yield return new WaitForSeconds(2f);
         FadeOpenEyes(); 

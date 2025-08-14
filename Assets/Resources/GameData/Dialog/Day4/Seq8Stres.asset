@@ -44,6 +44,18 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 5
+      dialogEntry: '*Tuninuning*'
+      audioDialogEntry: {fileID: 8300000, guid: bd7231ddbbeafd649834d0d7bd901be2, type: 3}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
       npcName: 1
       dialogEntry: Gak bisa...
       audioDialogEntry: {fileID: 0}
@@ -103,7 +115,7 @@ MonoBehaviour:
           npcResponse: Ibu... Aku lapar
         - npcName: 1
           npcResponse: '{+10stress} Kenapa sih Rey'
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 34fc5efa1b0dcce4c8ec06157917fae7, type: 3}
       - playerChoice: '*Oek* (Menangis)'
         correctChoice: 1
         dialogResponses:
@@ -111,7 +123,7 @@ MonoBehaviour:
           npcResponse: Ibu... Aku sungguh lapar
         - npcName: 1
           npcResponse: '{+10stress} Haduh malah nangis'
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 2a4117d36ad24414b96b9b5a9a5e9e5f, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0

@@ -45,7 +45,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: 4
       dialogEntry: Anak kecil...
-      audioDialogEntry: {fileID: 0}
+      audioDialogEntry: {fileID: 8300000, guid: 9f143aacbf2684047b92f687a582481e, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
@@ -100,7 +100,7 @@ MonoBehaviour:
         dialogResponses:
         - npcName: 0
           npcResponse: AYAH! IBU! TOLONG!
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 2a4117d36ad24414b96b9b5a9a5e9e5f, type: 3}
       - playerChoice: (Diam Takut)
         correctChoice: 0
         dialogResponses:

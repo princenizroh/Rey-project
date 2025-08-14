@@ -55,6 +55,18 @@ MonoBehaviour:
       dialogType: 1
       dialog3DLocation: 0
       camChoice: 0
+      npcName: 5
+      dialogEntry: '*Click Clock Click Clock*'
+      audioDialogEntry: {fileID: 8300000, guid: f849bd72e5256c44b827389360e754ae, type: 3}
+      choices: []
+    Animation:
+      Coordinates: {x: 0, y: 0, z: 0}
+  - Type: 0
+    Dialog:
+      cutsceneType: 0
+      dialogType: 1
+      dialog3DLocation: 0
+      camChoice: 0
       npcName: 1
       dialogEntry: Pengen dipeluk...
       audioDialogEntry: {fileID: 0}

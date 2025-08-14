@@ -66,6 +66,11 @@ public class NarratorDay8 : NarratorBase
         yield return new WaitForSeconds(1f);
         // PlayAudio("supernatural_intense");
         
+        bool seq4_1Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/SFX/Seq4Teriakan", 
+            () => { seq4_1Complete = true; });
+        yield return new WaitUntil(() => seq4_1Complete);
+        yield return new WaitForSeconds(1f);
         FadeOpenEyes(); 
         yield return new WaitForSeconds(2f);
         
@@ -82,26 +87,43 @@ public class NarratorDay8 : NarratorBase
         yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 0));
         yield return new WaitForSeconds(3f);
         SetCharacterSpawn(CharacterType.Ghost, 1);
+        bool seq4_2Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/SFX/Seq4Jendela", 
+            () => { seq4_2Complete = true; });
+        yield return new WaitUntil(() => seq4_2Complete);
         yield return new WaitForSeconds(3f);
         SetCharacterSpawn(CharacterType.Ghost, 2);
+        bool seq4_3Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/SFX/Seq4Jendela", 
+            () => { seq4_3Complete = true; });
+        yield return new WaitUntil(() => seq4_3Complete);
         yield return new WaitForSeconds(3f);
         yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 1, 0.5f));
         yield return new WaitForSeconds(1f);
         SetCharacterSpawn(CharacterType.Ghost, 0);
         yield return new WaitForSeconds(2f);
-        SetCharacterSpawn(CharacterType.Ghost, 1);
+        SetCharacterSpawn(CharacterType.Ghost, 3);
         yield return new WaitForSeconds(2f);
         yield return StartCoroutine(MoveCharacterToPosition(CharacterType.Ghost, 2, 0.5f));
         bool seq5Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day8/seq5DiaDisini", 
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
+        //Play animasi mencekik
 
         yield return new WaitForSeconds(1f);
-        SetCharacterSpawn(CharacterType.Ghost, 0);
+
         
         StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+        bool seq5_1Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day8/SFX/Seq5TeriakanKeras", 
+            () => { seq5_1Complete = true; });
+        yield return new WaitUntil(() => seq5_1Complete);
+
+        SetCharacterSpawn(CharacterType.Ghost, 0);
+        
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
         
         bool seq6Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq6Keputusasaan", 

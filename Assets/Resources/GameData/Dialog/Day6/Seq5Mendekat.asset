@@ -52,7 +52,7 @@ MonoBehaviour:
         dialogResponses:
         - npcName: 0
           npcResponse: IBU! ADA YANG ANEH DI KAMAR!
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 2a4117d36ad24414b96b9b5a9a5e9e5f, type: 3}
       - playerChoice: (Diam Takut)
         correctChoice: 0
         dialogResponses:

@@ -100,7 +100,7 @@ MonoBehaviour:
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu Dimana...
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: b5c30f5149243184b9479b5ab6cf0fec, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
   - Type: 0

@@ -20,8 +20,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 5
-      dialogEntry: '{+10stress} *Duggg*'
-      audioDialogEntry: {fileID: 0}
+      dialogEntry: '{+10stress} *Duggg Trackk*'
+      audioDialogEntry: {fileID: 8300000, guid: 410461bc30b29ec4199d0bd9bb8a575d, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
@@ -33,7 +33,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: 5
       dialogEntry: '{+20stress} *Debugg'
-      audioDialogEntry: {fileID: 0}
+      audioDialogEntry: {fileID: 8300000, guid: 04f100354587a9e4e88b41aa7eb28f78, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
@@ -45,7 +45,7 @@ MonoBehaviour:
       camChoice: 0
       npcName: 5
       dialogEntry: '{+20stress} *Prankk'
-      audioDialogEntry: {fileID: 0}
+      audioDialogEntry: {fileID: 8300000, guid: ac03d4131a54a8e4083a253ee220727e, type: 3}
       choices: []
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
@@ -88,12 +88,12 @@ MonoBehaviour:
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu... lapar...
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: b5c30f5149243184b9479b5ab6cf0fec, type: 3}
       - playerChoice: '*Oeekk* (Menangis Keras)'
         correctChoice: 1
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu... Aku lapar...
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 2a4117d36ad24414b96b9b5a9a5e9e5f, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}

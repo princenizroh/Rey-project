@@ -32,7 +32,7 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 0
-      dialogEntry: Tadi aku mendengar suara tertawa
+      dialogEntry: Tadi aku mendengar suara teriakan
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

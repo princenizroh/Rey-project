@@ -79,6 +79,10 @@ public class NarratorDay7 : NarratorBase
         
         StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
         
+        bool seq4_1Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day7/SFX/Seq4TeriakanKeras", 
+            () => { seq4_1Complete = true; });
+        yield return new WaitUntil(() => seq4_1Complete);
         yield return new WaitForSeconds(1f);
          
         bool seq4Complete = false;
@@ -99,6 +103,10 @@ public class NarratorDay7 : NarratorBase
         yield return new WaitUntil(() => seq5Complete);
         SetObjectsActive(gameObjects.activeObjects, true);
         yield return new WaitForSeconds(3f);
+        bool seq5_1Complete = false;
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day7/SFX/Seq5TeriakanMakinKeras", 
+            () => { seq5_1Complete = true; });
+        yield return new WaitUntil(() => seq5_1Complete);
         SetCharacterSpawn(CharacterType.Ghost, 1);
         SetObjectsActive(gameObjects.inActiveObjects, false);
         

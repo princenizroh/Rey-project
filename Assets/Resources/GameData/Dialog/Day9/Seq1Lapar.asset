@@ -64,12 +64,12 @@ MonoBehaviour:
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu...
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: 34fc5efa1b0dcce4c8ec06157917fae7, type: 3}
       - playerChoice: '*Oek* (Menangis)'
         correctChoice: 1
         dialogResponses:
         - npcName: 0
           npcResponse: Ibu.. Lapar..
-        audioDialogResponse: {fileID: 0}
+        audioDialogResponse: {fileID: 8300000, guid: b5c30f5149243184b9479b5ab6cf0fec, type: 3}
     Animation:
       Coordinates: {x: 0, y: 0, z: 0}
