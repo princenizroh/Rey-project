@@ -17,43 +17,51 @@ public class NarratorMainMenu : NarratorBase
         }
     }
 
+
+    [System.Obsolete]
+    public new IEnumerator StartNarration()
+    {
+        PlayMainMenuSequence();
+        yield break; 
+    }
+
+    [System.Obsolete]
+    protected override IEnumerator Narrate()
+    {
+        yield break; 
+    }
+
     private IEnumerator DelayedMainMenuPlay()
     {
         yield return new WaitForSeconds(delayBeforePlay);
         PlayMainMenuSequence();
     }
 
-    /// <summary>
-    /// Main function to play character animations based on current save day
-    /// Call this from UI buttons or other scripts
-    /// </summary>
     [ContextMenu("Play Main Menu Sequence")]
     public void PlayMainMenuSequence()
     {
         if (saveFileManager == null)
         {
-            Debug.LogWarning("[NarratorMainMenu] SaveFileManager not found. Using default Day 1 animations.");
             PlayDay1MainMenuAnimation();
             return;
         }
 
-        // Get current day from save data
         int currentDay = GetCurrentSaveDay();
         
-        Debug.Log($"[NarratorMainMenu] Playing animations for Day {currentDay}");
         
-        // Play animations based on day
         PlayAnimationsForDay(currentDay);
     }
 
-    /// <summary>
-    /// Get current day from SaveFileManager
-    /// </summary>
     private int GetCurrentSaveDay()
     {
         try
         {
-            // Access SaveFileManager's target ScriptableObject using reflection
+            if (saveFileManager == null)
+            {
+                Debug.LogWarning("[NarratorMainMenu] SaveFileManager is null, defaulting to Day 1");
+                return 1;
+            }
+
             var saveDataField = saveFileManager.GetType().GetField("targetSaveObject", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
@@ -62,12 +70,13 @@ public class NarratorMainMenu : NarratorBase
                 var coreGameSaves = saveDataField.GetValue(saveFileManager);
                 if (coreGameSaves != null)
                 {
-                    // Get day field using reflection
                     var dayField = coreGameSaves.GetType().GetField("day");
                     if (dayField != null)
                     {
                         int day = (int)dayField.GetValue(coreGameSaves);
-                        return Mathf.Clamp(day, 1, 14); // Clamp between Day 1-14
+                        int clampedDay = Mathf.Clamp(day, 1, 14); 
+                        
+                        return clampedDay;
                     }
                 }
             }
@@ -80,12 +89,8 @@ public class NarratorMainMenu : NarratorBase
         return 1; // Default to Day 1 if error
     }
 
-    /// <summary>
-    /// Play character animations based on specific day
-    /// </summary>
     private void PlayAnimationsForDay(int day)
     {
-        // Ensure all characters are in proper main menu positions first
         SetupMainMenuPositions();
         
         switch (day)
@@ -133,7 +138,6 @@ public class NarratorMainMenu : NarratorBase
                 PlayDay14MainMenuAnimation();
                 break;
             default:
-                Debug.LogWarning($"[NarratorMainMenu] Unknown day: {day}. Using Day 1 animations.");
                 PlayDay1MainMenuAnimation();
                 break;
         }
@@ -141,208 +145,309 @@ public class NarratorMainMenu : NarratorBase
 
     private void SetupMainMenuPositions()
     {
-        SetCharacterSpawn(CharacterType.Mother, 0);
-        SetCharacterSpawn(CharacterType.Father, 0);
-        SetCharacterSpawn(CharacterType.Baby, 0);
-        SetCharacterSpawn(CharacterType.Object, 0);
+        SafeSetCharacterSpawn(CharacterType.Mother, 0);
+        SafeSetCharacterSpawn(CharacterType.Father, 0);
+        SafeSetCharacterSpawn(CharacterType.Baby, 0);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 0);
+        SafeSetCharacterSpawn(CharacterType.Object, 0);
+    }
 
+
+    private void SafeSetCharacterSpawn(CharacterType characterType, int spawnIndex)
+    {
+        try
+        {
+            SetCharacterSpawn(characterType, spawnIndex);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[NarratorMainMenu] Could not spawn {characterType}: {e.Message}");
+        }
+    }
+
+    private void SafePlayCharacterAnimation(CharacterType characterType, string animationName)
+    {
+        try
+        {
+            PlayCharacterAnimation(characterType, animationName);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[NarratorMainMenu] Could not animate {characterType} with {animationName}: {e.Message}");
+        }
+    }
+
+    private void SafeSetHeadTarget(CharacterType characterType, CharacterTarget targetType)
+    {
+        try
+        {
+            if (headTrackingManager != null)
+            {
+                StartCoroutine(SetHeadTarget(characterType, targetType));
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[NarratorMainMenu] Could not set head target for {characterType}: {e.Message}");
+        }
     }
 
     #region Day-Specific Animation Methods
-    
+
     private void PlayDay1MainMenuAnimation()
     {
-        
-        SetObjectsActive(gameObjects.activeObjects, true); 
-        PlayCharacterAnimation(CharacterType.Mother, "Sit");
-        PlayCharacterAnimation(CharacterType.Father, "Sitting");
-        PlayCharacterAnimation(CharacterType.Bidan, "Idle");
-        
-        SetCharacterSpawn(CharacterType.Object, 0); 
-        
-        Debug.Log("[NarratorMainMenu] Playing Day 1 animations: Birth scene");
+        SafeSetCharacterSpawn(CharacterType.Mother, 0);
+        SafeSetCharacterSpawn(CharacterType.Father, 0);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 0);
+        SafeSetCharacterSpawn(CharacterType.Baby, 0);
+        SafeSetCharacterSpawn(CharacterType.Object, 0);
+
+        SafePlayCharacterAnimation(CharacterType.Mother, "Sit");
+        SafePlayCharacterAnimation(CharacterType.Father, "Sitting");
+        SafePlayCharacterAnimation(CharacterType.Bidan, "Idle");
+
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
+        SafeSetHeadTarget(CharacterType.Bidan, CharacterTarget.Baby);
+        SafeSetHeadTarget(CharacterType.Father, CharacterTarget.Baby);
     }
 
     private void PlayDay2MainMenuAnimation()
     {
-        SetObjectsActive(gameObjects.inActiveObjects, false);
-        PlayCharacterAnimation(CharacterType.Mother, "Angry");
-        PlayCharacterAnimation(CharacterType.Father, "Sitting_Talking");
-        PlayCharacterAnimation(CharacterType.Baby, "Idle");
+
+        SafeSetCharacterSpawn(CharacterType.Mother, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 1);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        SetCharacterSpawn(CharacterType.Object, 1);
+        SafePlayCharacterAnimation(CharacterType.Mother, "Angry");
+        SafePlayCharacterAnimation(CharacterType.Father, "Sitting_Talking");
         
-        Debug.Log("[NarratorMainMenu] Playing Day 2 animations: First day home");
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
     }
 
     private void PlayDay3MainMenuAnimation()
     {
-        // Day 3: Growing baby - more active
-        PlayCharacterAnimation(CharacterType.Mother, "Happy");
-        PlayCharacterAnimation(CharacterType.Father, "Idle");
-        PlayCharacterAnimation(CharacterType.Baby, "Active");
+        SafeSetCharacterSpawn(CharacterType.Mother, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 1);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 3 animations: Growing baby");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Angry");
+        SafePlayCharacterAnimation(CharacterType.Father, "Sitting_Talking");
+        
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
+        SafeSetHeadTarget(CharacterType.Father, CharacterTarget.Baby);
     }
 
     private void PlayDay4MainMenuAnimation()
     {
-        // Day 4: Family bonding
-        PlayCharacterAnimation(CharacterType.Mother, "Playing");
-        PlayCharacterAnimation(CharacterType.Father, "Happy");
-        PlayCharacterAnimation(CharacterType.Baby, "Happy");
-        
-        Debug.Log("[NarratorMainMenu] Playing Day 4 animations: Family bonding");
+        SafeSetCharacterSpawn(CharacterType.Mother, 2);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
+
+        SafePlayCharacterAnimation(CharacterType.Mother, "Angry");
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
     }
 
     private void PlayDay5MainMenuAnimation()
     {
-        // Day 5: Learning phase
-        PlayCharacterAnimation(CharacterType.Mother, "Teaching");
-        PlayCharacterAnimation(CharacterType.Father, "Watching");
-        PlayCharacterAnimation(CharacterType.Baby, "Learning");
+        SafeSetCharacterSpawn(CharacterType.Mother, 1);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 5 animations: Learning phase");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Talking On Phone");        
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
     }
 
     private void PlayDay6MainMenuAnimation()
     {
-        // Day 6: Developing skills
-        PlayCharacterAnimation(CharacterType.Mother, "Encouraging");
-        PlayCharacterAnimation(CharacterType.Father, "Proud");
-        PlayCharacterAnimation(CharacterType.Baby, "Crawling");
+        SafeSetCharacterSpawn(CharacterType.Mother, 1);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 6 animations: Developing skills");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Thinking");
+        
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
     }
 
     private void PlayDay7MainMenuAnimation()
     {
-        // Day 7: Week milestone
-        PlayCharacterAnimation(CharacterType.Mother, "Celebrating");
-        PlayCharacterAnimation(CharacterType.Father, "Celebrating");
-        PlayCharacterAnimation(CharacterType.Baby, "Smiling");
+        SafeSetCharacterSpawn(CharacterType.Mother, 2);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 7 animations: Week milestone");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Defeat");
+        
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
     }
 
     private void PlayDay8MainMenuAnimation()
     {
-        // Day 8: New challenges
-        PlayCharacterAnimation(CharacterType.Mother, "Concerned");
-        PlayCharacterAnimation(CharacterType.Father, "Helping");
-        PlayCharacterAnimation(CharacterType.Baby, "Fussy");
-        
-        Debug.Log("[NarratorMainMenu] Playing Day 8 animations: New challenges");
+        SafeSetCharacterSpawn(CharacterType.Mother, 1);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
+
+        SafePlayCharacterAnimation(CharacterType.Mother, "Sad Idle");
+
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
+        SafeSetHeadTarget(CharacterType.Ghost, CharacterTarget.Baby);
     }
 
     private void PlayDay9MainMenuAnimation()
     {
-        // Day 9: Adaptation
-        PlayCharacterAnimation(CharacterType.Mother, "Adapting");
-        PlayCharacterAnimation(CharacterType.Father, "Supporting");
-        PlayCharacterAnimation(CharacterType.Baby, "Growing");
+        SafeSetCharacterSpawn(CharacterType.Mother, 1);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 9 animations: Adaptation");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Sad Idle");
+        
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
     }
 
     private void PlayDay10MainMenuAnimation()
     {
-        // Day 10: Progress
-        PlayCharacterAnimation(CharacterType.Mother, "Proud");
-        PlayCharacterAnimation(CharacterType.Father, "Amazed");
-        PlayCharacterAnimation(CharacterType.Baby, "Achieving");
+        SafeSetCharacterSpawn(CharacterType.Mother, 0);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 10 animations: Progress");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Sad Idle");
+        
+        SafeSetHeadTarget(CharacterType.Mother, CharacterTarget.Baby);
     }
 
     private void PlayDay11MainMenuAnimation()
     {
-        // Day 11: Advanced development
-        PlayCharacterAnimation(CharacterType.Mother, "Guiding");
-        PlayCharacterAnimation(CharacterType.Father, "Observing");
-        PlayCharacterAnimation(CharacterType.Baby, "Advanced");
+        SafeSetCharacterSpawn(CharacterType.Mother, 0);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 11 animations: Advanced development");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Sitting Disbelief");
     }
 
     private void PlayDay12MainMenuAnimation()
     {
-        // Day 12: Near completion
-        PlayCharacterAnimation(CharacterType.Mother, "Emotional");
-        PlayCharacterAnimation(CharacterType.Father, "Reflective");
-        PlayCharacterAnimation(CharacterType.Baby, "Mature");
+        SafeSetCharacterSpawn(CharacterType.Mother, 0);
+        SafeSetCharacterSpawn(CharacterType.Baby, 1);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 12 animations: Near completion");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Sitting Disbelief");
     }
 
     private void PlayDay13MainMenuAnimation()
     {
-        // Day 13: Final preparations
-        PlayCharacterAnimation(CharacterType.Mother, "Preparing");
-        PlayCharacterAnimation(CharacterType.Father, "Ready");
-        PlayCharacterAnimation(CharacterType.Baby, "Almost_Ready");
+        SafeSetCharacterSpawn(CharacterType.Mother, 0);
+        SafeSetCharacterSpawn(CharacterType.Baby, 2);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 13 animations: Final preparations");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Sitting");
     }
 
     private void PlayDay14MainMenuAnimation()
     {
-        // Day 14: Completion/Birth
-        PlayCharacterAnimation(CharacterType.Mother, "Complete");
-        PlayCharacterAnimation(CharacterType.Father, "Joyful");
-        PlayCharacterAnimation(CharacterType.Baby, "Born");
+        SafeSetCharacterSpawn(CharacterType.Mother, 0);
+        SafeSetCharacterSpawn(CharacterType.Baby, 2);
+        SafeSetCharacterSpawn(CharacterType.Father, 2);
+        SafeSetCharacterSpawn(CharacterType.Bidan, 1);
+        SafeSetCharacterSpawn(CharacterType.Object, 1);
         
-        Debug.Log("[NarratorMainMenu] Playing Day 14 animations: Completion");
+        SafePlayCharacterAnimation(CharacterType.Mother, "Sitting");
+
     }
     
     #endregion
 
     #region Public Utility Methods
-    
-    /// <summary>
-    /// Force play animations for specific day (for testing/debugging)
-    /// </summary>
     public void ForcePlayDayAnimation(int day)
     {
-        Debug.Log($"[NarratorMainMenu] Forcing animations for Day {day}");
         PlayAnimationsForDay(day);
     }
-    
-    /// <summary>
-    /// Get current save day (public accessor for other scripts)
-    /// </summary>
+
     public int GetCurrentDay()
     {
         return GetCurrentSaveDay();
     }
     
-    /// <summary>
-    /// Refresh main menu animations (useful after save file changes)
-    /// </summary>
     public void RefreshMainMenu()
     {
         PlayMainMenuSequence();
+    }
+    
+    public void ResetToMainMenuPositions()
+    {
+        SetupMainMenuPositions();
+    }
+
+    public void StopAllAnimations()
+    {
+        PlayCharacterAnimation(CharacterType.Mother, "Idle");
+        PlayCharacterAnimation(CharacterType.Father, "Idle");
+        PlayCharacterAnimation(CharacterType.Bidan, "Idle");
+        PlayCharacterAnimation(CharacterType.Ghost, "Idle");
+        
+        StartCoroutine(ResetHeadTracking());
     }
     
     #endregion
 
     #region Context Menu Debug Methods
     
-    [ContextMenu("Test Day 1")]
+    [ContextMenu("Test Day 1 - Birth")]
     private void TestDay1() => ForcePlayDayAnimation(1);
     
-    [ContextMenu("Test Day 7")]
+    [ContextMenu("Test Day 2 - First Day")]
+    private void TestDay2() => ForcePlayDayAnimation(2);
+    
+    [ContextMenu("Test Day 5 - Mother Angry")]
+    private void TestDay5() => ForcePlayDayAnimation(5);
+    
+    [ContextMenu("Test Day 7 - Alone")]
     private void TestDay7() => ForcePlayDayAnimation(7);
     
-    [ContextMenu("Test Day 14")]
+    [ContextMenu("Test Day 8 - Supernatural Peak")]
+    private void TestDay8() => ForcePlayDayAnimation(8);
+    
+    [ContextMenu("Test Day 12 - Chaos")]
+    private void TestDay12() => ForcePlayDayAnimation(12);
+    
+    [ContextMenu("Test Day 14 - Final")]
     private void TestDay14() => ForcePlayDayAnimation(14);
     
     [ContextMenu("Get Current Save Day")]
     private void DebugCurrentDay()
     {
         int day = GetCurrentSaveDay();
-        Debug.Log($"[NarratorMainMenu] Current save day: {day}");
     }
+    
+    [ContextMenu("Reset All Positions")]
+    private void DebugResetPositions() => ResetToMainMenuPositions();
+    
+    [ContextMenu("Stop All Animations")]
+    private void DebugStopAnimations() => StopAllAnimations();
+    
+    [ContextMenu("Refresh Main Menu")]
+    private void DebugRefreshMainMenu() => RefreshMainMenu();
     
     #endregion
 }

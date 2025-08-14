@@ -465,29 +465,8 @@ public abstract class NarratorBase : MonoBehaviour
                     Debug.LogWarning($"{characterType} Animator is not enabled!");
                     return;
                 }
+                characterData.animator.Play(animationName);
 
-                Debug.Log($"Playing animation '{animationName}' for {characterType}");
-
-                if (characterType == CharacterType.Bidan)
-                {
-                    characterData.animator.Play(animationName);
-                }
-                if (characterType == CharacterType.Mother)
-                {
-                    characterData.animator.Play(animationName);
-                }
-                if (characterType == CharacterType.Father)
-                {
-                    characterData.animator.Play(animationName);
-                }
-                if (characterType == CharacterType.Ghost)
-                {
-                    characterData.animator.Play(animationName);
-                }
-                else
-                {
-                    Debug.LogError($"Animator for {characterType} doesn't play {animationName}");
-                }
             }
             else
             {

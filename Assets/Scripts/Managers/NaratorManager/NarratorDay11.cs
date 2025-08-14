@@ -5,25 +5,42 @@ public class NarratorDay11 : NarratorBase
 {
     [SerializeField] protected Rigidbody rigidbodyIbu;
 
-    // protected override void Awake()
-    // {
-    //     rigidbodyIbu = GetComponent<Rigidbody>();
-    //     if (rigidbodyIbu == null)
-    //     {
-    //         Debug.LogError("Rigidbody Ibu is not assigned in the inspector.");
-    //     }
-    // }
+    protected override void Awake()
+    {
+        base.Awake(); 
+        
+        InitializeRigidbodyIbu();
+    }
+    
+    private void InitializeRigidbodyIbu()
+    {
+        if (rigidbodyIbu == null)
+        {
+            foreach (var characterData in charactersDataArray)
+            {
+                if (characterData.characterType == CharacterType.Mother)
+                {
+                    rigidbodyIbu = characterData.characterObject.GetComponent<Rigidbody>();
+                    if (rigidbodyIbu == null)
+                    {
+                        rigidbodyIbu = characterData.characterObject.AddComponent<Rigidbody>();
+                    }
+                    break;
+                }
+            }
+        }
+    }
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
         saveFileManager.UpdateCoreGameSaves(10, 1);
         saveFileManager.SaveToLocalMyGamesFolder();
-        
+        DisableNavMeshAgent(CharacterType.Mother);
         yield return StartCoroutine(SetCameraPanRangeBack());
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
-        // SetFreezePosition(true);
+        SetFreezePosition(true); 
         
         PlayCharacterAnimation(CharacterType.Mother, "Sitting_Sexy");
         yield return new WaitForSeconds(1f);
@@ -42,8 +59,8 @@ public class NarratorDay11 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         
+        SetFreezePosition(false); 
         EnableNavMeshAgent(CharacterType.Mother);
-        // SetFreezePosition(false);
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         bool seq2Complete = false;
@@ -83,16 +100,28 @@ public class NarratorDay11 : NarratorBase
 
     public void SetFreezePosition(bool freeze)
     {
-        if (rigidbodyIbu == null) return;
+        // Ensure rigidbody is initialized
+        if (rigidbodyIbu == null)
+        {
+            InitializeRigidbodyIbu();
+        }
+        
+        if (rigidbodyIbu == null) 
+        {
+            Debug.LogError("Cannot set freeze position: rigidbodyIbu is still null!");
+            return;
+        }
 
         if (freeze)
         {
+            Debug.Log("Freezing Mother's position");
             rigidbodyIbu.constraints |= RigidbodyConstraints.FreezePositionX |
                               RigidbodyConstraints.FreezePositionY |
                               RigidbodyConstraints.FreezePositionZ;
         }
         else
         {
+            Debug.Log("Unfreezing Mother's position");
             rigidbodyIbu.constraints &= ~RigidbodyConstraints.FreezePositionX;
             rigidbodyIbu.constraints &= ~RigidbodyConstraints.FreezePositionY;
             rigidbodyIbu.constraints &= ~RigidbodyConstraints.FreezePositionZ;
