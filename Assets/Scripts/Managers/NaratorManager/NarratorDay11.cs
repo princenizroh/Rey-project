@@ -3,6 +3,9 @@ using System.Collections;
 
 public class NarratorDay11 : NarratorBase
 {
+    [Header("Charge Meter")]
+    public GameObject chargeMeterObject;
+    
     [SerializeField] protected Rigidbody rigidbodyIbu;
 
     protected override void Awake()
@@ -56,6 +59,9 @@ public class NarratorDay11 : NarratorBase
         dialogGameManager.StartCoreGame("GameData/Dialog/Day11/Seq1BerbicaraAneh", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
+        
+        // ChargeMeter untuk "menangis makin keras" - Seq1 BerbicaraAneh  
+        yield return StartCoroutine(PlayChargeMeterSequence(chargeMeterObject));
         
         yield return new WaitForSeconds(1f);
         

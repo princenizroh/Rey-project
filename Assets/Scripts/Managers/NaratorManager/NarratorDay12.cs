@@ -17,7 +17,7 @@ public class NarratorDay12 : NarratorBase
     {
         saveFileManager.UpdateCoreGameSaves(11, 1);
         saveFileManager.SaveToLocalMyGamesFolder();
-        
+
         AppearObjects();
         TimeManager.instance.TimeOfDay = 13.0f;
         SetCharacterSpawn(CharacterType.Baby, 0);
@@ -30,16 +30,16 @@ public class NarratorDay12 : NarratorBase
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
 
-        FadeOpenEyes(); 
+        FadeOpenEyes();
 
         // PlayCharacterAnimation(CharacterType.Object, "OpenTheDoor");
         yield return new WaitForSeconds(1f);
 
         bool seq1Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq1KepulanganAyah", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq1KepulanganAyah",
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
-        
+
         yield return new WaitForSeconds(1f);
 
         SetRaycastContext("Day12", "Afternoon");
@@ -49,14 +49,15 @@ public class NarratorDay12 : NarratorBase
         bool correctInteraction = false;
         while (!correctInteraction)
         {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) =>
+            {
 
-                if (characterIdentity == "Object") 
+                if (characterIdentity == "Object")
                 {
-                    correctInteraction = true; 
+                    correctInteraction = true;
                 }
             }, "Day12", "Afternoon"));
-            
+
             if (!correctInteraction)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -65,33 +66,32 @@ public class NarratorDay12 : NarratorBase
 
         this.DisableRaycastInteraction();
 
-        animator.Play("OpenTheDoor"); 
+        animator.Play("OpenTheDoor");
 
         yield return new WaitForSeconds(1f);
-        
+
         bool seq2Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq2Berantakan", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq2Berantakan",
             () => { seq2Complete = true; });
         yield return new WaitUntil(() => seq2Complete);
 
         CoreGameManager.OnPlayerChoiceSelected += OnPlayerChoiceReceived;
         choiceReceived = false;
-        
+
         bool seq3ABComplete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3A-B", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3A-B",
             () => { seq3ABComplete = true; });
         yield return new WaitUntil(() => seq3ABComplete);
-  
+
         CoreGameManager.OnPlayerChoiceSelected -= OnPlayerChoiceReceived;
 
         yield return StartCoroutine(HandlePlayerChoiceAndPlayTimeline());
-        
-        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(ReturnToMainMenuAfterEnding());
 
-        FadeCloseEyes(); 
-        yield return new WaitForSeconds(2f);
-        
-        GoToNextTimeOfDay();
+        // Komen bawah ini untuk multiple ending nantinya
+        // yield return new WaitForSeconds(2f);
+
+        // GoToNextTimeOfDay();
     }
     
     [System.Obsolete]
@@ -149,16 +149,25 @@ public class NarratorDay12 : NarratorBase
             CoreGameManager.OnPlayerChoiceSelected -= OnPlayerChoiceReceived;
         }
     }
-    
+
+    /// <summary>
+    /// Simple method to return to main menu after ending
+    /// </summary>
+    private IEnumerator ReturnToMainMenuAfterEnding()
+    {
+        yield return new WaitForSeconds(1f);
+        ReturnToMainMenu();
+    }
+
 
     [System.Obsolete]
     private IEnumerator PlayAngryTimeline()
     {
         bool seq3Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3AKemarahanAyah", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3AKemarahanAyah",
             () => { seq3Complete = true; });
         yield return new WaitUntil(() => seq3Complete);
-        
+
         SetRaycastContext("Day12", "Afternoon-1");
 
         this.EnableRaycastInteraction();
@@ -166,14 +175,15 @@ public class NarratorDay12 : NarratorBase
         bool correctInteraction = false;
         while (!correctInteraction)
         {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) =>
+            {
 
-                if (characterIdentity == "Object-Dapur") 
+                if (characterIdentity == "Object-Dapur")
                 {
-                    correctInteraction = true; 
+                    correctInteraction = true;
                 }
             }, "Day12", "Afternoon-1"));
-            
+
             if (!correctInteraction)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -181,7 +191,7 @@ public class NarratorDay12 : NarratorBase
         }
 
         this.DisableRaycastInteraction();
-        
+
         animator2.Play("OpenTheDoor");
 
         SetRaycastContext("Day12", "Afternoon-2");
@@ -190,14 +200,15 @@ public class NarratorDay12 : NarratorBase
         bool correctInteraction_2 = false;
         while (!correctInteraction_2)
         {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) =>
+            {
 
-                if (characterIdentity == "Object-KamarOrtu") 
+                if (characterIdentity == "Object-KamarOrtu")
                 {
-                    correctInteraction_2 = true; 
+                    correctInteraction_2 = true;
                 }
             }, "Day12", "Afternoon-2"));
-            
+
             if (!correctInteraction_2)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -209,10 +220,10 @@ public class NarratorDay12 : NarratorBase
         yield return new WaitForSeconds(1f);
 
         bool seq4Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq4AMencariIbu", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq4AMencariIbu",
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
-        
+
 
         SetRaycastContext("Day12", "Afternoon-3");
         this.EnableRaycastInteraction();
@@ -220,14 +231,15 @@ public class NarratorDay12 : NarratorBase
         bool correctInteraction_3 = false;
         while (!correctInteraction_3)
         {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) =>
+            {
 
-                if (characterIdentity == "Object-KamarRey") 
+                if (characterIdentity == "Object-KamarRey")
                 {
-                    correctInteraction_3 = true; 
+                    correctInteraction_3 = true;
                 }
             }, "Day12", "Afternoon-3"));
-            
+
             if (!correctInteraction_3)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -237,21 +249,30 @@ public class NarratorDay12 : NarratorBase
         this.DisableRaycastInteraction();
         animator4.Play("OpenTheDoor");
         yield return new WaitForSeconds(1f);
-        
+
         bool seq5Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq5AMenemukanIbu", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq5AMenemukanIbu",
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
+        yield return new WaitForSeconds(2f);
+
+        FadeCloseEyes(); 
+        yield return new WaitForSeconds(2f);
+
+        uiElements.narratorText.gameObject.SetActive(true);
+        uiElements.narratorText.text = "Bad Ending\n Memarahi istri disaat kondisi mental yang tidak baik baik saja";
+        yield return new WaitForSeconds(2f);
+        uiElements.narratorText.gameObject.SetActive(false);
     }
-    
+
     [System.Obsolete]
     private IEnumerator PlayConcernedTimeline()
     {
         bool seq3Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3BKhawatir", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq3BKhawatir",
             () => { seq3Complete = true; });
         yield return new WaitUntil(() => seq3Complete);
-        
+
         SetRaycastContext("Day12-1", "Afternoon-1v1");
 
         this.EnableRaycastInteraction();
@@ -259,14 +280,15 @@ public class NarratorDay12 : NarratorBase
         bool correctInteraction = false;
         while (!correctInteraction)
         {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) =>
+            {
 
-                if (characterIdentity == "Object-Dapur") 
+                if (characterIdentity == "Object-Dapur")
                 {
-                    correctInteraction = true; 
+                    correctInteraction = true;
                 }
             }, "Day12-1", "Afternoon-1v1"));
-            
+
             if (!correctInteraction)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -274,7 +296,7 @@ public class NarratorDay12 : NarratorBase
         }
 
         this.DisableRaycastInteraction();
-        
+
         animator2.Play("OpenTheDoor");
 
         SetRaycastContext("Day12-2", "Afternoon-2v1");
@@ -283,14 +305,15 @@ public class NarratorDay12 : NarratorBase
         bool correctInteraction_2 = false;
         while (!correctInteraction_2)
         {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) =>
+            {
 
-                if (characterIdentity == "Object-KamarOrtu") 
+                if (characterIdentity == "Object-KamarOrtu")
                 {
-                    correctInteraction_2 = true; 
+                    correctInteraction_2 = true;
                 }
             }, "Day12-2", "Afternoon-2v1"));
-            
+
             if (!correctInteraction_2)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -301,9 +324,9 @@ public class NarratorDay12 : NarratorBase
         animator3.Play("OpenTheDoor");
 
         yield return new WaitForSeconds(1f);
-        
+
         bool seq4Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq4BMencariIbu", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq4BMencariIbu",
             () => { seq4Complete = true; });
         yield return new WaitUntil(() => seq4Complete);
 
@@ -313,14 +336,15 @@ public class NarratorDay12 : NarratorBase
         bool correctInteraction_3 = false;
         while (!correctInteraction_3)
         {
-            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) => {
+            yield return StartCoroutine(WaitForRaycastInteraction((characterIdentity) =>
+            {
 
-                if (characterIdentity == "Object-KamarRey") 
+                if (characterIdentity == "Object-KamarRey")
                 {
-                    correctInteraction_3 = true; 
+                    correctInteraction_3 = true;
                 }
             }, "Day12-3", "Afternoon-3v1"));
-            
+
             if (!correctInteraction_3)
             {
                 yield return new WaitForSeconds(0.5f);
@@ -330,10 +354,18 @@ public class NarratorDay12 : NarratorBase
         this.DisableRaycastInteraction();
         animator4.Play("OpenTheDoor");
         yield return new WaitForSeconds(1f);
-        
+
         bool seq5Complete = false;
-        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq5BMenemukanIbu", 
+        dialogGameManager.StartCoreGame("GameData/Dialog/Day12/Seq5BMenemukanIbu",
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
+
+        FadeCloseEyes();
+        yield return new WaitForSeconds(2f);
+        uiElements.narratorText.gameObject.SetActive(true);
+        uiElements.narratorText.text = "Bad Ending\n Memarahi istri disaat kondisi mental yang tidak baik baik saja";
+        yield return new WaitForSeconds(2f);
+        uiElements.narratorText.gameObject.SetActive(false);
+        
     }
 }

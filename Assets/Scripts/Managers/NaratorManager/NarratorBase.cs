@@ -5,6 +5,7 @@ using System.Collections;
 using UnityEngine.AI;
 using System.Collections.Generic;
 using Unity.Cinemachine;
+using UnityEngine.SceneManagement;
 
 public enum NarratorDay
 {
@@ -681,6 +682,37 @@ public abstract class NarratorBase : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Play charge meter sequence for "menangis makin keras" mechanic
+    /// </summary>
+    protected IEnumerator PlayChargeMeterSequence(GameObject chargeMeterObject)
+    {
+        if (chargeMeterObject == null)
+        {
+            Debug.LogWarning("[NarratorBase] ChargeMeter GameObject not assigned!");
+            yield break;
+        }
+        
+        // Aktifkan charge meter
+        chargeMeterObject.SetActive(true);
+        
+        // Get component
+        ChargeMeter chargeMeter = chargeMeterObject.GetComponent<ChargeMeter>();
+        
+        // Setup callback
+        bool completed = false;
+        chargeMeter.OnChargeSuccess = () => { completed = true; };
+        
+        // Wait sampai selesai
+        while (!completed)
+        {
+            yield return null;
+        }
+        
+        // Matikan lagi
+        chargeMeterObject.SetActive(false);
+    }
+
     [System.Obsolete]
     protected void GoToNextTimeOfDay()
     {
@@ -1000,6 +1032,16 @@ public abstract class NarratorBase : MonoBehaviour
         CloseEyes();
         StartCoroutine(SwitchLights.Instance.SwitchToDark());
         yield return null;
+    }
+
+    protected void ReturnToMainMenu()
+    {        
+        if (saveFileManager != null)
+        {
+            saveFileManager.SaveToLocalMyGamesFolder();
+        }
+        
+        SceneManager.LoadScene("MainMenu");
     }
 #endregion
 }

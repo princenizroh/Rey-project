@@ -2,7 +2,9 @@ using UnityEngine;
 using System.Collections;
 
 public class NarratorDay4 : NarratorBase
-{    
+{
+    [Header("Charge Meter")]
+    public GameObject chargeMeterObject;    
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
@@ -29,6 +31,9 @@ public class NarratorDay4 : NarratorBase
         dialogGameManager.StartCoreGame("GameData/Dialog/Day4/Seq1TempatBerbeda", 
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
+        
+        // ChargeMeter untuk "menangis makin keras" - Seq1 TempatBerbeda
+        yield return StartCoroutine(PlayChargeMeterSequence(chargeMeterObject));
         
         yield return new WaitForSeconds(1f);
 

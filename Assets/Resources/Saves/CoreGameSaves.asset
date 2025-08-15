@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CoreGameSaves
   m_EditorClassIdentifier: 
   day: 4
-  timeOfDay: 3
+  timeOfDay: 1
   mother_stress_level: 0

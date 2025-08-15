@@ -14,6 +14,7 @@ public class ChargeMeter : MonoBehaviour
     [SerializeField] private float pullbackThreshold = 25f; // Percentage when pullback starts
     [SerializeField] private float pullbackRate = 5f; // How fast it pulls back
     [SerializeField] private float maxChargeLevel = 100f;
+    [SerializeField] private float successThreshold = 99f; // Percentage when considered successful
     
     [Header("Input Settings")]
     private float lastSpacePress = 0f;
@@ -73,6 +74,66 @@ public class ChargeMeter : MonoBehaviour
     {
         return GetChargePercentage() >= pullbackThreshold;
     }
+    
+    /// <summary>
+    /// Check if charge is at or above success threshold
+    /// </summary>
+    public bool IsChargeSuccessful()
+    {
+        return GetChargePercentage() >= successThreshold;
+    }
+    
+    /// <summary>
+    /// Check if charge is at maximum level
+    /// </summary>
+    public bool IsChargeFull()
+    {
+        return chargeLevel >= maxChargeLevel;
+    }
+    
+    /// <summary>
+    /// Event that can be subscribed to when charge meter completes successfully
+    /// </summary>
+    public System.Action OnChargeSuccess;
+    
+    /// <summary>
+    /// Deactivate the charge meter and reset values
+    /// </summary>
+    public void DeactivateChargeMeter()
+    {
+        chargeLevel = 0f;
+        gameObject.SetActive(false);
+        Debug.Log("[ChargeMeter] Deactivated and reset");
+    }
+    
+    /// <summary>
+    /// Manually activate the charge meter with custom settings
+    /// </summary>
+    public void ActivateChargeMeter(float customChargeRate = -1, float customPullbackThreshold = -1, float customPullbackRate = -1)
+    {
+        // Reset charge level
+        chargeLevel = 0f;
+        
+        // Apply custom settings if provided
+        if (customChargeRate > 0) chargeRate = customChargeRate;
+        if (customPullbackThreshold > 0) pullbackThreshold = customPullbackThreshold;
+        if (customPullbackRate > 0) pullbackRate = customPullbackRate;
+        
+        // Ensure UI elements are found
+        if (spaceSpamIndicator == null)
+        {
+            spaceSpamIndicator = GameObject.Find("TextSpam")?.GetComponent<TMP_Text>();
+        }
+        if (chargeMeterFillImage == null)
+        {
+            chargeMeterFillImage = GameObject.Find("Indicator")?.GetComponent<Image>();
+        }
+        
+        // Activate the object
+        gameObject.SetActive(true);
+        
+        Debug.Log($"[ChargeMeter] Activated with settings - Rate: {chargeRate}, Pullback Threshold: {pullbackThreshold}%, Pullback Rate: {pullbackRate}");
+    }
 
     void Update()
     {
@@ -126,25 +187,16 @@ public class ChargeMeter : MonoBehaviour
             chargeMeterFillImage.fillAmount = chargeLevel / maxChargeLevel;
         }
 
-        // Check if meter is full
-        if (chargeLevel >= maxChargeLevel)
+        // Check if meter reaches success threshold (99% or 100%)
+        if (IsChargeSuccessful())
         {
-            Debug.Log("Charge meter full! Starting core game...");
+            Debug.Log($"Charge meter successful! Level: {GetChargePercentage():F1}%");
             
-            // Find and start core game
-            CoreGameManager coreGameManager = FindFirstObjectByType<CoreGameManager>();
-            if (coreGameManager != null)
-            {
-                coreGameManager.StartCoreGame("Rey", null);
-            }
-            else
-            {
-                Debug.LogError("CoreGameManager not found in the scene.");
-            }
+            // Trigger success event if available
+            OnChargeSuccess?.Invoke();
             
             // Deactivate and reset
-            gameObject.SetActive(false);
-            chargeLevel = 0f;
+            DeactivateChargeMeter();
         }
     }
 }

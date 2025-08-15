@@ -3,6 +3,8 @@ using System.Collections;
 
 public class NarratorDay7 : NarratorBase
 {
+    [Header("Charge Meter")]
+    public GameObject chargeMeterObject;
     [System.Obsolete]
     protected override IEnumerator PlayAfternoonSequence()
     {
@@ -28,12 +30,18 @@ public class NarratorDay7 : NarratorBase
             () => { seq1Complete = true; });
         yield return new WaitUntil(() => seq1Complete);
         
+        // ChargeMeter untuk "menangis makin keras" - Seq1 Lapar  
+        yield return StartCoroutine(PlayChargeMeterSequence(chargeMeterObject));
+        
         yield return new WaitForSeconds(1f);
         
         bool seq2Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day7/Seq2Sendirian", 
             () => { seq2Complete = true; });
         yield return new WaitUntil(() => seq2Complete);
+        
+        // ChargeMeter untuk "menangis makin keras" - Seq2 Sendirian
+        yield return StartCoroutine(PlayChargeMeterSequence(chargeMeterObject));
         
         FadeCloseEyes(); 
         yield return new WaitForSeconds(2f);
