@@ -67,6 +67,8 @@ public class NarratorDay11 : NarratorBase
         
         SetFreezePosition(false); 
         EnableNavMeshAgent(CharacterType.Mother);
+        StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
+
         yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
         
         bool seq2Complete = false;

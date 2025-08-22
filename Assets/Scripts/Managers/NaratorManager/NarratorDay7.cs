@@ -110,7 +110,6 @@ public class NarratorDay7 : NarratorBase
             () => { seq5Complete = true; });
         yield return new WaitUntil(() => seq5Complete);
         SetObjectsActive(gameObjects.activeObjects, true);
-        yield return new WaitForSeconds(3f);
         bool seq5_1Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day7/SFX/Seq5TeriakanMakinKeras", 
             () => { seq5_1Complete = true; });

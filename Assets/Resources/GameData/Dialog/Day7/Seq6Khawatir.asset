@@ -45,8 +45,8 @@ MonoBehaviour:
       dialog3DLocation: 0
       camChoice: 0
       npcName: 1
-      dialogEntry: '{+10tress} Ibu cape hari ini gara-gara kerjaan dari manager tiba-tiba
-        berikan banyak kerjaan segunung'
+      dialogEntry: '{+10stress} Ibu cape hari ini gara-gara kerjaan dari manager
+        tiba-tiba berikan banyak kerjaan segunung'
       audioDialogEntry: {fileID: 0}
       choices: []
     Animation:

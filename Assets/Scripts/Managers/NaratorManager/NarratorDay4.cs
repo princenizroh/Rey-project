@@ -16,7 +16,8 @@ public class NarratorDay4 : NarratorBase
         yield return StartCoroutine(SetCameraPanRangeLeft());
         TimeManager.instance.TimeOfDay = 13.0f; 
         SetCharacterSpawn(CharacterType.Baby, 0);   
-        SetCharacterSpawn(CharacterType.Mother, 0); 
+        SetCharacterSpawn(CharacterType.Mother, 0);
+        SetCharacterSpawn(CharacterType.Father, 0);
         
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.gameObject.SetActive(true);

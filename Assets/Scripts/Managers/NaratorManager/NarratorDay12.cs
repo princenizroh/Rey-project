@@ -23,7 +23,7 @@ public class NarratorDay12 : NarratorBase
         SetCharacterSpawn(CharacterType.Baby, 0);
         SetCharacterSpawn(CharacterType.Mother, 0);
         SetCharacterSpawn(CharacterType.Father, 0);
-
+        PlayCharacterAnimation(CharacterType.Mother, "Sitting Idle");
         yield return new WaitForSeconds(1f);
         uiElements.narratorText.gameObject.SetActive(true);
         uiElements.narratorText.text = "Day 12\nKekacauan";
@@ -363,7 +363,7 @@ public class NarratorDay12 : NarratorBase
         FadeCloseEyes();
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(true);
-        uiElements.narratorText.text = "Bad Ending\n Memarahi istri disaat kondisi mental yang tidak baik baik saja";
+        uiElements.narratorText.text = "Good Ending\n MengKhawatirkan istri disaat kondisi mental yang tidak baik baik saja";
         yield return new WaitForSeconds(2f);
         uiElements.narratorText.gameObject.SetActive(false);
         

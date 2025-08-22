@@ -42,7 +42,7 @@ public class NarratorDay8 : NarratorBase
         
         yield return new WaitForSeconds(1f);
         StartCoroutine(SetHeadTarget(CharacterType.Mother, CharacterTarget.Baby));
-        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 0));
+        yield return StartCoroutine(MoveAgentToMovementPosition(CharacterType.Mother, 1));
         
         bool seq3Complete = false;
         dialogGameManager.StartCoreGame("GameData/Dialog/Day8/Seq3MarahBesar", 
